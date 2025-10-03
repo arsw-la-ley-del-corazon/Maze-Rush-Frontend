@@ -1,11 +1,21 @@
 import { useState } from "react"
-import { Box, Button, TextField, Typography, Paper, Checkbox, FormControlLabel, Divider, Stack } from "@mui/material"
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Paper,
+  Checkbox,
+  FormControlLabel,
+  Divider,
+  Stack,
+} from "@mui/material"
 import { Link as RouterLink } from "react-router-dom"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import EmailIcon from "@mui/icons-material/Email"
 import LockIcon from "@mui/icons-material/Lock"
 import Loader from "../../components/Loader"
-import styles from './SignUpPage.module.css'
+import styles from "./SignUpPage.module.css"
 
 const SignUpPage = () => {
   const [email, setEmail] = useState("")
@@ -125,12 +135,7 @@ const SignUpPage = () => {
         </Divider>
         <Typography align="center" variant="body2" sx={{ color: "rgba(255,255,255,0.7)" }}>
           ¿Ya tienes cuenta?{" "}
-          <Button
-            component={RouterLink}
-            to="/login"
-            variant="text"
-            className={styles.linkLink}
-          >
+          <Button component={RouterLink} to="/login" variant="text" className={styles.linkLink}>
             Inicia sesión
           </Button>
         </Typography>

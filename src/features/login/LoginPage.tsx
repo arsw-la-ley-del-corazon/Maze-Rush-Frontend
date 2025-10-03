@@ -1,11 +1,20 @@
 import { useState } from "react"
-import { Box, Button, TextField, Typography, Paper, Checkbox, FormControlLabel, Divider } from "@mui/material"
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Paper,
+  Checkbox,
+  FormControlLabel,
+  Divider,
+} from "@mui/material"
 import { Link as RouterLink } from "react-router-dom"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import EmailIcon from "@mui/icons-material/Email"
 import LockIcon from "@mui/icons-material/Lock"
 import Loader from "../../components/Loader"
-import styles from './LoginPage.module.css'
+import styles from "./LoginPage.module.css"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")

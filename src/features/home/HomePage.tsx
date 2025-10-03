@@ -3,7 +3,7 @@ import { Link as RouterLink } from "react-router-dom"
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents"
 import BoltIcon from "@mui/icons-material/Bolt"
 import TrackChangesIcon from "@mui/icons-material/TrackChanges"
-import styles from './HomePage.module.css'
+import styles from "./HomePage.module.css"
 
 export default function HomePage() {
   return (
@@ -22,7 +22,7 @@ export default function HomePage() {
               align="center"
               fontWeight="bold"
               className={styles.titleGradient}
-              sx={{ fontSize: { xs: '2.4rem', sm: '3.2rem', md: '3.6rem' } }}
+              sx={{ fontSize: { xs: "2.4rem", sm: "3.2rem", md: "3.6rem" } }}
             >
               <Box component="span" color="primary.main" ml={2}>
                 RUSH
@@ -43,10 +43,22 @@ export default function HomePage() {
             spacing={2}
             sx={{ width: "100%", maxWidth: 400 }}
           >
-            <Button component={RouterLink} to="/login" size="large" fullWidth className={styles.ctaPrimary}>
+            <Button
+              component={RouterLink}
+              to="/login"
+              size="large"
+              fullWidth
+              className={styles.ctaPrimary}
+            >
               Jugar ahora
             </Button>
-            <Button component={RouterLink} to="/signup" size="large" fullWidth className={styles.ctaSecondary}>
+            <Button
+              component={RouterLink}
+              to="/signup"
+              size="large"
+              fullWidth
+              className={styles.ctaSecondary}
+            >
               Crear cuenta
             </Button>
           </Stack>

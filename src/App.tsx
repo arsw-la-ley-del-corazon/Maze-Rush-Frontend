@@ -31,17 +31,19 @@ const theme = createTheme({
         },
         containedPrimary: {
           background: "var(--gradient-button-primary)",
-          boxShadow: "0 4px 14px -2px rgba(76,111,255,0.55), 0 0 0 1px rgba(255,255,255,0.12) inset",
+          boxShadow:
+            "0 4px 14px -2px rgba(76,111,255,0.55), 0 0 0 1px rgba(255,255,255,0.12) inset",
           transition: "var(--transition-base)",
-          '&:hover': {
+          "&:hover": {
             background: "var(--gradient-button-primary-hover)",
-            boxShadow: "0 8px 20px -4px rgba(76,111,255,0.6), 0 0 0 1px rgba(255,255,255,0.18) inset",
+            boxShadow:
+              "0 8px 20px -4px rgba(76,111,255,0.6), 0 0 0 1px rgba(255,255,255,0.18) inset",
           },
         },
         outlinedSecondary: {
           background: "var(--gradient-button-secondary)",
           border: "1px solid var(--brand-border-translucent)",
-          '&:hover': {
+          "&:hover": {
             background: "var(--gradient-button-secondary-hover)",
             borderColor: "var(--brand-border-strong)",
           },

@@ -4,7 +4,7 @@ import { Link as RouterLink } from "react-router-dom"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import EmailIcon from "@mui/icons-material/Email"
 import Loader from "../../components/Loader"
-import styles from './ForgotPasswordPage.module.css'
+import styles from "./ForgotPasswordPage.module.css"
 
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState("")
@@ -72,7 +72,12 @@ const ForgotPasswordPage = () => {
               }}
               className={styles.textField}
             />
-            <Button type="submit" disabled={loading || !email} fullWidth className={styles.submitBtn}>
+            <Button
+              type="submit"
+              disabled={loading || !email}
+              fullWidth
+              className={styles.submitBtn}
+            >
               {loading ? "Enviando..." : "Enviar enlace"}
             </Button>
           </Box>
