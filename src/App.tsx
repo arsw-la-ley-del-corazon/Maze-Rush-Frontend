@@ -1,10 +1,15 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { ThemeProvider, CssBaseline, createTheme } from "@mui/material"
 import "./global.css"
 import HomePage from "./features/home/HomePage"
 import LoginPage from "./features/login/LoginPage"
 import SignUpPage from "./features/singup/SignUpPage"
 import ForgotPasswordPage from "./features/forgot/ForgotPasswordPage"
+import { AuthProvider } from "./context/AuthContext"
+import { useAuth } from "./context/useAuth"
+import AppShell from "./components/AppShell"
+import DashboardPage from "./features/dashboard/DashboardPage"
+import ProfilePage from "./features/profile/ProfilePage"
 
 const theme = createTheme({
   palette: {
@@ -62,19 +67,65 @@ const theme = createTheme({
   },
 })
 
+function Protected({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth()
+  if (loading) return null
+  if (!user) return <Navigate to="/login" replace />
+  return <>{children}</>
+}
+
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/home" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignUpPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        </Routes>
-      </BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            {/* Público */}
+            <Route path="/" element={<HomePage />} />
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignUpPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            {/* Autenticado */}
+            <Route
+              path="/app"
+              element={
+                <Protected>
+                  <AppShell>
+                    <DashboardPage />
+                  </AppShell>
+                </Protected>
+              }
+            />
+            <Route
+              path="/app/profile"
+              element={
+                <Protected>
+                  <AppShell>
+                    <ProfilePage />
+                  </AppShell>
+                </Protected>
+              }
+            />
+            {/* Placeholders futuros */}
+            <Route
+              path="/app/:stub"
+              element={
+                <Protected>
+                  <AppShell>
+                    <div style={{ padding: 24 }}>
+                      <h2>En construcción</h2>
+                      <p>Esta sección estará disponible próximamente.</p>
+                    </div>
+                  </AppShell>
+                </Protected>
+              }
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </ThemeProvider>
   )
 }
