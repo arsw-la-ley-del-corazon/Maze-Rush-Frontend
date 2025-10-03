@@ -9,12 +9,12 @@ import ForgotPasswordPage from "./features/forgot/ForgotPasswordPage"
 const theme = createTheme({
   palette: {
     mode: "dark",
-    primary: { main: "#4C6FFF" },
+    primary: { main: "#A46AFF" },
     secondary: { main: "#9B51E0" },
-    background: { default: "#0B1020", paper: "#161C30" },
-    info: { main: "#3E9BFF" },
-    success: { main: "#6D5BFF" },
-    warning: { main: "#B675FF" },
+    background: { default: "#140B1F", paper: "#26173E" },
+    info: { main: "#C05DFF" },
+    success: { main: "#B675FF" },
+    warning: { main: "#C889FF" },
   },
   typography: {
     fontFamily: "Inter, system-ui, Roboto, Arial, sans-serif",
