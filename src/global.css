@@ -1,0 +1,51 @@
+/* Tema global Azul + Morado */
+:root {
+  /* Paleta base */
+  --brand-blue-50:#e7eeff;
+  --brand-blue-100:#cfdbff;
+  --brand-blue-300:#8fa9ff;
+  --brand-blue-500:#4C6FFF; /* primario */
+  --brand-blue-600:#3F5EE5;
+  --brand-blue-700:#334CC2;
+  --brand-purple-100:#f0e5ff;
+  --brand-purple-300:#d5b4ff;
+  --brand-purple-500:#9B51E0; /* secundario */
+  --brand-purple-600:#8735CF;
+  --brand-purple-700:#6c28a8;
+  --brand-electric-500:#3E9BFF; /* acento azul eléctrico */
+  --brand-violet-500:#B675FF; /* acento violeta claro */
+
+  /* Gradientes */
+  --gradient-text:linear-gradient(90deg,#4C6FFF 0%, #3E9BFF 24%, #6D5BFF 48%, #9B51E0 72%, #B675FF 100%);
+  --gradient-bg-app:linear-gradient(135deg,#0B1020 0%, #121A33 30%, #1C1E46 55%, #262053 75%, #2E1F5F 100%);
+  --gradient-button-primary:linear-gradient(140deg,#4C6FFF 0%, #3E9BFF 35%, #6D5BFF 65%, #9B51E0 100%);
+  --gradient-button-primary-hover:linear-gradient(140deg,#5a7dff 0%, #52a7ff 35%, #7b6aff 65%, #aa5cf0 100%);
+  --gradient-button-secondary:linear-gradient(145deg,#1b2540 0%, #202f55 50%, #253569 100%);
+  --gradient-button-secondary-hover:linear-gradient(145deg,#223051 0%, #243868 50%, #2c4280 100%);
+
+  /* Superficies */
+  --brand-panel-bg:rgba(22,28,48,0.55);
+  --brand-panel-bg-hover:rgba(28,34,58,0.62);
+  --brand-border-translucent:rgba(255,255,255,0.14);
+  --brand-border-strong:rgba(255,255,255,0.22);
+
+  /* Otros */
+  --focus-ring:0 0 0 3px rgba(76,111,255,0.45);
+  --transition-base:0.35s cubic-bezier(.16,.84,.44,1);
+}
+
+html, body, #root { height:100%; }
+body { margin:0; background:var(--gradient-bg-app); font-family:Inter, system-ui, Roboto, Arial, sans-serif; -webkit-font-smoothing:antialiased; }
+
+/* Scrollbar estilizado (solo navegadores WebKit / Chromium) */
+body::-webkit-scrollbar { width:10px; }
+body::-webkit-scrollbar-track { background:rgba(255,255,255,0.05); }
+body::-webkit-scrollbar-thumb { background:linear-gradient(180deg,#4C6FFF,#9B51E0); border-radius:20px; }
+body::-webkit-scrollbar-thumb:hover { background:linear-gradient(180deg,#5a7dff,#aa5cf0); }
+
+/* Utilidades */
+.text-gradient { background:var(--gradient-text); -webkit-background-clip:text; background-clip:text; color:transparent; }
+
+:focus-visible { outline:none; box-shadow:var(--focus-ring); }
+
+@media (prefers-reduced-motion:reduce){ * { animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important; } }
