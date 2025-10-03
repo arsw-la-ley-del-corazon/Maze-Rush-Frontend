@@ -1,0 +1,111 @@
+import { Box, Button, Typography, Stack, Paper, Divider } from "@mui/material"
+import { Link as RouterLink } from "react-router-dom"
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents"
+import BoltIcon from "@mui/icons-material/Bolt"
+import TrackChangesIcon from "@mui/icons-material/TrackChanges"
+import styles from "./HomePage.module.css"
+
+export default function HomePage() {
+  return (
+    <Box className={styles.root}>
+      {/* Fondo minimalista aplicado */}
+      <Box className={styles.vignette} />
+
+      {/* Contenido principal */}
+      <Box className={styles.panel}>
+        <Stack spacing={6} alignItems="center" sx={{ width: "100%" }}>
+          {/* Logo y título */}
+          <Stack spacing={2} alignItems="center">
+            <MazeLogo />
+            <Typography
+              variant="h2"
+              align="center"
+              fontWeight="bold"
+              className={styles.titleGradient}
+              sx={{ fontSize: { xs: "2.4rem", sm: "3.2rem", md: "3.6rem" } }}
+            >
+              <Box component="span" color="primary.main" ml={2}>
+                RUSH
+              </Box>
+            </Typography>
+            <Typography
+              variant="subtitle1"
+              align="center"
+              sx={{ color: "rgba(255,255,255,0.72)", maxWidth: 560 }}
+            >
+              Compite en tiempo real. Domina el laberinto.
+            </Typography>
+          </Stack>
+
+          {/* Botones CTA */}
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={2}
+            sx={{ width: "100%", maxWidth: 400 }}
+          >
+            <Button
+              component={RouterLink}
+              to="/login"
+              size="large"
+              fullWidth
+              className={styles.ctaPrimary}
+            >
+              Jugar ahora
+            </Button>
+            <Button
+              component={RouterLink}
+              to="/signup"
+              size="large"
+              fullWidth
+              className={styles.ctaSecondary}
+            >
+              Crear cuenta
+            </Button>
+          </Stack>
+
+          {/* Stats */}
+          <Stack direction="row" spacing={4} alignItems="center" mt={2}>
+            <Stat icon={<EmojiEventsIcon color="primary" />} label="Jugadores" value="2-4" />
+            <Divider orientation="vertical" flexItem />
+            <Stat icon={<BoltIcon color="secondary" />} label="Latencia" value="<200ms" />
+            <Divider orientation="vertical" flexItem />
+            <Stat icon={<TrackChangesIcon color="primary" />} label="Laberintos" value="∞" />
+          </Stack>
+        </Stack>
+      </Box>
+    </Box>
+  )
+}
+
+function MazeLogo() {
+  return (
+    <Box
+      component="img"
+      src="/img/icono.png"
+      alt="Logo Maze Rush"
+      sx={{
+        width: { xs: 160, sm: 260, md: 340, lg: 420 },
+        objectFit: "contain",
+        mb: 1,
+        filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.4))",
+      }}
+    />
+  )
+}
+
+function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return (
+    <Paper
+      elevation={0}
+      sx={{ px: 2, py: 1, bgcolor: "background.paper", textAlign: "center", minWidth: 80 }}
+    >
+      <Box sx={{ mb: 0.5 }}>{icon}</Box>
+      <Typography variant="h5" fontWeight="bold">
+        {value}
+      </Typography>
+      <Typography variant="caption" color="text.secondary">
+        {label}
+      </Typography>
+    </Paper>
+  )
+}
