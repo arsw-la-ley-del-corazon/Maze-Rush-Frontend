@@ -1,13 +1,11 @@
-import { defineConfig } from "vite"
-import react from "@vitejs/plugin-react"
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  // Habilita acceso desde otros dispositivos en la red local
+  base: "/", // 👈 importante
   server: {
-    host: true, // equivalente a 0.0.0.0
+    host: true,
     port: 5173,
-    // Puedes activar strictPort: true si quieres que falle en lugar de cambiar de puerto
   },
-})
+});
