@@ -1,0 +1,47 @@
+.grid {
+  display: grid;
+  gap: 28px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  align-items: stretch;
+}
+
+.cardInteractive {
+  position: relative;
+  cursor: pointer;
+  background: linear-gradient(145deg, rgba(49,31,79,0.65) 0%, rgba(61,34,98,0.55) 60%, rgba(79,42,128,0.50) 100%);
+  border: 1px solid var(--brand-border-translucent);
+  transition: var(--transition-base);
+  overflow: hidden;
+}
+.cardInteractive::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 20%, rgba(192,93,255,0.20), transparent 60%);
+  opacity: 0;
+  transition: var(--transition-base);
+}
+.cardInteractive:hover::before { opacity: 1; }
+.cardInteractive:hover {
+  transform: translateY(-4px) scale(1.015);
+  border-color: var(--brand-border-strong);
+  box-shadow: 0 6px 22px -6px rgba(164,106,255,0.45), 0 2px 4px -1px rgba(0,0,0,0.4);
+}
+.iconWrap {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  background: linear-gradient(145deg,#26173e,#321658);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+  margin-bottom: 12px;
+}
+
+.headlineGradient {
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}

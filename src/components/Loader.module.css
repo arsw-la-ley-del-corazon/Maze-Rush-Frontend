@@ -8,9 +8,9 @@
 }
 .loader {
   --duration: 3s;
-  --primary: #4c6fff;
-  --primary-light: #9b51e0;
-  --primary-rgba: rgba(76, 111, 255, 0);
+  --primary: #a46aff;
+  --primary-light: #b675ff;
+  --primary-rgba: rgba(164, 106, 255, 0);
   width: 200px;
   height: 320px;
   position: relative;
@@ -52,11 +52,11 @@
   height: 200px;
   background: linear-gradient(
     45deg,
-    #4c6fff 0%,
-    #4c6fff 40%,
-    #6d5bff 55%,
-    #9b51e0 75%,
-    #b675ff 100%
+    #a46aff 0%,
+    #a46aff 40%,
+    #9b51e0 60%,
+    #b675ff 80%,
+    #c889ff 100%
   );
   transform-style: preserve-3d;
   animation: ground var(--duration) linear forwards infinite;
@@ -95,11 +95,11 @@
 .box div {
   background: linear-gradient(
     135deg,
-    #4c6fff 0%,
-    #3e9bff 30%,
-    #6d5bff 55%,
-    #9b51e0 78%,
-    #b675ff 100%
+    #a46aff 0%,
+    #c05dff 30%,
+    #9b51e0 62%,
+    #b675ff 85%,
+    #c889ff 100%
   );
   width: 48px;
   height: 48px;
@@ -107,7 +107,7 @@
   transform-style: preserve-3d;
   animation: var(--duration) ease forwards infinite;
   transform: rotateY(-47deg) rotateX(-15deg) rotateZ(15deg) scale(0);
-  box-shadow: 0 0 12px -2px rgba(76, 111, 255, 0.6), 0 0 24px -4px rgba(155, 81, 224, 0.5);
+  box-shadow: 0 0 12px -2px rgba(164, 106, 255, 0.6), 0 0 24px -4px rgba(155, 81, 224, 0.5);
   border-radius: 6px;
 }
 .box div:before,
