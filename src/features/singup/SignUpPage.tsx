@@ -17,17 +17,39 @@ import LockIcon from "@mui/icons-material/Lock"
 import Loader from "../../components/Loader"
 import styles from "./SignUpPage.module.css"
 
+import { useNavigate } from "react-router-dom"
+import { useAuth } from "../../context/useAuth"
+import PersonIcon from "@mui/icons-material/Person"
+
 const SignUpPage = () => {
+  const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirm, setConfirm] = useState("")
-  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+  const navigate = useNavigate()
+  const { register, loading } = useAuth()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (password !== confirm) return
-    setLoading(true)
-    setTimeout(() => setLoading(false), 1800) // simulación
+    setError("")
+    
+    if (password !== confirm) {
+      setError("Las contraseñas no coinciden")
+      return
+    }
+    
+    if (!register) {
+      setError("Función de registro no disponible")
+      return
+    }
+    
+    const result = await register(username, email, password)
+    if (result.ok) {
+      navigate("/app")
+    } else {
+      setError(result.error || "Error al registrar usuario")
+    }
   }
 
   return (
@@ -63,11 +85,29 @@ const SignUpPage = () => {
         <Typography variant="body2" align="center" mb={3} sx={{ color: "rgba(255,255,255,0.72)" }}>
           Regístrate para unirte a las partidas y competir.
         </Typography>
+        {error && (
+          <Typography variant="body2" color="error" align="center" mb={2}>
+            {error}
+          </Typography>
+        )}
         <Box
           component="form"
           onSubmit={handleSubmit}
           sx={{ display: "flex", flexDirection: "column", gap: 2 }}
         >
+          <TextField
+            label="Nombre de Usuario"
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+            fullWidth
+            variant="outlined"
+            InputProps={{
+              startAdornment: <PersonIcon sx={{ mr: 1, color: "rgba(255,255,255,0.4)" }} />,
+            }}
+            className={styles.textField}
+          />
           <TextField
             label="Email"
             type="email"

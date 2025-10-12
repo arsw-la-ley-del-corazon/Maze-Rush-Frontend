@@ -14,17 +14,27 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import EmailIcon from "@mui/icons-material/Email"
 import LockIcon from "@mui/icons-material/Lock"
 import Loader from "../../components/Loader"
+import { useNavigate } from "react-router-dom"
+import { useAuth } from "../../context/useAuth"
 import styles from "./LoginPage.module.css"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const navigate = useNavigate()
+  const { login, loading } = useAuth()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Aquí iría la lógica de login
-    console.log("Login:", { email, password })
-    // navigate('/profile') // ejemplo de navegación tras login
+    setError("")
+    
+    const result = await login(email, password)
+    if (result.ok) {
+      navigate("/app")
+    } else {
+      setError(result.error || "Error de autenticación")
+    }
   }
 
   return (
@@ -66,6 +76,11 @@ export default function LoginPage() {
         <Typography variant="body2" color="rgba(255,255,255,0.72)" align="center" mb={3}>
           Ingresa tus credenciales para acceder a tu cuenta
         </Typography>
+        {error && (
+          <Typography variant="body2" color="error" align="center" mb={2}>
+            {error}
+          </Typography>
+        )}
         <Box
           component="form"
           onSubmit={handleSubmit}
@@ -115,8 +130,8 @@ export default function LoginPage() {
               ¿Olvidaste tu contraseña?
             </Button>
           </Box>
-          <Button type="submit" fullWidth className={styles.submitBtn}>
-            Iniciar sesión
+          <Button type="submit" disabled={loading} fullWidth className={styles.submitBtn}>
+            {loading ? "Ingresando..." : "Iniciar sesión"}
           </Button>
         </Box>
         <Divider sx={{ my: 3, "& .MuiDivider-wrapper": { px: 2 } }}>
@@ -130,9 +145,11 @@ export default function LoginPage() {
             Regístrate
           </Button>
         </Typography>
-        <Box mt={4} display="flex" justifyContent="center">
-          <Loader />
-        </Box>
+        {loading && (
+          <Box mt={4} display="flex" justifyContent="center">
+            <Loader />
+          </Box>
+        )}
       </Paper>
     </Box>
   )
