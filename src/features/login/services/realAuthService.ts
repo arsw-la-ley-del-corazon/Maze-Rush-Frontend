@@ -1,6 +1,5 @@
 import axiosInstance from '../../../common/AxiosIntance';
 import { API_ENDPOINTS } from '../../../common/globas';
-import { logger } from '../../../common/logger';
 import type {
   AuthResponse,
   LoginRequest,
