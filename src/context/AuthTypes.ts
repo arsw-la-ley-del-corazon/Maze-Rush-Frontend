@@ -14,9 +14,10 @@ export interface UserProfile {
 export interface AuthContextValue {
   user: UserProfile | null
   loading: boolean
-  login: (email: string, password: string) => Promise<void>
+  login: (email: string, password: string) => Promise<{ ok: boolean; error?: string }>
   logout: () => void
   updateProfile: (data: Partial<UserProfile>) => void
+  register?: (username: string, email: string, password: string) => Promise<{ ok: boolean; error?: string }>
 }
 
 export const AuthContext = createContext<AuthContextValue | undefined>(undefined)

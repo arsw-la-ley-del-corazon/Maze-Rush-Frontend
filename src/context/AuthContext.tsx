@@ -1,7 +1,13 @@
-import React, { useState, useCallback, useEffect, useRef, type ReactNode } from "react"
+import { useState, useCallback, useEffect, useRef, type ReactNode } from "react"
 import { AuthContext, type UserProfile } from "./AuthTypes"
-import { login as apiLogin, refresh as apiRefresh, logout as apiLogout } from "../features/login/services/authService"
+import { 
+  login as apiLogin, 
+  refresh as apiRefresh, 
+  logout as apiLogout,
+  register as apiRegister 
+} from "../features/login/services/realAuthService"
 import type { AuthResponse } from "../types/api"
+import { AUTH_CONFIG } from "../common/globas"
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserProfile | null>(null)
@@ -14,8 +20,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const scheduleRefresh = useCallback((expiresInSeconds: number) => {
     if (refreshTimer.current) window.clearTimeout(refreshTimer.current)
-    // refrescar 30 segundos antes de expirar
-    const timeoutMs = Math.max((expiresInSeconds - 30) * 1000, 5000)
+    // refrescar usando el margen configurado antes de expirar
+    const timeoutMs = Math.max((expiresInSeconds - AUTH_CONFIG.TOKEN_REFRESH_MARGIN) * 1000, 5000)
     refreshTimer.current = window.setTimeout(async () => {
       if (refreshRef.current) {
         const result = await apiRefresh({ refreshToken: refreshRef.current })
@@ -41,7 +47,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     scheduleRefresh(resp.expiresIn)
     // Persistencia mínima
     localStorage.setItem(
-      "auth_state",
+      AUTH_CONFIG.STORAGE_KEY,
       JSON.stringify({
         accessToken: resp.accessToken,
         refreshToken: resp.refreshToken,
@@ -51,11 +57,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     )
   }, [scheduleRefresh])
 
-  const login = useCallback(async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string): Promise<{ ok: boolean; error?: string }> => {
     setLoading(true)
-    const result = await apiLogin({ email, password })
-    if (result.ok) applyAuth(result.data)
-    setLoading(false)
+    try {
+      const result = await apiLogin({ email, password })
+      if (result.ok) {
+        applyAuth(result.data)
+        setLoading(false)
+        return { ok: true }
+      } else {
+        setLoading(false)
+        return { ok: false, error: result.error.message }
+      }
+    } catch (error) {
+      setLoading(false)
+      return { ok: false, error: 'Error de conexión' }
+    }
   }, [applyAuth])
 
 
@@ -66,8 +83,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     expiryRef.current = null
     if (refreshTimer.current) window.clearTimeout(refreshTimer.current)
     setUser(null)
-    localStorage.removeItem("auth_state")
+    localStorage.removeItem(AUTH_CONFIG.STORAGE_KEY)
   }, [])
+
+  const register = useCallback(async (username: string, email: string, password: string): Promise<{ ok: boolean; error?: string }> => {
+    setLoading(true)
+    try {
+      const result = await apiRegister({ username, email, password })
+      if (result.ok) {
+        applyAuth(result.data)
+        setLoading(false)
+        return { ok: true }
+      } else {
+        setLoading(false)
+        return { ok: false, error: result.error.message }
+      }
+    } catch (error) {
+      setLoading(false)
+      return { ok: false, error: 'Error de conexión' }
+    }
+  }, [applyAuth])
 
   const updateProfile = useCallback((data: Partial<UserProfile>) => {
     setUser((prev) => (prev ? { ...prev, ...data } : prev))
@@ -75,7 +110,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Rehidratación al montar
   useEffect(() => {
-    const raw = localStorage.getItem("auth_state")
+    const raw = localStorage.getItem(AUTH_CONFIG.STORAGE_KEY)
     if (!raw) return
     try {
       const parsed = JSON.parse(raw)
@@ -89,7 +124,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           user: parsed.user,
         })
       } else {
-        localStorage.removeItem("auth_state")
+        localStorage.removeItem(AUTH_CONFIG.STORAGE_KEY)
       }
     } catch {
       // ignorar
@@ -97,7 +132,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [applyAuth])
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, updateProfile }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, updateProfile, register }}>
       {children}
     </AuthContext.Provider>
   )

@@ -15,6 +15,7 @@ import {
   Tooltip,
   Button,
 } from "@mui/material"
+import CircleIcon from "@mui/icons-material/Circle"
 import MenuIcon from "@mui/icons-material/Menu"
 import DashboardIcon from "@mui/icons-material/SpaceDashboard"
 import AccountCircleIcon from "@mui/icons-material/AccountCircle"
@@ -25,6 +26,7 @@ import EmojiEventsIcon from "@mui/icons-material/EmojiEvents"
 import SettingsIcon from "@mui/icons-material/Settings"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useAuth } from "../context/useAuth"
+import { useSocket } from "../context/SocketContext"
 
 interface NavItem {
   label: string
@@ -44,6 +46,7 @@ const navItems: NavItem[] = [
 export default function AppShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false)
   const { user, logout } = useAuth()
+  const { status, quickPlayPlayers } = useSocket()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -70,6 +73,19 @@ export default function AppShell({ children }: { children: ReactNode }) {
           <Typography variant="h6" fontWeight={700} sx={{ flexGrow: 1 }}>
             Maze <Box component="span" sx={{ color: "primary.main" }}>Rush</Box>
           </Typography>
+          {/* Indicador WebSocket */}
+          <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 1.5, mr: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+              <CircleIcon fontSize="small" sx={{ color: status === 'open' ? '#4ade80' : status === 'connecting' ? '#facc15' : '#f87171' }} />
+              <Typography variant="caption" sx={{ textTransform: 'capitalize', opacity: 0.8 }}>
+                {status === 'open' ? 'online' : status}
+              </Typography>
+            </Box>
+            <Divider orientation="vertical" flexItem sx={{ borderColor: 'rgba(255,255,255,0.12)' }} />
+            <Typography variant="caption" sx={{ opacity: 0.8 }}>
+              Quick: {quickPlayPlayers ?? '—'}
+            </Typography>
+          </Box>
           {user && (
             <Tooltip title={user.email} arrow>
               <Avatar sx={{ bgcolor: user.avatarColor, cursor: "pointer" }} onClick={() => navigate("/app/profile")}> 

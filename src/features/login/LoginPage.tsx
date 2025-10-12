@@ -21,12 +21,20 @@ import styles from "./LoginPage.module.css"
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
   const navigate = useNavigate()
   const { login, loading } = useAuth()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    login(email, password).then(() => navigate("/app"))
+    setError("")
+    
+    const result = await login(email, password)
+    if (result.ok) {
+      navigate("/app")
+    } else {
+      setError(result.error || "Error de autenticación")
+    }
   }
 
   return (
@@ -68,6 +76,11 @@ export default function LoginPage() {
         <Typography variant="body2" color="rgba(255,255,255,0.72)" align="center" mb={3}>
           Ingresa tus credenciales para acceder a tu cuenta
         </Typography>
+        {error && (
+          <Typography variant="body2" color="error" align="center" mb={2}>
+            {error}
+          </Typography>
+        )}
         <Box
           component="form"
           onSubmit={handleSubmit}

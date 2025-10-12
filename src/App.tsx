@@ -10,6 +10,8 @@ import { useAuth } from "./context/useAuth"
 import AppShell from "./components/AppShell"
 import DashboardPage from "./features/dashboard/DashboardPage"
 import ProfilePage from "./features/profile/ProfilePage"
+import { SocketProvider } from "./context/SocketContext"
+import QuickPlayPage from "./features/quickplay/QuickPlayPage"
 
 const theme = createTheme({
   palette: {
@@ -79,6 +81,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AuthProvider>
+        <SocketProvider>
         <BrowserRouter>
           <Routes>
             {/* Público */}
@@ -108,6 +111,16 @@ function App() {
                 </Protected>
               }
             />
+            <Route
+              path="/app/quick-play"
+              element={
+                <Protected>
+                  <AppShell>
+                    <QuickPlayPage />
+                  </AppShell>
+                </Protected>
+              }
+            />
             {/* Placeholders futuros */}
             <Route
               path="/app/:stub"
@@ -125,6 +138,7 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>
+        </SocketProvider>
       </AuthProvider>
     </ThemeProvider>
   )
