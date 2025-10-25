@@ -12,6 +12,8 @@ export const API_ENDPOINTS = {
     REFRESH: '/auth/refresh',
     LOGOUT: '/auth/logout',
     VALIDATE: '/auth/validate',
+    ME: '/auth/me',
+    GOOGLE: '/auth/google',
   },
   USERS: {
     BASE: '/users',

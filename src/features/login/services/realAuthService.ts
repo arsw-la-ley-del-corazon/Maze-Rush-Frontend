@@ -9,11 +9,10 @@ import type {
   ApiErrorShape,
 } from "../../../types/api";
 
-// Servicio de autenticación que se conecta al backend real
+// Servicio de autenticación que se conecta al backend real usando cookies
 export async function login(req: LoginRequest): Promise<Result<AuthResponse>> {
   try {
     const response = await axiosInstance.post(API_ENDPOINTS.AUTH.LOGIN, req);
-    
     
     return success(mapBackendAuthResponse(response.data));
   } catch (error: any) {
@@ -33,7 +32,8 @@ export async function register(req: RegisterRequest): Promise<Result<AuthRespons
 
 export async function refresh(req: RefreshTokenRequest): Promise<Result<AuthResponse>> {
   try {
-    const response = await axiosInstance.post(API_ENDPOINTS.AUTH.REFRESH, req);
+    // El refresh token viene de las cookies, no necesitamos enviarlo
+    const response = await axiosInstance.post(API_ENDPOINTS.AUTH.REFRESH, {});
     
     return success(mapBackendAuthResponse(response.data));
   } catch (error: any) {
@@ -41,13 +41,9 @@ export async function refresh(req: RefreshTokenRequest): Promise<Result<AuthResp
   }
 }
 
-export async function logout(accessToken: string): Promise<Result<null>> {
+export async function logout(): Promise<Result<null>> {
   try {
-    await axiosInstance.post(API_ENDPOINTS.AUTH.LOGOUT, {}, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`
-      }
-    });
+    await axiosInstance.post(API_ENDPOINTS.AUTH.LOGOUT, {});
     
     return { ok: true, data: null };
   } catch (error: any) {
@@ -56,17 +52,36 @@ export async function logout(accessToken: string): Promise<Result<null>> {
   }
 }
 
-export async function validateToken(accessToken: string): Promise<boolean> {
+export async function validateToken(): Promise<boolean> {
   try {
-    const response = await axiosInstance.get(API_ENDPOINTS.AUTH.VALIDATE, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`
-      }
-    });
+    const response = await axiosInstance.get(API_ENDPOINTS.AUTH.VALIDATE);
     
     return response.data === true;
   } catch (error) {
     return false;
+  }
+}
+
+export async function getCurrentUser(): Promise<Result<AuthResponse['user']>> {
+  try {
+    const response = await axiosInstance.get(API_ENDPOINTS.AUTH.ME);
+    
+    return { ok: true, data: response.data };
+  } catch (error: any) {
+    return handleApiError(error, API_ENDPOINTS.AUTH.ME);
+  }
+}
+
+// Autenticar con Google usando token ID
+export async function authenticateWithGoogle(idToken: string): Promise<Result<AuthResponse>> {
+  try {
+    const response = await axiosInstance.post(API_ENDPOINTS.AUTH.GOOGLE, {
+      idToken
+    });
+    
+    return success(mapBackendAuthResponse(response.data));
+  } catch (error: any) {
+    return handleApiError(error, API_ENDPOINTS.AUTH.GOOGLE);
   }
 }
 

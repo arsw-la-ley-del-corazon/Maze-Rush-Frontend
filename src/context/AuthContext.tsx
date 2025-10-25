@@ -1,39 +1,18 @@
-import { useState, useCallback, useEffect, useRef, type ReactNode } from "react"
+import { useState, useCallback, useEffect, type ReactNode } from "react"
 import { AuthContext, type UserProfile } from "./AuthTypes"
 import { 
   login as apiLogin, 
-  refresh as apiRefresh, 
   logout as apiLogout,
-  register as apiRegister 
+  register as apiRegister,
+  getCurrentUser
 } from "../features/login/services/realAuthService"
 import type { AuthResponse } from "../types/api"
-import { AUTH_CONFIG } from "../common/globas"
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserProfile | null>(null)
-  const [loading, setLoading] = useState(false)
-
-  const accessRef = useRef<string | null>(null)
-  const refreshRef = useRef<string | null>(null)
-  const expiryRef = useRef<number | null>(null)
-  const refreshTimer = useRef<number | null>(null)
-
-  const scheduleRefresh = useCallback((expiresInSeconds: number) => {
-    if (refreshTimer.current) window.clearTimeout(refreshTimer.current)
-    // refrescar usando el margen configurado antes de expirar
-    const timeoutMs = Math.max((expiresInSeconds - AUTH_CONFIG.TOKEN_REFRESH_MARGIN) * 1000, 5000)
-    refreshTimer.current = window.setTimeout(async () => {
-      if (refreshRef.current) {
-        const result = await apiRefresh({ refreshToken: refreshRef.current })
-        if (result.ok) applyAuth(result.data)
-      }
-    }, timeoutMs)
-  }, [])
+  const [loading, setLoading] = useState(true)
 
   const applyAuth = useCallback((resp: AuthResponse) => {
-    accessRef.current = resp.accessToken
-    refreshRef.current = resp.refreshToken
-    expiryRef.current = Date.parse(resp.expiresAt)
     setUser({
       id: resp.user.id,
       email: resp.user.email,
@@ -44,18 +23,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       score: resp.user.score,
       level: resp.user.level,
     } as UserProfile)
-    scheduleRefresh(resp.expiresIn)
-    // Persistencia mínima
-    localStorage.setItem(
-      AUTH_CONFIG.STORAGE_KEY,
-      JSON.stringify({
-        accessToken: resp.accessToken,
-        refreshToken: resp.refreshToken,
-        expiresAt: resp.expiresAt,
-        user: resp.user,
-      }),
-    )
-  }, [scheduleRefresh])
+  }, [])
 
   const login = useCallback(async (email: string, password: string): Promise<{ ok: boolean; error?: string }> => {
     setLoading(true)
@@ -76,14 +44,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [applyAuth])
 
 
-  const logout = useCallback(() => {
-    if (accessRef.current) apiLogout(accessRef.current)
-    accessRef.current = null
-    refreshRef.current = null
-    expiryRef.current = null
-    if (refreshTimer.current) window.clearTimeout(refreshTimer.current)
+  const logout = useCallback(async () => {
+    try {
+      await apiLogout()
+    } catch (error) {
+      console.error('Error during logout:', error)
+    }
     setUser(null)
-    localStorage.removeItem(AUTH_CONFIG.STORAGE_KEY)
   }, [])
 
   const register = useCallback(async (username: string, email: string, password: string): Promise<{ ok: boolean; error?: string }> => {
@@ -108,28 +75,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser((prev) => (prev ? { ...prev, ...data } : prev))
   }, [])
 
-  // Rehidratación al montar
+  // Verificar autenticación al montar
   useEffect(() => {
-    const raw = localStorage.getItem(AUTH_CONFIG.STORAGE_KEY)
-    if (!raw) return
-    try {
-      const parsed = JSON.parse(raw)
-      if (parsed.expiresAt && Date.parse(parsed.expiresAt) > Date.now()) {
-        applyAuth({
-          accessToken: parsed.accessToken,
-          refreshToken: parsed.refreshToken,
-          tokenType: "Bearer",
-          expiresIn: Math.floor((Date.parse(parsed.expiresAt) - Date.now()) / 1000),
-          expiresAt: parsed.expiresAt,
-          user: parsed.user,
-        })
-      } else {
-        localStorage.removeItem(AUTH_CONFIG.STORAGE_KEY)
+    const checkAuth = async () => {
+      try {
+        const result = await getCurrentUser()
+        if (result.ok && result.data) {
+          setUser({
+            id: result.data.id,
+            email: result.data.email,
+            username: result.data.username,
+            avatarColor: pickColorFromEmail(result.data.email),
+            preferredMazeSize: "Mediano",
+            bio: "Nuevo explorador de laberintos",
+            score: result.data.score || 0,
+            level: result.data.level || 1,
+          } as UserProfile)
+        }
+      } catch (error) {
+        // Usuario no autenticado, esto es normal
+        console.debug('Usuario no autenticado')
+      } finally {
+        setLoading(false)
       }
-    } catch {
-      // ignorar
     }
-  }, [applyAuth])
+    
+    checkAuth()
+  }, [])
 
   return (
     <AuthContext.Provider value={{ user, loading, login, logout, updateProfile, register }}>

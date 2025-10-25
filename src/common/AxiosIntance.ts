@@ -1,5 +1,5 @@
-import axios, { type AxiosInstance, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
-import { API_CONFIG, AUTH_CONFIG } from './globas';
+import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
+import { API_CONFIG } from './globas';
 
 // Crear instancia de axios usando la configuración de las variables de entorno
 const axiosInstance: AxiosInstance = axios.create({
@@ -8,29 +8,9 @@ const axiosInstance: AxiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  // Habilitar el envío de cookies en todas las peticiones
+  withCredentials: true,
 });
-
-// Interceptor para añadir el token a las peticiones
-axiosInstance.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    // Obtener token del localStorage usando la clave configurada
-    const authState = localStorage.getItem(AUTH_CONFIG.STORAGE_KEY);
-    if (authState) {
-      try {
-        const parsed = JSON.parse(authState);
-        if (parsed.accessToken) {
-          config.headers.Authorization = `Bearer ${parsed.accessToken}`;
-        }
-      } catch (error) {
-        console.error('Error parsing auth state:', error);
-      }
-    }
-    return config;
-  },
-  (error: any) => {
-    return Promise.reject(error);
-  }
-);
 
 // Interceptor para manejar respuestas y errores
 axiosInstance.interceptors.response.use(
@@ -38,11 +18,10 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error: any) => {
-    // Si el token está expirado o es inválido, limpiar el estado
+    // Si el token está expirado o es inválido, redirigir al login
     if (error.response?.status === 401) {
-      localStorage.removeItem(AUTH_CONFIG.STORAGE_KEY);
       // Redirigir al login si es necesario
-      if (window.location.pathname !== '/login') {
+      if (window.location.pathname !== '/login' && !window.location.pathname.startsWith('/oauth2')) {
         window.location.href = '/login';
       }
     }

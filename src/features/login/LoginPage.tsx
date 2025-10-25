@@ -13,10 +13,12 @@ import { Link as RouterLink } from "react-router-dom"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import EmailIcon from "@mui/icons-material/Email"
 import LockIcon from "@mui/icons-material/Lock"
+import GoogleIcon from "@mui/icons-material/Google"
 import Loader from "../../components/Loader"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../../context/useAuth"
 import styles from "./LoginPage.module.css"
+import { API_CONFIG } from "../../common/globas"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -35,6 +37,12 @@ export default function LoginPage() {
     } else {
       setError(result.error || "Error de autenticación")
     }
+  }
+
+  const handleGoogleLogin = () => {
+    // Redirigir al endpoint de OAuth2 de Google en el backend
+    const backendUrl = API_CONFIG.BASE_URL.replace('/api/v1', '')
+    window.location.href = `${backendUrl}/oauth2/authorization/google`
   }
 
   return (
@@ -139,6 +147,30 @@ export default function LoginPage() {
             O
           </Typography>
         </Divider>
+
+        {/* Botón de Google Sign-In */}
+        <Button
+          onClick={handleGoogleLogin}
+          disabled={loading}
+          fullWidth
+          variant="outlined"
+          startIcon={<GoogleIcon />}
+          sx={{
+            mb: 2,
+            color: "#fff",
+            borderColor: "rgba(255,255,255,0.3)",
+            backgroundColor: "rgba(255,255,255,0.05)",
+            "&:hover": {
+              borderColor: "#fff",
+              backgroundColor: "rgba(255,255,255,0.1)",
+            },
+            textTransform: "none",
+            fontWeight: 600,
+          }}
+        >
+          Continuar con Google
+        </Button>
+
         <Typography align="center" variant="body2" sx={{ color: "rgba(255,255,255,0.7)" }}>
           ¿No tienes cuenta?{" "}
           <Button component={RouterLink} to="/signup" variant="text" className={styles.linkAlt}>
