@@ -5,6 +5,7 @@ import HomePage from "./features/home/HomePage"
 import LoginPage from "./features/login/LoginPage"
 import SignUpPage from "./features/singup/SignUpPage"
 import ForgotPasswordPage from "./features/forgot/ForgotPasswordPage"
+import ResetPasswordPage from "./features/forgot/ResetPasswordPage"
 import OAuth2RedirectPage from "./features/auth/pages/OAuth2RedirectPage"
 import { AuthProvider } from "./context/AuthContext"
 import { useAuth } from "./context/useAuth"
@@ -91,6 +92,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/oauth2/redirect" element={<OAuth2RedirectPage />} />
             {/* Autenticado */}
             <Route

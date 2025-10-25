@@ -32,6 +32,19 @@ export interface RefreshTokenRequest {
   refreshToken: string
 }
 
+export interface ForgotPasswordRequest {
+  email: string
+}
+
+export interface ResetPasswordRequest {
+  token: string
+  newPassword: string
+}
+
+export interface MessageResponse {
+  message: string
+}
+
 export type UserResponse = UserInfo
 
 export interface UserRequest {

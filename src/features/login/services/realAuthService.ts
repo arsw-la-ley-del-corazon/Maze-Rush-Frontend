@@ -5,6 +5,9 @@ import type {
   LoginRequest,
   RegisterRequest,
   RefreshTokenRequest,
+  ForgotPasswordRequest,
+  ResetPasswordRequest,
+  MessageResponse,
   Result,
   ApiErrorShape,
 } from "../../../types/api";
@@ -82,6 +85,28 @@ export async function authenticateWithGoogle(idToken: string): Promise<Result<Au
     return success(mapBackendAuthResponse(response.data));
   } catch (error: any) {
     return handleApiError(error, API_ENDPOINTS.AUTH.GOOGLE);
+  }
+}
+
+// Solicitar recuperación de contraseña
+export async function forgotPassword(req: ForgotPasswordRequest): Promise<Result<MessageResponse>> {
+  try {
+    const response = await axiosInstance.post(API_ENDPOINTS.AUTH.FORGOT_PASSWORD, req);
+    
+    return success(response.data);
+  } catch (error: any) {
+    return handleApiError(error, API_ENDPOINTS.AUTH.FORGOT_PASSWORD);
+  }
+}
+
+// Resetear contraseña con token
+export async function resetPassword(req: ResetPasswordRequest): Promise<Result<MessageResponse>> {
+  try {
+    const response = await axiosInstance.post(API_ENDPOINTS.AUTH.RESET_PASSWORD, req);
+    
+    return success(response.data);
+  } catch (error: any) {
+    return handleApiError(error, API_ENDPOINTS.AUTH.RESET_PASSWORD);
   }
 }
 

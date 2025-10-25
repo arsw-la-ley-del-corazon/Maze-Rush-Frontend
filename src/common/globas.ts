@@ -14,6 +14,8 @@ export const API_ENDPOINTS = {
     VALIDATE: '/auth/validate',
     ME: '/auth/me',
     GOOGLE: '/auth/google',
+    FORGOT_PASSWORD: '/auth/password/forgot',
+    RESET_PASSWORD: '/auth/password/reset',
   },
   USERS: {
     BASE: '/users',
