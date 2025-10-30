@@ -1,93 +1,229 @@
-import { Box, Typography, Paper, Stack } from "@mui/material"
+import { Box, Typography, Chip, Avatar, Stack, IconButton } from "@mui/material"
 import PlayCircleIcon from "@mui/icons-material/PlayCircle"
 import GroupAddIcon from "@mui/icons-material/GroupAdd"
 import KeyIcon from "@mui/icons-material/VpnKey"
-import AccountCircleIcon from "@mui/icons-material/AccountCircle"
-import EmojiEventsIcon from "@mui/icons-material/EmojiEvents"
-import SettingsIcon from "@mui/icons-material/Settings"
+import PersonIcon from "@mui/icons-material/Person"
+import LockIcon from "@mui/icons-material/Lock"
+import PublicIcon from "@mui/icons-material/Public"
+import RefreshIcon from "@mui/icons-material/Refresh"
 import styles from "./DashboardPage.module.css"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../../context/useAuth"
+import { useState } from "react"
 
-interface FeatureCardProps {
+interface Room {
+  id: string
+  name: string
+  host: string
+  players: number
+  maxPlayers: number
+  isPrivate: boolean
+  status: "waiting" | "playing" | "full"
+  code?: string
+}
+
+interface QuickActionProps {
   icon: React.ReactNode
-  title: string
-  desc: string
+  label: string
+  onClick: () => void
+  color: string
+}
+
+function QuickAction({ icon, label, onClick, color }: QuickActionProps) {
+  return (
+    <div className={styles.quickAction} onClick={onClick} data-color={color}>
+      <div className={styles.quickActionIcon}>{icon}</div>
+      <Typography variant="body2" className={styles.quickActionLabel}>
+        {label}
+      </Typography>
+    </div>
+  )
+}
+
+interface RoomCardProps {
+  room: Room
   onClick: () => void
 }
 
-function FeatureCard({ icon, title, desc, onClick }: FeatureCardProps) {
+function RoomCard({ room, onClick }: RoomCardProps) {
+  const statusColors = {
+    waiting: "success",
+    playing: "warning",
+    full: "error",
+  } as const
+
+  const statusText = {
+    waiting: "ESPERANDO",
+    playing: "EN JUEGO",
+    full: "LLENA",
+  }
+
   return (
-    <Paper elevation={0} className={styles.cardInteractive} onClick={onClick}>
-      <Box sx={{ p: 2.6, display: "flex", flexDirection: "column", height: "100%" }}>
-        <div className={styles.iconWrap}>{icon}</div>
-        <Typography variant="h6" fontWeight={600} gutterBottom>
-          {title}
-        </Typography>
-        <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.68)" }}>
-          {desc}
-        </Typography>
-        <Box sx={{ flexGrow: 1 }} />
-        <Typography variant="caption" sx={{ mt: 2, opacity: 0.6 }}>
-          Abrir →
-        </Typography>
-      </Box>
-    </Paper>
+    <div className={styles.roomCard} onClick={onClick} data-status={room.status}>
+      <div className={styles.roomHeader}>
+        <div className={styles.roomInfo}>
+          <Typography variant="h6" className={styles.roomName}>
+            {room.name}
+          </Typography>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Avatar sx={{ width: 24, height: 24, fontSize: 12 }}>
+              {room.host[0].toUpperCase()}
+            </Avatar>
+            <Typography variant="caption" className={styles.roomHost}>
+              {room.host}
+            </Typography>
+          </Stack>
+        </div>
+        <div className={styles.roomBadge}>
+          {room.isPrivate ? <LockIcon sx={{ fontSize: 20 }} /> : <PublicIcon sx={{ fontSize: 20 }} />}
+        </div>
+      </div>
+
+      <div className={styles.roomFooter}>
+        <Stack direction="row" spacing={1} alignItems="center">
+          <PersonIcon sx={{ fontSize: 18 }} />
+          <Typography variant="body2" className={styles.roomPlayers}>
+            {room.players}/{room.maxPlayers}
+          </Typography>
+        </Stack>
+        <Chip
+          label={statusText[room.status]}
+          color={statusColors[room.status]}
+          size="small"
+          className={styles.statusChip}
+        />
+      </div>
+    </div>
   )
 }
 
 export default function DashboardPage() {
   const navigate = useNavigate()
   const { user } = useAuth()
+
+  // Datos simulados de salas (TODO: conectar con WebSocket/API)
+  const [rooms] = useState<Room[]>([
+    {
+      id: "1",
+      name: "Sala Épica de Alex",
+      host: "Alex",
+      players: 3,
+      maxPlayers: 4,
+      isPrivate: false,
+      status: "waiting",
+    },
+    {
+      id: "2",
+      name: "Desafío Extremo",
+      host: "Luna",
+      players: 2,
+      maxPlayers: 6,
+      isPrivate: false,
+      status: "waiting",
+    },
+    {
+      id: "3",
+      name: "Solo Pros 🔥",
+      host: "Shadow",
+      players: 4,
+      maxPlayers: 4,
+      isPrivate: true,
+      status: "full",
+      code: "ABC123",
+    },
+    {
+      id: "4",
+      name: "Carrera Nocturna",
+      host: "Night",
+      players: 2,
+      maxPlayers: 8,
+      isPrivate: false,
+      status: "playing",
+    },
+    {
+      id: "5",
+      name: "Modo Casual",
+      host: "Chill",
+      players: 1,
+      maxPlayers: 4,
+      isPrivate: false,
+      status: "waiting",
+    },
+  ])
+
+  const handleRefreshRooms = () => {
+    // TODO: Actualizar salas desde el servidor
+    console.log("Refrescando salas...")
+  }
+
+  const handleJoinRoom = (room: Room) => {
+    if (room.status === "waiting" && room.players < room.maxPlayers) {
+      navigate(`/app/lobby/${room.id}`)
+    }
+  }
+
   return (
-    <Box>
-      <Stack spacing={3} mb={4}>
-        <Typography variant="h4" fontWeight={700} className={styles.headlineGradient}>
-          ¡Bienvenido {user?.username}! ⚡
+    <Box className={styles.dashboardContainer}>
+      {/* Header */}
+      <div className={styles.header}>
+        <Typography variant="h3" fontWeight={900} className={styles.mainTitle}>
+          MAZE RUSH
         </Typography>
-        <Typography variant="body1" sx={{ maxWidth: 760, color: "rgba(255,255,255,0.72)" }}>
-          Elige una opción para empezar. Crea un lobby para tus amigos, únete con un código o
-          lánzate a un juego rápido. Tu meta: dominar el laberinto antes que los demás.
+        <Typography variant="h6" className={styles.welcomeText}>
+          ¡Hola {user?.username}! 🎮
         </Typography>
-      </Stack>
-      <Box className={styles.grid}>
-        <FeatureCard
-          icon={<PlayCircleIcon color="primary" sx={{ fontSize: 32 }} />}
-          title="Juego Rápido"
-          desc="Emparejamiento rápido con jugadores disponibles."
+      </div>
+
+      {/* Quick Actions */}
+      <div className={styles.quickActions}>
+        <QuickAction
+          icon={<PlayCircleIcon sx={{ fontSize: 32 }} />}
+          label="QUICK PLAY"
           onClick={() => navigate("/app/quick-play")}
+          color="red"
         />
-        <FeatureCard
-          icon={<GroupAddIcon color="secondary" sx={{ fontSize: 32 }} />}
-          title="Crear Lobby"
-          desc="Configura tamaño y comparte el código."
+        <QuickAction
+          icon={<GroupAddIcon sx={{ fontSize: 32 }} />}
+          label="CREAR SALA"
           onClick={() => navigate("/app/create-lobby")}
+          color="blue"
         />
-        <FeatureCard
-          icon={<KeyIcon color="primary" sx={{ fontSize: 32 }} />}
-          title="Unirse con Código"
-          desc="Introduce un código para unirte a un lobby privado."
+        <QuickAction
+          icon={<KeyIcon sx={{ fontSize: 32 }} />}
+          label="UNIRSE"
           onClick={() => navigate("/app/join")}
+          color="green"
         />
-        <FeatureCard
-          icon={<AccountCircleIcon color="secondary" sx={{ fontSize: 32 }} />}
-          title="Mi Perfil"
-          desc="Edita tu identidad y preferencias."
-          onClick={() => navigate("/app/profile")}
-        />
-        <FeatureCard
-          icon={<EmojiEventsIcon color="primary" sx={{ fontSize: 32 }} />}
-          title="Leaderboard"
-          desc="Clasificaciones (próximamente)."
-          onClick={() => navigate("/app/leaderboard")}
-        />
-        <FeatureCard
-          icon={<SettingsIcon color="secondary" sx={{ fontSize: 32 }} />}
-          title="Configuración"
-          desc="Ajustes de experiencia (futuro)."
-          onClick={() => navigate("/app/settings")}
-        />
-      </Box>
+      </div>
+
+      {/* Rooms Section */}
+      <div className={styles.roomsSection}>
+        <div className={styles.roomsHeader}>
+          <Typography variant="h5" className={styles.sectionTitle}>
+            🎯 SALAS DISPONIBLES
+          </Typography>
+          <IconButton onClick={handleRefreshRooms} className={styles.refreshButton}>
+            <RefreshIcon />
+          </IconButton>
+        </div>
+
+        {rooms.length === 0 ? (
+          <div className={styles.emptyState}>
+            <Typography variant="h6" className={styles.emptyText}>
+              No hay salas disponibles 😔
+            </Typography>
+            <Typography variant="body2" className={styles.emptySubtext}>
+              ¡Sé el primero en crear una!
+            </Typography>
+          </div>
+        ) : (
+          <div className={styles.roomsGrid}>
+            {rooms.map((room) => (
+              <RoomCard key={room.id} room={room} onClick={() => handleJoinRoom(room)} />
+            ))}
+          </div>
+        )}
+      </div>
     </Box>
   )
 }

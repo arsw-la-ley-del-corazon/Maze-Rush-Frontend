@@ -1,9 +1,7 @@
 import { APP_CONFIG } from '../common/globas';
 
-// Niveles de logging
 type LogLevel = 'error' | 'warn' | 'info' | 'debug';
 
-// Mapeo de niveles a números para comparación
 const LOG_LEVELS: Record<LogLevel, number> = {
   error: 0,
   warn: 1,
@@ -11,16 +9,13 @@ const LOG_LEVELS: Record<LogLevel, number> = {
   debug: 3,
 };
 
-// Obtener el nivel actual de logging de la configuración
 const currentLogLevel = APP_CONFIG.LOG_LEVEL as LogLevel;
 const currentLogLevelNumber = LOG_LEVELS[currentLogLevel] || LOG_LEVELS.info;
 
-// Función helper para determinar si se debe loggear
 function shouldLog(level: LogLevel): boolean {
   return APP_CONFIG.DEBUG && LOG_LEVELS[level] <= currentLogLevelNumber;
 }
 
-// Funciones de logging
 export const logger = {
   error: (message: string, ...args: any[]) => {
     if (shouldLog('error')) {
@@ -46,17 +41,14 @@ export const logger = {
     }
   },
 
-  // Función específica para errores de autenticación
   authError: (message: string, error?: any) => {
     logger.error(`Auth Error: ${message}`, error);
   },
 
-  // Función específica para información de autenticación
   authInfo: (message: string, ...args: any[]) => {
     logger.info(`Auth: ${message}`, ...args);
   },
 
-  // Función específica para APIs
   apiError: (message: string, error?: any) => {
     logger.error(`API Error: ${message}`, error);
   },
@@ -66,5 +58,4 @@ export const logger = {
   },
 };
 
-// Export para compatibilidad
 export default logger;

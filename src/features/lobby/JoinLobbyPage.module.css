@@ -1,0 +1,75 @@
+/* Diseño minimalista estilo Among Us - Join Lobby */
+
+.container {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: 1.2fr 1fr;
+  align-items: start;
+}
+
+.joinPanel,
+.infoPanel {
+  position: relative;
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 48px 32px;
+  transition: all 0.2s ease;
+  overflow: hidden;
+  box-shadow: 
+    0 6px 24px rgba(0, 0, 0, 0.15),
+    0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.joinPanel::before,
+.infoPanel::before {
+  display: none; /* Sin efectos complejos */
+}
+
+.joinPanel:hover,
+.infoPanel:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 10px 32px rgba(0, 0, 0, 0.2),
+    0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.iconContainer {
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4c6fff 0%, #9b51e0 100%);
+  box-shadow: 
+    0 8px 24px rgba(76, 111, 255, 0.4),
+    0 2px 4px rgba(0, 0, 0, 0.2);
+  margin-bottom: 8px;
+}
+
+.headlineGradient {
+  background: linear-gradient(135deg, #4c6fff 0%, #9b51e0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 900;
+}
+
+@media (max-width: 968px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .joinPanel,
+  .infoPanel {
+    padding: 32px 24px;
+  }
+
+  .iconContainer {
+    width: 96px;
+    height: 96px;
+  }
+}
+

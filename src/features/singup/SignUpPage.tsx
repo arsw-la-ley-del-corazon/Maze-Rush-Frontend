@@ -1,59 +1,32 @@
-import { useState } from "react"
 import {
   Box,
   Button,
-  TextField,
   Typography,
   Paper,
-  Checkbox,
-  FormControlLabel,
-  Divider,
-  Stack,
 } from "@mui/material"
 import { Link as RouterLink } from "react-router-dom"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
-import EmailIcon from "@mui/icons-material/Email"
-import LockIcon from "@mui/icons-material/Lock"
+import GoogleIcon from "@mui/icons-material/Google"
 import Loader from "../../components/Loader"
 import styles from "./SignUpPage.module.css"
-
-import { useNavigate } from "react-router-dom"
 import { useAuth } from "../../context/useAuth"
-import PersonIcon from "@mui/icons-material/Person"
+import { API_CONFIG } from "../../common/globas"
 
 const SignUpPage = () => {
-  const [username, setUsername] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirm, setConfirm] = useState("")
-  const [error, setError] = useState("")
-  const navigate = useNavigate()
-  const { register, loading } = useAuth()
+  const { loading } = useAuth()
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-    
-    if (password !== confirm) {
-      setError("Las contraseñas no coinciden")
-      return
-    }
-    
-    if (!register) {
-      setError("Función de registro no disponible")
-      return
-    }
-    
-    const result = await register(username, email, password)
-    if (result.ok) {
-      navigate("/app")
-    } else {
-      setError(result.error || "Error al registrar usuario")
-    }
+  const handleGoogleSignup = () => {
+    // Redirigir al endpoint de OAuth2 de Google en el backend
+    const backendUrl = API_CONFIG.BASE_URL.replace('/api/v1', '')
+    window.location.href = `${backendUrl}/oauth2/authorization/google`
   }
 
   return (
     <Box className={styles.root}>
+      {/* Halo animado detrás */}
+      <Box className={styles.halo} />
+
+      {/* Botón volver NEÓN CIAN */}
       <Button
         component={RouterLink}
         to="/"
@@ -63,16 +36,76 @@ const SignUpPage = () => {
           position: "absolute",
           top: 32,
           left: 32,
-          color: "rgba(255,255,255,0.7)",
+          color: "#00ffff",
           zIndex: 3,
           fontWeight: "bold",
           textTransform: "none",
-          "&:hover": { color: "#fff" },
+          backgroundColor: "rgba(0, 0, 0, 0.7)",
+          padding: "10px 20px",
+          borderRadius: "12px",
+          backdropFilter: "blur(10px)",
+          border: "2px solid rgba(0, 255, 255, 0.5)",
+          boxShadow: "0 0 15px rgba(0, 255, 255, 0.4), inset 0 0 10px rgba(0, 255, 255, 0.05)",
+          textShadow: "0 0 8px rgba(0, 255, 255, 0.8)",
+          transition: "all 0.3s ease",
+          "&:hover": { 
+            color: "#ffffff",
+            backgroundColor: "rgba(0, 0, 0, 0.85)",
+            transform: "translateX(-4px)",
+            borderColor: "rgba(0, 255, 255, 0.9)",
+            boxShadow: "0 0 25px rgba(0, 255, 255, 0.7), inset 0 0 15px rgba(0, 255, 255, 0.15)",
+            textShadow: "0 0 12px rgba(0, 255, 255, 1), 0 0 20px rgba(0, 200, 255, 0.8)",
+          },
         }}
       >
         Volver
       </Button>
       <Paper elevation={0} className={styles.card}>
+        {/* Ícono animado NEÓN CIAN */}
+        <Box 
+          sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            mb: 3,
+            animation: 'bounce 2.5s ease-in-out infinite',
+            '@keyframes bounce': {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-8px)' }
+            }
+          }}
+        >
+          <Box
+            sx={{
+              width: 80,
+              height: 80,
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #00ffff 0%, #00c8ff 50%, #00ffff 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 0 25px rgba(0, 255, 255, 0.7), 0 0 50px rgba(0, 200, 255, 0.4)',
+              animation: 'rotate 25s linear infinite, cianPulse 3s ease-in-out infinite',
+              border: '2px solid rgba(0, 255, 255, 0.5)',
+              '@keyframes rotate': {
+                '0%': { transform: 'rotate(0deg)' },
+                '100%': { transform: 'rotate(360deg)' }
+              },
+              '@keyframes cianPulse': {
+                '0%, 100%': { 
+                  borderColor: 'rgba(0, 255, 255, 0.5)',
+                  boxShadow: '0 0 25px rgba(0, 255, 255, 0.7), 0 0 50px rgba(0, 200, 255, 0.4)'
+                },
+                '50%': { 
+                  borderColor: 'rgba(0, 255, 255, 0.9)',
+                  boxShadow: '0 0 35px rgba(0, 255, 255, 1), 0 0 70px rgba(0, 200, 255, 0.6)'
+                }
+              }
+            }}
+          >
+            <GoogleIcon sx={{ fontSize: '2.5rem', color: '#fff', filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.9))' }} />
+          </Box>
+        </Box>
+
         <Typography
           variant="h4"
           fontWeight="bold"
@@ -80,100 +113,56 @@ const SignUpPage = () => {
           mb={1}
           className={styles.titleGradient}
         >
-          Crear cuenta
+          Únete ahora
         </Typography>
-        <Typography variant="body2" align="center" mb={3} sx={{ color: "rgba(255,255,255,0.72)" }}>
-          Regístrate para unirte a las partidas y competir.
-        </Typography>
-        {error && (
-          <Typography variant="body2" color="error" align="center" mb={2}>
-            {error}
-          </Typography>
-        )}
-        <Box
-          component="form"
-          onSubmit={handleSubmit}
-          sx={{ display: "flex", flexDirection: "column", gap: 2 }}
-        >
-          <TextField
-            label="Nombre de Usuario"
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            fullWidth
-            variant="outlined"
-            InputProps={{
-              startAdornment: <PersonIcon sx={{ mr: 1, color: "rgba(255,255,255,0.4)" }} />,
-            }}
-            className={styles.textField}
-          />
-          <TextField
-            label="Email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            fullWidth
-            variant="outlined"
-            InputProps={{
-              startAdornment: <EmailIcon sx={{ mr: 1, color: "rgba(255,255,255,0.4)" }} />,
-            }}
-            className={styles.textField}
-          />
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-            <TextField
-              label="Contraseña"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              fullWidth
-              variant="outlined"
-              InputProps={{
-                startAdornment: <LockIcon sx={{ mr: 1, color: "rgba(255,255,255,0.4)" }} />,
-              }}
-              className={`${styles.textField} ${styles.passwordField}`}
-            />
-            <TextField
-              label="Confirmar"
-              type="password"
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-              required
-              fullWidth
-              variant="outlined"
-              InputProps={{
-                startAdornment: <LockIcon sx={{ mr: 1, color: "rgba(255,255,255,0.4)" }} />,
-              }}
-              className={`${styles.textField} ${styles.passwordField}`}
-              error={confirm.length > 0 && confirm !== password}
-              helperText={confirm.length > 0 && confirm !== password ? "No coincide" : " "}
-            />
-          </Stack>
-          <FormControlLabel
-            control={
-              <Checkbox
-                sx={{ color: "rgba(255,255,255,0.4)", "&.Mui-checked": { color: "#38f2a4" } }}
-              />
+        <Typography 
+          variant="body2" 
+          align="center" 
+          mb={4} 
+          sx={{ 
+            color: "#00ffff",
+            fontWeight: 500,
+            textShadow: '0 0 8px rgba(0, 255, 255, 0.7)',
+            animation: 'fadeIn 1s ease-out 0.3s both, textGlowCian 4s ease-in-out infinite',
+            '@keyframes fadeIn': {
+              '0%': { opacity: 0, transform: 'translateY(10px)' },
+              '100%': { opacity: 1, transform: 'translateY(0)' }
+            },
+            '@keyframes textGlowCian': {
+              '0%, 100%': { textShadow: '0 0 8px rgba(0, 255, 255, 0.7)' },
+              '50%': { textShadow: '0 0 15px rgba(0, 255, 255, 1), 0 0 25px rgba(0, 200, 255, 0.6)' }
             }
-            label={<Typography sx={{ color: "rgba(255,255,255,0.7)" }}>Acepto términos</Typography>}
-          />
-          <Button
-            type="submit"
-            disabled={loading || !email || !password || password !== confirm}
-            fullWidth
-            className={styles.submitBtn}
-          >
-            {loading ? "Creando..." : "Crear cuenta"}
-          </Button>
-        </Box>
-        <Divider sx={{ my: 3 }}>
-          <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.5)", letterSpacing: 2 }}>
-            O
-          </Typography>
-        </Divider>
-        <Typography align="center" variant="body2" sx={{ color: "rgba(255,255,255,0.7)" }}>
+          }}
+        >
+          Crea tu cuenta con Google y empieza a competir
+        </Typography>
+
+        {/* Botón de Google Sign-Up */}
+        <Button
+          onClick={handleGoogleSignup}
+          disabled={loading}
+          fullWidth
+          className={styles.submitBtn}
+          startIcon={<GoogleIcon sx={{ fontSize: '1.8rem' }} />}
+        >
+          {loading ? "Conectando..." : "Registrarse con Google"}
+        </Button>
+
+        <Typography 
+          align="center" 
+          variant="body2" 
+          sx={{ 
+            color: "#00ffff", 
+            fontWeight: 500, 
+            mt: 4,
+            textShadow: "0 0 5px rgba(0, 255, 255, 0.6)",
+            animation: 'fadeIn 1s ease-out 0.5s both',
+            '@keyframes fadeIn': {
+              '0%': { opacity: 0 },
+              '100%': { opacity: 1 }
+            }
+          }}
+        >
           ¿Ya tienes cuenta?{" "}
           <Button component={RouterLink} to="/login" variant="text" className={styles.linkLink}>
             Inicia sesión

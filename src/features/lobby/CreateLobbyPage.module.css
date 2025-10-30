@@ -1,0 +1,67 @@
+/* Diseño minimalista estilo Among Us - Create Lobby */
+
+.container {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: 1.5fr 1fr;
+  align-items: start;
+}
+
+.formPanel,
+.previewPanel {
+  position: relative;
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 32px;
+  transition: all 0.2s ease;
+  overflow: hidden;
+  box-shadow: 
+    0 6px 24px rgba(0, 0, 0, 0.15),
+    0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.formPanel::before,
+.previewPanel::before {
+  display: none; /* Sin efectos complejos */
+}
+
+.formPanel:hover,
+.previewPanel:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 10px 32px rgba(0, 0, 0, 0.2),
+    0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.previewCard {
+  background: #f5f5f5;
+  border: 2px solid #e0e0e0;
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.headlineGradient {
+  background: linear-gradient(135deg, #4c6fff 0%, #9b51e0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 900;
+}
+
+@media (max-width: 968px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+
+  .previewPanel {
+    order: -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .formPanel,
+  .previewPanel {
+    padding: 24px;
+  }
+}
+

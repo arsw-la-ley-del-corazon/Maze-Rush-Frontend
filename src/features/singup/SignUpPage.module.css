@@ -1,37 +1,641 @@
-/* Estilos para SignUpPage (reutiliza patrón de Login/Home) */
+/* Diseño NEÓN CIAN tipo laberinto - Estilo Tron/Retro Gaming */
 
-.root { min-height:100vh; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; padding:0 8px; background:var(--gradient-bg-app); }
-.root:before { content:""; position:absolute; inset:0; background:radial-gradient(circle at 20% 25%, rgba(255,255,255,0.10), rgba(255,255,255,0) 55%), radial-gradient(circle at 80% 70%, rgba(255,255,255,0.08), rgba(255,255,255,0) 60%); mix-blend-mode:overlay; pointer-events:none; }
-.root:after { content:""; position:absolute; inset:0; background:repeating-linear-gradient(90deg, rgba(255,255,255,0.035) 0px, rgba(255,255,255,0.035) 1px, transparent 1px, transparent 80px), repeating-linear-gradient(0deg, rgba(255,255,255,0.035) 0px, rgba(255,255,255,0.035) 1px, transparent 1px, transparent 80px); opacity:.17; pointer-events:none; background-size:160px 160px,160px 160px; animation:gridMove 28s linear infinite; }
+.root { 
+  min-height: 100vh; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  position: relative; 
+  overflow: hidden; 
+  padding: 24px; 
+  background: 
+    radial-gradient(ellipse at top, #001a1a 0%, #000508 100%),
+    linear-gradient(180deg, #000000 0%, #001214 50%, #000000 100%);
+}
 
-.card { width:100%; max-width:480px; position:relative; z-index:2; border-radius:32px; padding:3.5rem 3.2rem; background:var(--brand-panel-bg); backdrop-filter:blur(18px) saturate(160%); -webkit-backdrop-filter:blur(18px) saturate(160%); border:1px solid var(--brand-border-translucent); box-shadow:0 8px 26px -6px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05) inset; overflow:hidden; animation: cardIn 900ms cubic-bezier(.16,.84,.44,1); }
-.card:before { content:""; position:absolute; inset:0; background: radial-gradient(circle at 30% 25%, rgba(255,255,255,0.12), transparent 65%); opacity:.5; pointer-events:none; }
-.card:after { content:""; position:absolute; inset:0; pointer-events:none; background: linear-gradient(120deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 28%, rgba(255,255,255,0) 72%, rgba(255,255,255,0.18) 100%); mix-blend-mode:overlay; opacity:.35; background-size:220% 100%; animation: sheen 11s linear infinite; }
-.card:hover { background:rgba(20,48,66,0.6); }
+/* Patrón de laberinto NEÓN CIAN animado en el fondo */
+.root:before { 
+  content: ""; 
+  position: absolute; 
+  inset: 0; 
+  background-image: 
+    /* Líneas verticales del laberinto */
+    repeating-linear-gradient(90deg, 
+      transparent, 
+      transparent 60px, 
+      rgba(0, 255, 255, 0.15) 60px, 
+      rgba(0, 255, 255, 0.15) 61px,
+      rgba(0, 255, 255, 0.4) 61px,
+      rgba(0, 255, 255, 0.4) 63px,
+      rgba(0, 255, 255, 0.15) 63px,
+      rgba(0, 255, 255, 0.15) 64px,
+      transparent 64px,
+      transparent 120px,
+      rgba(0, 200, 255, 0.12) 120px,
+      rgba(0, 200, 255, 0.12) 121px,
+      rgba(0, 200, 255, 0.3) 121px,
+      rgba(0, 200, 255, 0.3) 123px,
+      rgba(0, 200, 255, 0.12) 123px,
+      rgba(0, 200, 255, 0.12) 124px
+    ),
+    /* Líneas horizontales del laberinto */
+    repeating-linear-gradient(0deg,
+      transparent,
+      transparent 60px,
+      rgba(0, 255, 255, 0.15) 60px,
+      rgba(0, 255, 255, 0.15) 61px,
+      rgba(0, 255, 255, 0.4) 61px,
+      rgba(0, 255, 255, 0.4) 63px,
+      rgba(0, 255, 255, 0.15) 63px,
+      rgba(0, 255, 255, 0.15) 64px,
+      transparent 64px,
+      transparent 120px,
+      rgba(0, 200, 255, 0.12) 120px,
+      rgba(0, 200, 255, 0.12) 121px,
+      rgba(0, 200, 255, 0.3) 121px,
+      rgba(0, 200, 255, 0.3) 123px,
+      rgba(0, 200, 255, 0.12) 123px,
+      rgba(0, 200, 255, 0.12) 124px
+    ),
+    /* Intersecciones del laberinto */
+    radial-gradient(circle at 25% 25%, rgba(0, 255, 255, 0.08), transparent 40%),
+    radial-gradient(circle at 75% 75%, rgba(0, 200, 255, 0.06), transparent 40%);
+  background-size: 480px 480px, 480px 480px, 100% 100%, 100% 100%;
+  background-position: 0 0, 0 0, center, center;
+  filter: blur(0.3px);
+  opacity: 0.85;
+  pointer-events: none;
+  animation: 
+    mazeDrift 40s linear infinite, 
+    neonPulse 4s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
 
-.titleGradient { background:var(--gradient-text); background-clip:text; -webkit-background-clip:text; color:transparent; }
+/* Partículas NEÓN CIAN flotantes */
+.root:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(2px 2px at 15% 25%, rgba(0, 255, 255, 0.6), transparent),
+    radial-gradient(3px 3px at 45% 60%, rgba(0, 255, 255, 0.7), transparent),
+    radial-gradient(2px 2px at 75% 35%, rgba(0, 200, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 85% 70%, rgba(0, 255, 255, 0.8), transparent),
+    radial-gradient(2px 2px at 25% 80%, rgba(0, 230, 255, 0.6), transparent),
+    radial-gradient(3px 3px at 60% 15%, rgba(0, 255, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 90% 45%, rgba(0, 200, 255, 0.7), transparent);
+  background-size: 200% 200%;
+  background-position: 0% 0%;
+  animation: 
+    floatParticles 15s ease-in-out infinite,
+    particlePulse 3s ease-in-out infinite;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
 
-.textField :global(.MuiOutlinedInput-root) { backdrop-filter:blur(4px); background:rgba(255,255,255,0.04); border-radius:12px; }
-.textField :global(.MuiOutlinedInput-root fieldset) { border-color:rgba(255,255,255,0.15); }
-.textField:hover :global(.MuiOutlinedInput-root fieldset) { border-color:var(--brand-blue-500); }
-.textField:global(.Mui-focused) :global(.MuiOutlinedInput-root fieldset) { border-color:var(--brand-purple-500); }
-.textField :global(.MuiInputLabel-root) { color:rgba(255,255,255,0.7); }
-.textField :global(.MuiInputBase-input) { color:#fff; }
+.halo { 
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: 
+    radial-gradient(circle, rgba(0, 255, 255, 0.15) 0%, transparent 60%),
+    radial-gradient(circle, rgba(0, 200, 255, 0.12) 0%, transparent 70%);
+  filter: blur(80px);
+  animation: 
+    pulseGlow 4s ease-in-out infinite,
+    floatHalo 10s ease-in-out infinite;
+  z-index: 0;
+  pointer-events: none;
+}
 
-.passwordField:hover :global(.MuiOutlinedInput-root fieldset) { border-color:var(--brand-electric-500); }
-.passwordField:global(.Mui-focused) :global(.MuiOutlinedInput-root fieldset) { border-color:var(--brand-violet-500); }
+/* Card con efectos NEÓN CIAN */
+.card { 
+  width: 100%; 
+  max-width: 420px; 
+  position: relative; 
+  z-index: 2; 
+  border-radius: 16px; 
+  padding: 64px 48px; 
+  background: 
+    linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 10, 15, 0.95) 100%);
+  border: 2px solid rgba(0, 255, 255, 0.3);
+  box-shadow: 
+    0 0 30px rgba(0, 255, 255, 0.3),
+    0 0 60px rgba(0, 200, 255, 0.15),
+    0 20px 60px rgba(0, 0, 0, 0.9),
+    inset 0 0 40px rgba(0, 255, 255, 0.03);
+  animation: 
+    cardSlideIn 0.8s cubic-bezier(0.16, 0.84, 0.44, 1),
+    cardNeonPulse 5s ease-in-out infinite;
+  transform-origin: center;
+  backdrop-filter: blur(10px);
+}
 
-.submitBtn { font-weight:bold; height:54px; font-size:1.05rem; border-radius:999px; background:var(--gradient-button-primary); color:#ffffff; text-shadow:0 1px 0 rgba(0,0,0,0.35); box-shadow:0 4px 14px -2px rgba(76,111,255,0.55), 0 0 0 1px rgba(255,255,255,0.12) inset; transition:var(--transition-base); position:relative; overflow:hidden; }
-.submitBtn:before { content:""; position:absolute; inset:0; background:linear-gradient(120deg, rgba(255,255,255,0.38) 0%, rgba(255,255,255,0) 30%, rgba(255,255,255,0) 70%, rgba(255,255,255,0.32) 100%); mix-blend-mode:overlay; opacity:0; transition:opacity .45s; }
-.submitBtn:hover { background:var(--gradient-button-primary-hover); transform:translateY(-2px); box-shadow:0 8px 22px -4px rgba(76,111,255,0.6), 0 0 0 1px rgba(255,255,255,0.18) inset; }
-.submitBtn:hover:before { opacity:1; }
-.submitBtn:active { transform:translateY(0); box-shadow:0 4px 12px -2px rgba(76,111,255,0.55) inset; }
+.card:before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(
+    45deg, 
+    rgba(0, 255, 255, 0.6) 0%, 
+    rgba(0, 200, 255, 0.4) 50%, 
+    rgba(0, 255, 255, 0.6) 100%
+  );
+  border-radius: 16px;
+  z-index: -1;
+  opacity: 0.5;
+  filter: blur(6px);
+  background-size: 200% 200%;
+  animation: neonBorderFlow 8s linear infinite;
+}
 
-.linkLink { color:var(--brand-blue-500); font-weight:bold; text-transform:none; }
-.linkLink:hover { color:var(--brand-purple-500); }
+.card:after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  background: radial-gradient(
+    circle, 
+    rgba(0, 255, 255, 0.2), 
+    rgba(0, 200, 255, 0.1),
+    transparent
+  );
+  border-radius: 16px;
+  z-index: -2;
+  opacity: 0;
+  filter: blur(20px);
+  transition: opacity 0.3s ease;
+}
 
-@keyframes gridMove { 0% { background-position:0 0,0 0;} 50% { background-position:80px 80px,0 40px;} 100% { background-position:160px 160px,0 0;} }
-@keyframes cardIn { 0% { opacity:0; transform:translateY(18px) scale(.97);} 60% { opacity:1;} 100% { opacity:1; transform:translateY(0) scale(1);} }
-@keyframes sheen { 0% { background-position:0% 50%;} 100% { background-position:120% 50%;} }
+.card:hover:after {
+  opacity: 0.6;
+}
 
-@media (prefers-reduced-motion: reduce) { .root:after { animation:none;} .card:after { animation:none;} }
+/* Título con efecto NEÓN CIAN */
+.titleGradient { 
+  background: linear-gradient(
+    135deg, 
+    #00ffff 0%, 
+    #00d4ff 50%,
+    #00ffff 100%
+  );
+  background-clip: text; 
+  -webkit-background-clip: text; 
+  color: transparent;
+  font-weight: 900;
+  filter: drop-shadow(0 0 12px rgba(0, 255, 255, 0.8))
+         drop-shadow(0 0 24px rgba(0, 200, 255, 0.5));
+  animation: 
+    titlePulse 3s ease-in-out infinite,
+    neonTextGlow 4s ease-in-out infinite;
+  background-size: 200% 200%;
+}
+
+/* Campos de texto NEÓN CIAN minimalistas */
+.textField :global(.MuiOutlinedInput-root) { 
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 12px; 
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.textField :global(.MuiOutlinedInput-root fieldset) { 
+  border: 2px solid rgba(0, 255, 255, 0.4);
+  box-shadow: 
+    0 0 10px rgba(0, 255, 255, 0.2),
+    inset 0 0 10px rgba(0, 255, 255, 0.05);
+}
+
+.textField:hover :global(.MuiOutlinedInput-root) { 
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.textField:hover :global(.MuiOutlinedInput-root fieldset) { 
+  border-color: rgba(0, 255, 255, 0.7);
+  box-shadow: 
+    0 0 15px rgba(0, 255, 255, 0.4),
+    inset 0 0 15px rgba(0, 255, 255, 0.1);
+}
+
+.textField:global(.Mui-focused) :global(.MuiOutlinedInput-root) { 
+  background: rgba(0, 0, 0, 0.9);
+  box-shadow: 
+    0 0 20px rgba(0, 255, 255, 0.5),
+    inset 0 0 20px rgba(0, 255, 255, 0.15);
+}
+
+.textField:global(.Mui-focused) :global(.MuiOutlinedInput-root fieldset) { 
+  border-color: #00ffff;
+  border-width: 3px;
+  box-shadow: 
+    0 0 25px rgba(0, 255, 255, 0.7),
+    inset 0 0 25px rgba(0, 255, 255, 0.2);
+}
+
+.textField :global(.MuiInputLabel-root) { 
+  color: #00ffff;
+  font-weight: 600;
+  text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+}
+
+.textField :global(.MuiInputBase-input) { 
+  color: #ffffff;
+  font-weight: 500;
+  text-shadow: 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+.passwordField :global(.MuiOutlinedInput-root fieldset) { 
+  border: 2px solid rgba(0, 200, 255, 0.4);
+  box-shadow: 
+    0 0 10px rgba(0, 200, 255, 0.2),
+    inset 0 0 10px rgba(0, 200, 255, 0.05);
+}
+
+.passwordField:hover :global(.MuiOutlinedInput-root fieldset) { 
+  border-color: rgba(0, 200, 255, 0.7);
+  box-shadow: 
+    0 0 15px rgba(0, 200, 255, 0.4),
+    inset 0 0 15px rgba(0, 200, 255, 0.1);
+}
+
+.passwordField:global(.Mui-focused) :global(.MuiOutlinedInput-root) { 
+  box-shadow: 
+    0 0 20px rgba(0, 200, 255, 0.5),
+    inset 0 0 20px rgba(0, 200, 255, 0.15);
+}
+
+.passwordField:global(.Mui-focused) :global(.MuiOutlinedInput-root fieldset) { 
+  border-color: #00c8ff;
+  border-width: 3px;
+  box-shadow: 
+    0 0 25px rgba(0, 200, 255, 0.7),
+    inset 0 0 25px rgba(0, 200, 255, 0.2);
+}
+
+/* Botón principal estilo LABERINTO NEÓN CIAN */
+.submitBtn { 
+  font-weight: 800; 
+  height: 64px; 
+  font-size: 1.15rem; 
+  border-radius: 12px; 
+  background: 
+    linear-gradient(135deg, 
+      rgba(0, 255, 255, 0.1) 0%, 
+      rgba(0, 200, 255, 0.1) 100%
+    ),
+    linear-gradient(135deg, #000000 0%, #000a0f 100%);
+  border: 3px solid #00ffff;
+  color: #00ffff; 
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  box-shadow: 
+    0 0 20px rgba(0, 255, 255, 0.6),
+    0 0 40px rgba(0, 255, 255, 0.3),
+    0 8px 28px rgba(0, 255, 255, 0.2),
+    inset 0 0 20px rgba(0, 255, 255, 0.05);
+  transition: all 0.3s cubic-bezier(0.16, 0.84, 0.44, 1);
+  position: relative;
+  overflow: hidden;
+  animation: 
+    buttonAppear 0.6s ease-out 0.3s both,
+    neonButtonPulse 3s ease-in-out infinite;
+}
+
+.submitBtn:before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: 
+    radial-gradient(circle, 
+      rgba(0, 255, 255, 0.4) 0%, 
+      rgba(0, 200, 255, 0.2) 50%,
+      transparent 100%
+    );
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.submitBtn:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: scanLine 4s linear infinite;
+}
+
+.submitBtn:hover:before {
+  width: 400px;
+  height: 400px;
+}
+
+.submitBtn:hover { 
+  transform: translateY(-4px) scale(1.05);
+  border-color: #00ffff;
+  color: #ffffff;
+  box-shadow: 
+    0 0 30px rgba(0, 255, 255, 0.9),
+    0 0 60px rgba(0, 255, 255, 0.6),
+    0 0 100px rgba(0, 200, 255, 0.4),
+    0 16px 40px rgba(0, 255, 255, 0.3),
+    inset 0 0 30px rgba(0, 255, 255, 0.15);
+  letter-spacing: 3px;
+  text-shadow: 
+    0 0 10px rgba(0, 255, 255, 1),
+    0 0 20px rgba(0, 255, 255, 0.8);
+}
+
+.submitBtn:active { 
+  transform: translateY(-1px) scale(0.98);
+  box-shadow: 
+    0 0 15px rgba(0, 255, 255, 0.7),
+    0 0 30px rgba(0, 255, 255, 0.4),
+    0 6px 20px rgba(0, 255, 255, 0.2),
+    inset 0 0 20px rgba(0, 255, 255, 0.2);
+}
+
+.submitBtn:disabled {
+  opacity: 0.4;
+  transform: none;
+  cursor: not-allowed;
+  animation: pulse 2s ease-in-out infinite;
+  border-color: #444;
+  color: #666;
+}
+
+/* Enlaces NEÓN CIAN */
+.linkAlt { 
+  color: #00ffff; 
+  font-weight: 700; 
+  text-transform: none;
+  text-decoration: none;
+  position: relative;
+  transition: all 0.3s ease;
+  text-shadow: 
+    0 0 5px rgba(0, 255, 255, 0.7),
+    0 0 10px rgba(0, 255, 255, 0.4);
+}
+
+.linkAlt:after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #00ffff, #00c8ff, #00ffff);
+  box-shadow: 
+    0 0 5px rgba(0, 255, 255, 0.7),
+    0 0 10px rgba(0, 200, 255, 0.5);
+  transition: width 0.3s ease;
+}
+
+.linkAlt:hover {
+  color: #00c8ff;
+  transform: translateX(3px);
+  text-shadow: 
+    0 0 10px rgba(0, 255, 255, 1),
+    0 0 20px rgba(0, 255, 255, 0.8),
+    0 0 30px rgba(0, 200, 255, 0.5);
+}
+
+.linkAlt:hover:after {
+  width: 100%;
+}
+
+.linkLink { 
+  color: #00ffff; 
+  font-weight: 700; 
+  text-transform: none;
+  text-decoration: none;
+  text-shadow: 
+    0 0 5px rgba(0, 255, 255, 0.7),
+    0 0 10px rgba(0, 255, 255, 0.4);
+  transition: all 0.3s ease;
+}
+
+.linkLink:hover { 
+  color: #00c8ff;
+  text-decoration: underline;
+  text-shadow: 
+    0 0 10px rgba(0, 255, 255, 1),
+    0 0 20px rgba(0, 255, 255, 0.8);
+}
+
+/* Animaciones NEÓN CIAN tipo LABERINTO */
+@keyframes cardSlideIn { 
+  0% { 
+    opacity: 0; 
+    transform: translateY(60px) scale(0.9);
+  }
+  60% {
+    transform: translateY(-8px) scale(1.02);
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(0) scale(1);
+  } 
+}
+
+@keyframes neonPulse {
+  0%, 100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes mazeDrift {
+  0% {
+    background-position: 0 0, 0 0, center, center;
+  }
+  100% {
+    background-position: 480px 480px, -480px 480px, center, center;
+  }
+}
+
+@keyframes particlePulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes floatHalo {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(20px, -20px);
+  }
+  50% {
+    transform: translate(0, -30px);
+  }
+  75% {
+    transform: translate(-20px, -20px);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.15;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes cardNeonPulse {
+  0%, 100% {
+    box-shadow: 
+      0 0 30px rgba(0, 255, 255, 0.3),
+      0 0 60px rgba(0, 200, 255, 0.15),
+      0 20px 60px rgba(0, 0, 0, 0.9),
+      inset 0 0 40px rgba(0, 255, 255, 0.03);
+  }
+  50% {
+    box-shadow: 
+      0 0 40px rgba(0, 255, 255, 0.5),
+      0 0 80px rgba(0, 200, 255, 0.25),
+      0 20px 60px rgba(0, 0, 0, 0.9),
+      inset 0 0 50px rgba(0, 255, 255, 0.05);
+  }
+}
+
+@keyframes neonBorderFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+@keyframes floatParticles {
+  0%, 100% {
+    background-position: 0% 0%;
+  }
+  25% {
+    background-position: 100% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  75% {
+    background-position: 0% 100%;
+  }
+}
+
+@keyframes titlePulse {
+  0%, 100% {
+    background-position: 0% 50%;
+    transform: scale(1);
+  }
+  50% {
+    background-position: 100% 50%;
+    transform: scale(1.02);
+  }
+}
+
+@keyframes neonTextGlow {
+  0%, 100% {
+    filter: 
+      drop-shadow(0 0 12px rgba(0, 255, 255, 0.8))
+      drop-shadow(0 0 24px rgba(0, 200, 255, 0.5));
+  }
+  50% {
+    filter: 
+      drop-shadow(0 0 18px rgba(0, 255, 255, 1))
+      drop-shadow(0 0 36px rgba(0, 200, 255, 0.7));
+  }
+}
+
+@keyframes buttonAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  60% {
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes neonButtonPulse {
+  0%, 100% {
+    box-shadow: 
+      0 0 20px rgba(0, 255, 255, 0.6),
+      0 0 40px rgba(0, 255, 255, 0.3),
+      0 8px 28px rgba(0, 255, 255, 0.2),
+      inset 0 0 20px rgba(0, 255, 255, 0.05);
+  }
+  50% {
+    box-shadow: 
+      0 0 30px rgba(0, 255, 255, 0.8),
+      0 0 60px rgba(0, 255, 255, 0.5),
+      0 8px 28px rgba(0, 255, 255, 0.3),
+      inset 0 0 30px rgba(0, 255, 255, 0.1);
+  }
+}
+
+@keyframes scanLine {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@media (max-width: 600px) {
+  .card {
+    padding: 36px 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) { 
+  .card,
+  .titleGradient,
+  .submitBtn,
+  .root:before,
+  .root:after,
+  .card:before,
+  .card:after,
+  .halo { 
+    animation: none !important;
+  }
+  
+  .submitBtn:hover:before {
+    width: 0;
+    height: 0;
+  }
+}

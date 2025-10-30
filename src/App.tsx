@@ -4,8 +4,6 @@ import "./global.css"
 import HomePage from "./features/home/HomePage"
 import LoginPage from "./features/login/LoginPage"
 import SignUpPage from "./features/singup/SignUpPage"
-import ForgotPasswordPage from "./features/forgot/ForgotPasswordPage"
-import ResetPasswordPage from "./features/forgot/ResetPasswordPage"
 import OAuth2RedirectPage from "./features/auth/pages/OAuth2RedirectPage"
 import { AuthProvider } from "./context/AuthContext"
 import { useAuth } from "./context/useAuth"
@@ -14,6 +12,7 @@ import DashboardPage from "./features/dashboard/DashboardPage"
 import ProfilePage from "./features/profile/ProfilePage"
 import { SocketProvider } from "./context/SocketContext"
 import QuickPlayPage from "./features/quickplay/QuickPlayPage"
+import { LobbyPage, CreateLobbyPage, JoinLobbyPage } from "./features/lobby"
 
 const theme = createTheme({
   palette: {
@@ -91,8 +90,6 @@ function App() {
             <Route path="/home" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUpPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/oauth2/redirect" element={<OAuth2RedirectPage />} />
             {/* Autenticado */}
             <Route
@@ -121,6 +118,36 @@ function App() {
                 <Protected>
                   <AppShell>
                     <QuickPlayPage />
+                  </AppShell>
+                </Protected>
+              }
+            />
+            <Route
+              path="/app/create-lobby"
+              element={
+                <Protected>
+                  <AppShell>
+                    <CreateLobbyPage />
+                  </AppShell>
+                </Protected>
+              }
+            />
+            <Route
+              path="/app/join"
+              element={
+                <Protected>
+                  <AppShell>
+                    <JoinLobbyPage />
+                  </AppShell>
+                </Protected>
+              }
+            />
+            <Route
+              path="/app/lobby/:lobbyCode"
+              element={
+                <Protected>
+                  <AppShell>
+                    <LobbyPage />
                   </AppShell>
                 </Protected>
               }

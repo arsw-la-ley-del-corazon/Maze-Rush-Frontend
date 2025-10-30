@@ -1,4 +1,4 @@
-import { Box, Button, Typography, Stack, Paper, Divider } from "@mui/material"
+import { Box, Button, Typography, Stack, Divider } from "@mui/material"
 import { Link as RouterLink } from "react-router-dom"
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents"
 import BoltIcon from "@mui/icons-material/Bolt"
@@ -22,18 +22,22 @@ export default function HomePage() {
               align="center"
               fontWeight="bold"
               className={styles.titleGradient}
-              sx={{ fontSize: { xs: "2.4rem", sm: "3.2rem", md: "3.6rem" } }}
+              sx={{ fontSize: { xs: "2.8rem", sm: "3.6rem", md: "4.2rem" } }}
             >
-              <Box component="span" color="primary.main" ml={2}>
-                RUSH
-              </Box>
+              MAZE RUSH
             </Typography>
             <Typography
               variant="subtitle1"
               align="center"
-              sx={{ color: "rgba(255,255,255,0.72)", maxWidth: 560 }}
+              sx={{ 
+                color: '#00ffff', 
+                maxWidth: 560, 
+                fontWeight: 500, 
+                fontSize: '1.1rem',
+                textShadow: '0 0 8px rgba(0, 255, 255, 0.6)'
+              }}
             >
-              Compite en tiempo real. Domina el laberinto.
+              Corre contra el tiempo. Resuelve el laberinto. Vence a tus rivales.
             </Typography>
           </Stack>
 
@@ -95,17 +99,32 @@ function MazeLogo() {
 
 function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <Paper
-      elevation={0}
-      sx={{ px: 2, py: 1, bgcolor: "background.paper", textAlign: "center", minWidth: 80 }}
-    >
-      <Box sx={{ mb: 0.5 }}>{icon}</Box>
-      <Typography variant="h5" fontWeight="bold">
+    <Box sx={{ textAlign: "center", minWidth: 80 }}>
+      <Box sx={{ 
+        mb: 1,
+        display: 'flex',
+        justifyContent: 'center',
+        '& svg': { 
+          fontSize: '2rem',
+          color: '#00ffff',
+          filter: 'drop-shadow(0 0 8px rgba(0, 255, 255, 0.7))'
+        }
+      }}>
+        {icon}
+      </Box>
+      <Typography variant="h5" fontWeight="bold" sx={{ 
+        color: '#00ffff',
+        textShadow: '0 0 8px rgba(0, 255, 255, 0.6)'
+      }}>
         {value}
       </Typography>
-      <Typography variant="caption" color="text.secondary">
+      <Typography variant="caption" sx={{ 
+        color: '#00c8ff', 
+        fontWeight: 600,
+        textShadow: '0 0 5px rgba(0, 200, 255, 0.4)'
+      }}>
         {label}
       </Typography>
-    </Paper>
+    </Box>
   )
 }

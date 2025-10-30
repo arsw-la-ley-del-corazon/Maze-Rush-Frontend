@@ -1,10 +1,8 @@
-// Configuración global de la aplicación usando variables de entorno
 export const API_CONFIG = {
   BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1',
   TIMEOUT: parseInt(import.meta.env.VITE_API_TIMEOUT) || 10000,
 } as const;
 
-// URLs de la API
 export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: '/auth/login',
@@ -14,8 +12,6 @@ export const API_ENDPOINTS = {
     VALIDATE: '/auth/validate',
     ME: '/auth/me',
     GOOGLE: '/auth/google',
-    FORGOT_PASSWORD: '/auth/password/forgot',
-    RESET_PASSWORD: '/auth/password/reset',
   },
   USERS: {
     BASE: '/users',
@@ -27,13 +23,11 @@ export const API_ENDPOINTS = {
   },
 } as const;
 
-// Configuración de autenticación
 export const AUTH_CONFIG = {
   STORAGE_KEY: import.meta.env.VITE_AUTH_STORAGE_KEY || 'auth_state',
   TOKEN_REFRESH_MARGIN: parseInt(import.meta.env.VITE_AUTH_TOKEN_REFRESH_MARGIN) || 30, // segundos antes de expirar para refrescar token
 } as const;
 
-// Configuración de la aplicación
 export const APP_CONFIG = {
   NAME: import.meta.env.VITE_APP_NAME || 'Maze Rush',
   VERSION: import.meta.env.VITE_APP_VERSION || '1.0.0',
@@ -42,7 +36,6 @@ export const APP_CONFIG = {
   LOG_LEVEL: import.meta.env.VITE_LOG_LEVEL || 'info',
 } as const;
 
-// Configuración de Socket (para uso futuro)
 export const SOCKET_CONFIG = {
   URL: import.meta.env.VITE_SOCKET_URL || 'http://localhost:8080',
 } as const;
