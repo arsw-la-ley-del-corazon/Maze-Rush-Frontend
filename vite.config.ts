@@ -11,8 +11,11 @@ export default defineConfig({
       "@context": path.resolve(__dirname, "./src/context"),
     },
   },
+  define: {
+    global: 'globalThis',
+  },
   server: {
     host: true,
-    port: 5173,
+    port: 3000,
   },
 });

@@ -3,6 +3,7 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import VpnKeyIcon from "@mui/icons-material/VpnKey"
 import LoginIcon from "@mui/icons-material/Login"
+import axios from "../../common/AxiosIntance"
 import styles from "./JoinLobbyPage.module.css"
 
 export default function JoinLobbyPage() {
@@ -28,16 +29,15 @@ export default function JoinLobbyPage() {
     setJoining(true)
     setError(null)
 
-    // TODO: Verificar con el backend si el lobby existe
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    // Simulación de validación
-    const exists = Math.random() > 0.3 // 70% de éxito
-
-    if (exists) {
+    try {
+      await axios.post(`/lobby/join/${lobbyCode}`)
+      
+      // Si la unión fue exitosa, navegar al lobby
       navigate(`/app/lobby/${lobbyCode}`)
-    } else {
-      setError("Lobby no encontrado. Verifica el código e intenta de nuevo.")
+    } catch (err: any) {
+      console.error("Error uniéndose al lobby:", err)
+      const errorMessage = err.response?.data?.message || "Lobby no encontrado. Verifica el código e intenta de nuevo."
+      setError(errorMessage)
       setJoining(false)
     }
   }

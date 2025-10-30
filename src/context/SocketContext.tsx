@@ -1,4 +1,7 @@
 import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from "react"
+import { Client } from "@stomp/stompjs"
+import type { IMessage, StompSubscription } from "@stomp/stompjs"
+import SockJS from "sockjs-client"
 
 // Tipos básicos de estado de conexión
 export type SocketStatus = "idle" | "connecting" | "open" | "closed" | "error"
@@ -10,7 +13,9 @@ interface SocketContextValue {
   joinedQuickPlay: boolean
   joinQuickPlay: () => void
   leaveQuickPlay: () => void
-  send: (data: Record<string, unknown>) => void
+  send: (data: Record<string, unknown>, destination?: string) => void
+  subscribe: (destination: string, handler: (body: any) => void) => void
+  unsubscribe: (destination: string) => void
 }
 
 const SocketContext = createContext<SocketContextValue | undefined>(undefined)
@@ -29,7 +34,9 @@ interface LocalMessage {
 const CHANNEL_NAME = "maze_rush_quick_play"
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const wsRef = useRef<WebSocket | null>(null)
+  const stompRef = useRef<Client | null>(null)
+  const subsRef = useRef<Record<string, StompSubscription | null>>({})
+  const pendingSubsRef = useRef<Record<string, (msg: IMessage) => void>>({})
   const [status, setStatus] = useState<SocketStatus>("idle")
   const [error, setError] = useState<string | undefined>()
   const [quickPlayPlayers, setQuickPlayPlayers] = useState<number | null>(null)
@@ -95,50 +102,70 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setupBroadcastChannel()
       return
     }
-    try {
-      setStatus("connecting")
-      const ws = new WebSocket(wsUrl)
-      wsRef.current = ws
-      ws.onopen = () => {
+
+    setStatus("connecting")
+    const client = new Client({
+      // use SockJS for better compatibility
+      webSocketFactory: () => new SockJS(wsUrl),
+      reconnectDelay: 5000,
+      debug: (msg) => {
+        // console.debug("STOMP:", msg)
+      },
+      onConnect: () => {
         setStatus("open")
         reconnectAttempts.current = 0
-        if (joinedRef.current) {
-          // Reunirse de nuevo al reconectar
-            ws.send(JSON.stringify({ type: "join_quick_play" }))
-        }
-      }
-      ws.onclose = () => {
-        setStatus("closed")
-        if (reconnectAttempts.current < 5) {
-          const timeout = Math.min(1000 * 2 ** reconnectAttempts.current, 8000)
-          reconnectAttempts.current += 1
-          setTimeout(connect, timeout)
-        }
-      }
-      ws.onerror = () => {
-        setError("Error de WebSocket")
-        setStatus("error")
-      }
-      ws.onmessage = (ev) => {
+        // Subscribe to generic lobby topics used by quick play if needed
+        // Ejemplo: suscribirse a conteo de quick play
         try {
-          const data = JSON.parse(ev.data)
-          if (data.type === "players_count" && data.mode === "quick_play" && typeof data.count === "number") {
-            setQuickPlayPlayers(data.count)
-          }
+          const sub = client.subscribe('/topic/quickplay', (msg: IMessage) => {
+            try {
+              const payload = JSON.parse(msg.body)
+              if (payload?.type === 'players_count' && typeof payload.count === 'number') {
+                setQuickPlayPlayers(payload.count)
+              }
+            } catch {}
+          })
+          subsRef.current['/topic/quickplay'] = sub
         } catch {
-          // No JSON válido, ignorar
+          // ignore
         }
+        // Re-subscribe to any pending subscriptions requested before connect
+        Object.entries(pendingSubsRef.current).forEach(([dest, handler]) => {
+          try {
+            const sub = client.subscribe(dest, handler)
+            subsRef.current[dest] = sub
+          } catch {
+            // ignore
+          }
+        })
+        // clear pending (they are now active)
+        pendingSubsRef.current = {}
+        // Re-join if needed
+        if (joinedRef.current) {
+          client.publish({ destination: '/app/quickplay/join', body: JSON.stringify({}) })
+        }
+      },
+      onStompError: (frame) => {
+        setError(frame && frame.headers && frame.headers['message'] ? frame.headers['message'] : 'STOMP error')
+        setStatus('error')
+      },
+      onWebSocketClose: () => {
+        setStatus('closed')
       }
-    } catch {
-      setError("No se pudo crear la conexión WebSocket")
-      setStatus("error")
-    }
+    })
+
+    stompRef.current = client
+    client.activate()
   }, [wsUrl])
 
   useEffect(() => {
     connect()
     return () => {
-      wsRef.current?.close()
+      try {
+        stompRef.current?.deactivate()
+      } catch {}
+      Object.values(subsRef.current).forEach(s => s?.unsubscribe())
+      subsRef.current = {}
       if (bcRef.current) {
         try { bcRef.current.close() } catch { /* ignore */ }
         bcRef.current = null
@@ -147,18 +174,63 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   }, [connect])
 
-  const send = useCallback((data: Record<string, unknown>) => {
-    if (wsRef.current && status === "open" && wsUrl) {
-      wsRef.current.send(JSON.stringify(data))
+  const send = useCallback((data: Record<string, unknown>, destination = '/app/quickplay') => {
+    const client = stompRef.current
+    if (client && status === 'open') {
+      try {
+        client.publish({ destination, body: JSON.stringify(data) })
+      } catch (e) {
+        // ignore publish errors
+      }
     }
-  }, [status, wsUrl])
+  }, [status])
+
+  const subscribe = useCallback((destination: string, handler: (body: any) => void) => {
+    const client = stompRef.current
+    const wrapped = (msg: IMessage) => {
+      try {
+        const parsed = msg.body ? JSON.parse(msg.body) : null
+        handler(parsed)
+      } catch (e) {
+        // if not JSON, pass raw
+        handler(msg.body)
+      }
+    }
+
+    // If connected, subscribe immediately
+    if (client && status === 'open') {
+      try {
+        const sub = client.subscribe(destination, wrapped)
+        subsRef.current[destination] = sub
+      } catch (e) {
+        // fallback to pending
+        pendingSubsRef.current[destination] = wrapped
+      }
+      return
+    }
+
+    // Not connected yet: register as pending subscription
+    pendingSubsRef.current[destination] = wrapped
+  }, [status])
+
+  const unsubscribe = useCallback((destination: string) => {
+    try {
+      const sub = subsRef.current[destination]
+      if (sub) {
+        sub.unsubscribe()
+        delete subsRef.current[destination]
+      }
+    } catch {}
+    // ensure pending removed as well
+    try { delete pendingSubsRef.current[destination] } catch {}
+  }, [])
 
   const joinQuickPlay = useCallback(() => {
     if (joinedRef.current) return
     joinedRef.current = true
     setJoinedQuickPlay(true)
     if (wsUrl) {
-      send({ type: "join_quick_play" })
+      send({}, '/app/quickplay/join')
     } else {
       // Fallback local
       localCountRef.current += 1
@@ -172,7 +244,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     joinedRef.current = false
     setJoinedQuickPlay(false)
     if (wsUrl) {
-      send({ type: "leave_quick_play" })
+      send({}, '/app/quickplay/leave')
     } else {
       localCountRef.current = Math.max(0, localCountRef.current - 1)
       setQuickPlayPlayers(localCountRef.current)
@@ -188,6 +260,8 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     joinQuickPlay,
     leaveQuickPlay,
     send,
+    subscribe,
+    unsubscribe,
   }
 
   return <SocketContext.Provider value={value}>{children}</SocketContext.Provider>

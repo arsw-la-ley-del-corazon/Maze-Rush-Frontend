@@ -5,6 +5,7 @@ import AddCircleIcon from "@mui/icons-material/AddCircle"
 import GroupIcon from "@mui/icons-material/Group"
 import LockIcon from "@mui/icons-material/Lock"
 import PublicIcon from "@mui/icons-material/Public"
+import axios from "../../common/AxiosIntance"
 import styles from "./CreateLobbyPage.module.css"
 
 export default function CreateLobbyPage() {
@@ -13,6 +14,7 @@ export default function CreateLobbyPage() {
   const [isPrivate, setIsPrivate] = useState(true)
   const [lobbyName, setLobbyName] = useState("")
   const [creating, setCreating] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleMaxPlayersChange = (event: SelectChangeEvent) => {
     setMaxPlayers(event.target.value)
@@ -20,15 +22,24 @@ export default function CreateLobbyPage() {
 
   const handleCreateLobby = async () => {
     setCreating(true)
+    setError(null)
     
-    // TODO: Llamar al backend para crear el lobby
-    // Simulación de creación
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    
-    const mockLobbyCode = Math.random().toString(36).substring(2, 8).toUpperCase()
-    
-    // Navegar al lobby creado
-    navigate(`/app/lobby/${mockLobbyCode}`)
+    try {
+      const response = await axios.post("/lobby/create", {
+        maxPlayers: parseInt(maxPlayers),
+        isPrivate: isPrivate,
+        name: lobbyName || undefined
+      })
+      
+      const lobbyCode = response.data.code
+      
+      // Navegar al lobby creado
+      navigate(`/app/lobby/${lobbyCode}`)
+    } catch (err: any) {
+      console.error("Error creando lobby:", err)
+      setError(err.response?.data?.message || "Error al crear el lobby. Intenta de nuevo.")
+      setCreating(false)
+    }
   }
 
   return (
@@ -108,6 +119,13 @@ export default function CreateLobbyPage() {
             <Alert severity="info" variant="outlined" icon={<GroupIcon />}>
               Se generará un código único que podrás compartir con tus amigos.
             </Alert>
+
+            {/* Error Alert */}
+            {error && (
+              <Alert severity="error" variant="outlined">
+                {error}
+              </Alert>
+            )}
 
             {/* Botones */}
             <Stack direction="row" spacing={2}>
