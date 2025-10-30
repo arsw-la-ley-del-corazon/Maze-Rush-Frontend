@@ -1,0 +1,1 @@
+export { default as OAuth2RedirectPage } from './OAuth2RedirectPage';

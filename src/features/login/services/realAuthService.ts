@@ -1,167 +1,33 @@
-import axiosInstance from '../../../common/AxiosIntance';
-import { API_ENDPOINTS } from '../../../common/globas';
-import type {
-  AuthResponse,
-  LoginRequest,
-  RegisterRequest,
-  RefreshTokenRequest,
-  ForgotPasswordRequest,
-  ResetPasswordRequest,
-  MessageResponse,
-  Result,
-  ApiErrorShape,
-} from "../../../types/api";
+/**
+ * @deprecated Este archivo se mantiene por compatibilidad.
+ * Usa las importaciones desde '@features/auth' en su lugar.
+ * 
+ * NOTA: La aplicación solo soporta autenticación OAuth2 con Google.
+ * Las funciones de login/register tradicionales no están disponibles.
+ */
 
-// Servicio de autenticación que se conecta al backend real usando cookies
-export async function login(req: LoginRequest): Promise<Result<AuthResponse>> {
-  try {
-    const response = await axiosInstance.post(API_ENDPOINTS.AUTH.LOGIN, req);
-    
-    return success(mapBackendAuthResponse(response.data));
-  } catch (error: any) {
-    return handleApiError(error, API_ENDPOINTS.AUTH.LOGIN);
-  }
-}
+import {
+  refreshAccessToken,
+  logoutUser,
+  validateAuthToken,
+  fetchCurrentUser,
+} from '../../auth/services/authService';
 
-export async function register(req: RegisterRequest): Promise<Result<AuthResponse>> {
-  try {
-    const response = await axiosInstance.post(API_ENDPOINTS.AUTH.REGISTER, req);
-    
-    return success(mapBackendAuthResponse(response.data));
-  } catch (error: any) {
-    return handleApiError(error, API_ENDPOINTS.AUTH.REGISTER);
-  }
-}
+// Re-exportar con nombres anteriores para compatibilidad
+export const refresh = refreshAccessToken;
+export const logout = logoutUser;
+export const validateToken = validateAuthToken;
+export const getCurrentUser = fetchCurrentUser;
 
-export async function refresh(req: RefreshTokenRequest): Promise<Result<AuthResponse>> {
-  try {
-    // El refresh token viene de las cookies, no necesitamos enviarlo
-    const response = await axiosInstance.post(API_ENDPOINTS.AUTH.REFRESH, {});
-    
-    return success(mapBackendAuthResponse(response.data));
-  } catch (error: any) {
-    return handleApiError(error, API_ENDPOINTS.AUTH.REFRESH);
-  }
-}
+// Funciones legacy no soportadas (solo OAuth2)
+export const login = () => {
+  throw new Error('Login con credenciales no soportado. Usa Google OAuth2');
+};
 
-export async function logout(): Promise<Result<null>> {
-  try {
-    await axiosInstance.post(API_ENDPOINTS.AUTH.LOGOUT, {});
-    
-    return { ok: true, data: null };
-  } catch (error: any) {
-    // Incluso si el logout falla en el backend, limpiamos el estado local
-    return { ok: true, data: null };
-  }
-}
+export const register = () => {
+  throw new Error('Registro tradicional no soportado. Usa Google OAuth2');
+};
 
-export async function validateToken(): Promise<boolean> {
-  try {
-    const response = await axiosInstance.get(API_ENDPOINTS.AUTH.VALIDATE);
-    
-    return response.data === true;
-  } catch (error) {
-    return false;
-  }
-}
-
-export async function getCurrentUser(): Promise<Result<AuthResponse['user']>> {
-  try {
-    const response = await axiosInstance.get(API_ENDPOINTS.AUTH.ME);
-    
-    return { ok: true, data: response.data };
-  } catch (error: any) {
-    return handleApiError(error, API_ENDPOINTS.AUTH.ME);
-  }
-}
-
-// Autenticar con Google usando token ID
-export async function authenticateWithGoogle(idToken: string): Promise<Result<AuthResponse>> {
-  try {
-    const response = await axiosInstance.post(API_ENDPOINTS.AUTH.GOOGLE, {
-      idToken
-    });
-    
-    return success(mapBackendAuthResponse(response.data));
-  } catch (error: any) {
-    return handleApiError(error, API_ENDPOINTS.AUTH.GOOGLE);
-  }
-}
-
-// Solicitar recuperación de contraseña
-export async function forgotPassword(req: ForgotPasswordRequest): Promise<Result<MessageResponse>> {
-  try {
-    const response = await axiosInstance.post(API_ENDPOINTS.AUTH.FORGOT_PASSWORD, req);
-    
-    return success(response.data);
-  } catch (error: any) {
-    return handleApiError(error, API_ENDPOINTS.AUTH.FORGOT_PASSWORD);
-  }
-}
-
-// Resetear contraseña con token
-export async function resetPassword(req: ResetPasswordRequest): Promise<Result<MessageResponse>> {
-  try {
-    const response = await axiosInstance.post(API_ENDPOINTS.AUTH.RESET_PASSWORD, req);
-    
-    return success(response.data);
-  } catch (error: any) {
-    return handleApiError(error, API_ENDPOINTS.AUTH.RESET_PASSWORD);
-  }
-}
-
-// Mapear la respuesta del backend al formato esperado por el frontend
-function mapBackendAuthResponse(backendResponse: any): AuthResponse {
-  return {
-    accessToken: backendResponse.accessToken,
-    refreshToken: backendResponse.refreshToken,
-    tokenType: backendResponse.tokenType || 'Bearer',
-    expiresIn: backendResponse.expiresIn,
-    expiresAt: backendResponse.expiresAt,
-    user: {
-      id: backendResponse.user.id,
-      username: backendResponse.user.username,
-      email: backendResponse.user.email,
-      score: backendResponse.user.score || 0,
-      level: backendResponse.user.level || 1,
-    },
-  };
-}
-
-// Manejar errores de la API
-function handleApiError(error: any, path: string): Result<never> {
-  let apiError: ApiErrorShape = {
-    status: 500,
-    message: 'Error interno del servidor',
-    path,
-  };
-
-  if (error.response) {
-    // Error de respuesta HTTP
-    apiError = {
-      status: error.response.status,
-      message: error.response.data?.message || error.response.statusText || 'Error desconocido',
-      path,
-    };
-  } else if (error.request) {
-    // Error de red
-    apiError = {
-      status: 0,
-      message: 'Error de conexión. Verifique su conexión a internet.',
-      path,
-    };
-  } else {
-    // Error de configuración
-    apiError = {
-      status: 400,
-      message: error.message || 'Error en la configuración de la petición',
-      path,
-    };
-  }
-
-  return { ok: false, error: apiError };
-}
-
-function success<T>(data: T): Result<T> {
-  return { ok: true, data };
-}
+export const authenticateWithGoogle = () => {
+  throw new Error('Autenticación OAuth2 se maneja automáticamente por el backend');
+};

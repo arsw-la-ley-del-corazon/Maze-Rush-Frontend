@@ -1,4 +1,9 @@
-import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
+import axios, {
+  type AxiosError,
+  type AxiosInstance,
+  type AxiosResponse,
+  type InternalAxiosRequestConfig,
+} from 'axios';
 import { API_CONFIG } from './globas';
 
 const axiosInstance: AxiosInstance = axios.create({
@@ -11,41 +16,46 @@ const axiosInstance: AxiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use(
-  (config) => {
+  (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
     config.maxRedirects = 0;
     return config;
   },
-  (error) => {
+  (error: AxiosError): Promise<AxiosError> => {
     return Promise.reject(error);
   }
 );
 
 axiosInstance.interceptors.response.use(
-  (response: AxiosResponse) => {
+  (response: AxiosResponse): AxiosResponse => {
     return response;
   },
-  (error: any) => {
+  (error: AxiosError): Promise<AxiosError> => {
+    // Handle redirects (301, 302)
     if (error.response?.status === 302 || error.response?.status === 301) {
-      const location = error.response.headers?.location || '';
+      const location = (error.response.headers?.location as string) || '';
       if (location.includes('oauth2') || location.includes('google')) {
         return Promise.reject({
           response: {
             status: 401,
-            data: { message: 'No autenticado' }
-          }
+            data: { message: 'No autenticado' },
+          },
         });
       }
     }
-    
+
+    // Handle unauthorized access (401)
     if (error.response?.status === 401) {
       const publicPaths = ['/login', '/signup'];
-      const isPublicPath = publicPaths.some(path => window.location.pathname.startsWith(path));
-      
+      const isPublicPath = publicPaths.some((path) =>
+        window.location.pathname.startsWith(path)
+      );
+
       if (!isPublicPath && !window.location.pathname.startsWith('/oauth2')) {
         console.warn('No autenticado, redirigiendo al login...');
         window.location.href = '/login';
       }
     }
+
     return Promise.reject(error);
   }
 );

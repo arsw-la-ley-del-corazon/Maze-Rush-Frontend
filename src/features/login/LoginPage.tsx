@@ -1,3 +1,8 @@
+/**
+ * Página de inicio de sesión
+ * Permite al usuario autenticarse mediante Google OAuth2
+ */
+
 import {
   Box,
   Button,
@@ -9,17 +14,15 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import GoogleIcon from "@mui/icons-material/Google"
 import Loader from "../../components/Loader"
 import { useAuth } from "../../context/useAuth"
+import { useGoogleLogin } from "../auth/hooks"
 import styles from "./LoginPage.module.css"
-import { API_CONFIG } from "../../common/globas"
 
+/**
+ * Componente de página de login con autenticación de Google
+ */
 export default function LoginPage() {
   const { loading } = useAuth()
-
-  const handleGoogleLogin = () => {
-    // Redirigir al endpoint de OAuth2 de Google en el backend
-    const backendUrl = API_CONFIG.BASE_URL.replace('/api/v1', '')
-    window.location.href = `${backendUrl}/oauth2/authorization/google`
-  }
+  const { handleGoogleLogin } = useGoogleLogin()
 
   return (
     <Box className={styles.root}>

@@ -17,43 +17,43 @@ function shouldLog(level: LogLevel): boolean {
 }
 
 export const logger = {
-  error: (message: string, ...args: any[]) => {
+  error: (message: string, ...args: unknown[]): void => {
     if (shouldLog('error')) {
       console.error(`[${APP_CONFIG.NAME}] ERROR:`, message, ...args);
     }
   },
 
-  warn: (message: string, ...args: any[]) => {
+  warn: (message: string, ...args: unknown[]): void => {
     if (shouldLog('warn')) {
       console.warn(`[${APP_CONFIG.NAME}] WARN:`, message, ...args);
     }
   },
 
-  info: (message: string, ...args: any[]) => {
+  info: (message: string, ...args: unknown[]): void => {
     if (shouldLog('info')) {
       console.info(`[${APP_CONFIG.NAME}] INFO:`, message, ...args);
     }
   },
 
-  debug: (message: string, ...args: any[]) => {
+  debug: (message: string, ...args: unknown[]): void => {
     if (shouldLog('debug')) {
       console.debug(`[${APP_CONFIG.NAME}] DEBUG:`, message, ...args);
     }
   },
 
-  authError: (message: string, error?: any) => {
+  authError: (message: string, error?: unknown): void => {
     logger.error(`Auth Error: ${message}`, error);
   },
 
-  authInfo: (message: string, ...args: any[]) => {
+  authInfo: (message: string, ...args: unknown[]): void => {
     logger.info(`Auth: ${message}`, ...args);
   },
 
-  apiError: (message: string, error?: any) => {
+  apiError: (message: string, error?: unknown): void => {
     logger.error(`API Error: ${message}`, error);
   },
 
-  apiInfo: (message: string, ...args: any[]) => {
+  apiInfo: (message: string, ...args: unknown[]): void => {
     logger.info(`API: ${message}`, ...args);
   },
 };
