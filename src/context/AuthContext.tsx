@@ -1,10 +1,9 @@
 import { useState, useCallback, useEffect, useRef, type ReactNode } from "react"
 import { AuthContext, type UserProfile } from "./AuthTypes"
 import { 
-  login as apiLogin, 
+  loginWithGoogle as apiLoginWithGoogle, 
   refresh as apiRefresh, 
-  logout as apiLogout,
-  register as apiRegister 
+  logout as apiLogout
 } from "../features/login/services/realAuthService"
 import type { AuthResponse } from "../types/api"
 import { AUTH_CONFIG } from "../common/globas"
@@ -57,10 +56,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     )
   }, [scheduleRefresh])
 
-  const login = useCallback(async (email: string, password: string): Promise<{ ok: boolean; error?: string }> => {
+  const loginWithGoogle = useCallback(async (credential: string): Promise<{ ok: boolean; error?: string }> => {
     setLoading(true)
     try {
-      const result = await apiLogin({ email, password })
+      const result = await apiLoginWithGoogle(credential)
       if (result.ok) {
         applyAuth(result.data)
         setLoading(false)
@@ -74,7 +73,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return { ok: false, error: 'Error de conexión' }
     }
   }, [applyAuth])
-
 
   const logout = useCallback(() => {
     if (accessRef.current) apiLogout(accessRef.current)
@@ -85,24 +83,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(null)
     localStorage.removeItem(AUTH_CONFIG.STORAGE_KEY)
   }, [])
-
-  const register = useCallback(async (username: string, email: string, password: string): Promise<{ ok: boolean; error?: string }> => {
-    setLoading(true)
-    try {
-      const result = await apiRegister({ username, email, password })
-      if (result.ok) {
-        applyAuth(result.data)
-        setLoading(false)
-        return { ok: true }
-      } else {
-        setLoading(false)
-        return { ok: false, error: result.error.message }
-      }
-    } catch (error) {
-      setLoading(false)
-      return { ok: false, error: 'Error de conexión' }
-    }
-  }, [applyAuth])
 
   const updateProfile = useCallback((data: Partial<UserProfile>) => {
     setUser((prev) => (prev ? { ...prev, ...data } : prev))
@@ -132,7 +112,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [applyAuth])
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, updateProfile, register }}>
+    <AuthContext.Provider value={{ user, loading, loginWithGoogle, logout, updateProfile }}>
       {children}
     </AuthContext.Provider>
   )
