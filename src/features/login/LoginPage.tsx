@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import {
   Box,
   Button,
@@ -49,6 +49,7 @@ declare global {
 export default function LoginPage() {
   const [error, setError] = useState("")
   const [googleLoaded, setGoogleLoaded] = useState(false)
+  const googleButtonRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
   const { loginWithGoogle, loading } = useAuth()
 
@@ -84,15 +85,13 @@ export default function LoginPage() {
       cancel_on_tap_outside: true,
     })
 
-    // Renderizar el botón de Google
-    const buttonDiv = document.getElementById("google-signin-button")
-    if (buttonDiv) {
-      window.google.accounts.id.renderButton(buttonDiv, {
+    // Renderizar el botón de Google en un div oculto
+    if (googleButtonRef.current) {
+      window.google.accounts.id.renderButton(googleButtonRef.current, {
         theme: "filled_blue",
         size: "large",
         text: "signin_with",
         shape: "rectangular",
-        logo_alignment: "left",
         width: "100%",
       })
     }
@@ -106,6 +105,19 @@ export default function LoginPage() {
       navigate("/app")
     } else {
       setError(result.error || "Error de autenticación con Google")
+    }
+  }
+
+  const handleGoogleSignIn = () => {
+    if (!googleButtonRef.current) {
+      setError("Google Identity Services no está cargado")
+      return
+    }
+    
+    // Hacer click en el botón invisible de Google
+    const googleButton = googleButtonRef.current.querySelector('div[role="button"]') as HTMLElement
+    if (googleButton) {
+      googleButton.click()
     }
   }
 
@@ -163,32 +175,54 @@ export default function LoginPage() {
 
         {!loading && (
           <>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2, alignItems: "center" }}>
-              {/* Botón de Google renderizado por Google Identity Services */}
-              <Box
-                id="google-signin-button"
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5, alignItems: "center" }}>
+              {/* Botón personalizado de Google con diseño mejorado */}
+              <Button
+                fullWidth
+                onClick={handleGoogleSignIn}
+                disabled={!googleLoaded}
+                className={styles.googleBtn}
+                startIcon={
+                  <Box
+                    sx={{
+                      width: 24,
+                      height: 24,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      backgroundColor: "white",
+                      borderRadius: "4px",
+                      padding: "3px",
+                    }}
+                  >
+                    <GoogleIcon sx={{ color: "#4285F4", fontSize: 18 }} />
+                  </Box>
+                }
                 sx={{
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "center",
-                  minHeight: "44px",
+                  py: 1.75,
+                  fontSize: "1rem",
+                  fontWeight: 600,
+                  textTransform: "none",
+                  letterSpacing: "0.3px",
                 }}
-              />
+              >
+                {googleLoaded ? "Continuar con Google" : "Cargando Google..."}
+              </Button>
 
-              {!googleLoaded && (
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  startIcon={<GoogleIcon />}
-                  disabled
+              {/* Indicador visual de estado */}
+              {googleLoaded && (
+                <Typography
+                  variant="caption"
                   sx={{
-                    py: 1.5,
-                    borderColor: "rgba(255,255,255,0.3)",
-                    color: "rgba(255,255,255,0.7)",
+                    color: "rgba(76, 255, 150, 0.8)",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 0.5,
+                    fontWeight: 500,
                   }}
                 >
-                  Cargando Google Sign-In...
-                </Button>
+                  <span style={{ fontSize: "10px" }}>●</span> Listo para iniciar sesión
+                </Typography>
               )}
             </Box>
 
@@ -209,6 +243,19 @@ export default function LoginPage() {
           </>
         )}
       </Paper>
+
+      {/* Div oculto con el botón real de Google */}
+      <Box
+        ref={googleButtonRef}
+        sx={{
+          position: "absolute",
+          opacity: 0,
+          pointerEvents: "none",
+          width: 0,
+          height: 0,
+          overflow: "hidden",
+        }}
+      />
     </Box>
   )
 }
