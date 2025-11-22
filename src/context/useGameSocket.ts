@@ -1,6 +1,8 @@
 import { useEffect, useRef, useCallback, useState } from "react"
 import { Client } from "@stomp/stompjs"
+import SockJS from "sockjs-client"
 import { useAuth } from "./useAuth"
+import { SOCKET_CONFIG } from "../common/globas"
 import type { GameEvent, PlayerGameState, GameSyncMessage, MazeData } from "../types/api"
 
 interface StompMessage {
@@ -56,11 +58,9 @@ export function useGameSocket(options: UseGameSocketOptions) {
       }
     }
 
-    // Use existing SockJS connection pattern
-    const wsUrl = `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/ws`
-    
-    // Create SockJS instance
-    const socket = new WebSocket(wsUrl.replace("http", "ws"))
+    // Use SockJS like LobbySocketContext
+    const wsUrl = `${SOCKET_CONFIG.URL}/ws`
+    const socket = new SockJS(wsUrl)
     
     const client = new Client({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -72,6 +72,8 @@ export function useGameSocket(options: UseGameSocketOptions) {
       onConnect: () => {
         setIsConnected(true)
         setError(null)
+
+        console.log(`Conectado al WebSocket del juego: ${lobbyCode}`)
 
         // Subscribe to game move events
         moveSubscriptionRef.current = client.subscribe(
@@ -231,12 +233,16 @@ export function useGameSocket(options: UseGameSocketOptions) {
     syncSubscriptionRef.current = null
 
     if (clientRef.current) {
-      // Notify backend that player left
-      if (user?.username) {
-        clientRef.current.publish({
-          destination: `/app/game/${lobbyCode}/leave`,
-          body: JSON.stringify({ username: user.username }),
-        })
+      // Notify backend that player left only if still connected
+      if (clientRef.current.connected && user?.username && lobbyCode) {
+        try {
+          clientRef.current.publish({
+            destination: `/app/game/${lobbyCode}/leave`,
+            body: JSON.stringify({ username: user.username }),
+          })
+        } catch (err) {
+          console.error("Error sending leave message:", err)
+        }
       }
       clientRef.current.deactivate()
       clientRef.current = null

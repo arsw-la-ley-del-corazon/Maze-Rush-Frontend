@@ -4,7 +4,7 @@
   border-radius: 0.5rem;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   display: inline-grid;
-  gap: 1px;
+  gap: 0;
   border: 2px solid rgba(168, 85, 247, 0.3);
 }
 
@@ -13,7 +13,6 @@
   aspect-ratio: 1;
   width: 16px;
   height: 16px;
-  background-color: rgba(88, 28, 135, 0.3);
   transition: background-color 300ms ease-in-out;
 }
 
@@ -31,8 +30,16 @@
   }
 }
 
-.cellWall {
-  border-color: rgba(168, 85, 247, 0.6);
+/* Wall cells - solid dark color */
+.wallCell {
+  background-color: rgba(30, 20, 50, 0.9);
+  border: none;
+}
+
+/* Path cells - lighter color with potential borders */
+.pathCell {
+  background-color: rgba(88, 28, 135, 0.3);
+  border-color: rgba(168, 85, 247, 0.8);
   border-style: solid;
   border-width: 0;
 }

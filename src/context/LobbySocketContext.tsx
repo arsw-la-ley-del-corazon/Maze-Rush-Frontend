@@ -147,7 +147,9 @@ export const LobbySocketProvider: React.FC<{ children: React.ReactNode }> = ({ c
               (message: StompMessage) => {
                 try {
                   const data = JSON.parse(message.body)
-                  // El backend puede enviar diferentes formatos
+                  console.log("Evento de ready recibido:", data)
+                  
+                  // El backend envía { username: string, isReady: boolean }
                   if (data.username) {
                     setReadyPlayers((prev) => {
                       const newSet = new Set(prev)
@@ -157,6 +159,7 @@ export const LobbySocketProvider: React.FC<{ children: React.ReactNode }> = ({ c
                       } else {
                         newSet.delete(data.username)
                       }
+                      console.log(`${data.username} está ${data.isReady ? 'listo' : 'no listo'}`)
                       return newSet
                     })
                   }
@@ -190,16 +193,20 @@ export const LobbySocketProvider: React.FC<{ children: React.ReactNode }> = ({ c
               (message: StompMessage) => {
                 try {
                   const data = JSON.parse(message.body)
+                  console.log("Evento de jugadores recibido:", data)
+                  
                   if (data.players && Array.isArray(data.players)) {
                     setPlayers(data.players)
                     
-                    // Agregar mensaje de sistema
-                    if (data.username && data.action) {
+                    // Agregar mensaje de sistema solo si hay acción específica
+                    if (data.username && data.action && data.username !== "system") {
                       const systemMsg: SystemMessage = {
                         username: "Sistema",
                         message: data.action === "joined" 
                           ? `${data.username} se unió al lobby`
-                          : `${data.username} salió del lobby`,
+                          : data.action === "left"
+                          ? `${data.username} salió del lobby`
+                          : `Lista de jugadores actualizada`,
                         isSystem: true,
                         type: data.action === "joined" ? "player_joined" : "player_left",
                         timestamp: new Date().toISOString(),

@@ -105,16 +105,25 @@ export default function GamePage() {
     setIsLoading(true)
     setMazeError(null)
     
+    console.log("Generating maze of size:", mazeSize)
     const result = await generateMazeFromBackend(mazeSize)
     
     if (!result.ok) {
+      console.error("Failed to generate maze:", result.error)
       setMazeError(result.error.message)
       setIsLoading(false)
       return
     }
 
-    const { layout, startX, startY, goalX, goalY } = result.data
+    console.log("Maze generated successfully:", result.data)
+    const { layout, startX, startY, goalX, goalY, width, height } = result.data
+    console.log("Maze dimensions:", width, "x", height)
+    console.log("Start position:", startX, startY)
+    console.log("Goal position:", goalX, goalY)
+    console.log("Layout sample (first 5 rows):", layout.slice(0, 5))
+    
     const mazeCells = convertLayoutToCells(layout)
+    console.log("Converted to cells, total cells:", mazeCells.length * (mazeCells[0]?.length || 0))
     
     setMaze(mazeCells)
     setPlayerPosition({ x: startX, y: startY })
@@ -175,14 +184,32 @@ export default function GamePage() {
         const { x, y } = prev
         let newPos = { ...prev }
 
+        // Check if movement is valid
         if (direction === "Up" && y > 0 && !maze[y][x].top) {
-          newPos = { x, y: y - 1 }
+          // Also check that destination cell is not a wall
+          const destCell = maze[y - 1][x]
+          const isDestWall = destCell.top && destCell.right && destCell.bottom && destCell.left
+          if (!isDestWall) {
+            newPos = { x, y: y - 1 }
+          }
         } else if (direction === "Down" && y < maze.length - 1 && !maze[y][x].bottom) {
-          newPos = { x, y: y + 1 }
+          const destCell = maze[y + 1][x]
+          const isDestWall = destCell.top && destCell.right && destCell.bottom && destCell.left
+          if (!isDestWall) {
+            newPos = { x, y: y + 1 }
+          }
         } else if (direction === "Left" && x > 0 && !maze[y][x].left) {
-          newPos = { x: x - 1, y }
+          const destCell = maze[y][x - 1]
+          const isDestWall = destCell.top && destCell.right && destCell.bottom && destCell.left
+          if (!isDestWall) {
+            newPos = { x: x - 1, y }
+          }
         } else if (direction === "Right" && x < maze[0].length - 1 && !maze[y][x].right) {
-          newPos = { x: x + 1, y }
+          const destCell = maze[y][x + 1]
+          const isDestWall = destCell.top && destCell.right && destCell.bottom && destCell.left
+          if (!isDestWall) {
+            newPos = { x: x + 1, y }
+          }
         }
 
         // Send move to server (with throttling)

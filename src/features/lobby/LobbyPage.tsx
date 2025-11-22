@@ -65,24 +65,30 @@ export default function LobbyPage() {
     }
   }, [lobby, isConnected, code, connect])
 
-  // Actualizar lista de jugadores periódicamente y cuando se reciben mensajes
+  // Actualizar lista de jugadores solo cuando cambian los jugadores del socket
+  // Ya no necesitamos polling porque el WebSocket notifica automáticamente
   useEffect(() => {
     if (!code || !lobby) return
 
+    // Solo actualizar si hay diferencias significativas
     const interval = setInterval(() => {
-      loadLobby()
-    }, 3000) // Actualizar cada 3 segundos
+      if (socketPlayers.length === 0) {
+        // Si no hay jugadores en el socket, recargar del servidor
+        loadLobby()
+      }
+    }, 10000) // Actualizar cada 10 segundos como fallback
 
     return () => clearInterval(interval)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code])
+  }, [code, socketPlayers.length])
 
-  // Actualizar lista de jugadores cuando cambia el lobby
+  // Actualizar lista de jugadores cuando cambia el lobby (solo al inicio)
   useEffect(() => {
-    if (lobby && lobby.players) {
+    if (lobby && lobby.players && socketPlayers.length === 0) {
+      // Solo sincronizar si el socket no tiene jugadores todavía
       updatePlayers(lobby.players)
     }
-  }, [lobby, updatePlayers])
+  }, [lobby, updatePlayers, socketPlayers.length])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -124,16 +130,20 @@ export default function LobbyPage() {
   }
 
   const handleStartGame = () => {
-    if (isHost && readyPlayers.size >= 2) {
+    if (isHost && canStartGame) {
       startGame()
       // Navegar a la página del juego
       navigate(`/app/game/${code}`)
     }
   }
 
-  // Usar jugadores del lobby si están disponibles, sino usar los del socket
-  const currentPlayers = (lobby?.players && lobby.players.length > 0) ? lobby.players : socketPlayers
-  const allPlayersReady = currentPlayers.length >= 2 && currentPlayers.every((p) => readyPlayers.has(p))
+  // Priorizar jugadores del socket cuando está conectado, sino usar los del lobby
+  const currentPlayers = isConnected && socketPlayers.length > 0 ? socketPlayers : (lobby?.players || [])
+  
+  // El host no necesita estar "listo", solo los demás jugadores
+  const nonHostPlayers = currentPlayers.filter(p => p !== lobby?.creatorUsername)
+  const allPlayersReady = nonHostPlayers.length > 0 && nonHostPlayers.every((p) => readyPlayers.has(p))
+  const canStartGame = currentPlayers.length >= 2 && allPlayersReady
 
   if (loading) {
     return (
@@ -231,15 +241,17 @@ export default function LobbyPage() {
               <>
                 <button
                   onClick={handleStartGame}
-                  disabled={!allPlayersReady || !isConnected}
-                  className={`${styles.primaryButton} ${styles.startButton} ${!allPlayersReady || !isConnected ? styles.buttonDisabled : ''}`}
+                  disabled={!canStartGame || !isConnected}
+                  className={`${styles.primaryButton} ${styles.startButton} ${!canStartGame || !isConnected ? styles.buttonDisabled : ''}`}
                 >
                   <span>▶</span>
                   Iniciar Juego
                 </button>
-                {!allPlayersReady && (
+                {!canStartGame && isConnected && (
                   <p className={styles.helperText}>
-                    Todos los jugadores deben estar listos
+                    {currentPlayers.length < 2 
+                      ? 'Se necesitan al menos 2 jugadores'
+                      : 'Todos los jugadores deben estar listos'}
                   </p>
                 )}
               </>

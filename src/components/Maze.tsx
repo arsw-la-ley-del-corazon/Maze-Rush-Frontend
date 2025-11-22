@@ -22,12 +22,14 @@ export function Maze({ maze, playerPosition, endPosition, isGameWon, otherPlayer
   }
 
   const width = maze[0].length
+  const height = maze.length
 
   return (
     <div
       className={styles.mazeContainer}
       style={{
         gridTemplateColumns: `repeat(${width}, minmax(0, 1fr))`,
+        gridTemplateRows: `repeat(${height}, minmax(0, 1fr))`,
       }}
     >
       {maze.map((row, y) =>
@@ -35,24 +37,27 @@ export function Maze({ maze, playerPosition, endPosition, isGameWon, otherPlayer
           const isPlayer = playerPosition.x === x && playerPosition.y === y
           const isEnd = endPosition.x === x && endPosition.y === y
           const otherPlayersHere = otherPlayers.filter((p) => p.position.x === x && p.position.y === y)
+          
+          // Check if this cell is a wall (all borders are true)
+          const isWall = cell.top && cell.right && cell.bottom && cell.left
 
           return (
             <div
               key={`${y}-${x}`}
               className={cn(
                 styles.cell,
-                styles.cellWall,
-                cell.top && styles.cellWallTop,
-                cell.right && styles.cellWallRight,
-                cell.bottom && styles.cellWallBottom,
-                cell.left && styles.cellWallLeft,
-                isEnd && styles.endPosition
+                isWall ? styles.wallCell : styles.pathCell,
+                !isWall && cell.top && styles.cellWallTop,
+                !isWall && cell.right && styles.cellWallRight,
+                !isWall && cell.bottom && styles.cellWallBottom,
+                !isWall && cell.left && styles.cellWallLeft,
+                isEnd && !isWall && styles.endPosition
               )}
             >
-              {isEnd && <div className={styles.endToken} />}
+              {isEnd && !isWall && <div className={styles.endToken} />}
               
               {/* Render other players at this position */}
-              {otherPlayersHere.map((player, idx) => (
+              {!isWall && otherPlayersHere.map((player, idx) => (
                 <div
                   key={player.username}
                   className={styles.otherPlayerToken}
@@ -66,7 +71,7 @@ export function Maze({ maze, playerPosition, endPosition, isGameWon, otherPlayer
               ))}
               
               {/* Render current player */}
-              {isPlayer && (
+              {isPlayer && !isWall && (
                 <div className={cn(styles.playerToken, isGameWon && styles.playerTokenWinning)} />
               )}
             </div>
