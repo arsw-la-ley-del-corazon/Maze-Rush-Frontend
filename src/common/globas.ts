@@ -20,6 +20,14 @@ export const API_ENDPOINTS = {
     BASE: '/game',
     ROOMS: '/game/rooms',
   },
+  LOBBY: {
+    BASE: '/lobby',
+    CREATE: '/lobby/create',
+    ALL: '/lobby/all',
+    JOIN: (code: string) => `/lobby/join/${code}`,
+    GET: (code: string) => `/lobby/${code}`,
+    LEAVE: (code: string) => `/lobby/${code}/leave`,
+  },
 } as const;
 
 // Configuración de autenticación

@@ -1,0 +1,22 @@
+.chatContainer {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(164, 106, 255, 0.3) transparent;
+}
+
+.chatContainer::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chatContainer::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chatContainer::-webkit-scrollbar-thumb {
+  background-color: rgba(164, 106, 255, 0.3);
+  border-radius: 3px;
+}
+
+.chatContainer::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(164, 106, 255, 0.5);
+}
+

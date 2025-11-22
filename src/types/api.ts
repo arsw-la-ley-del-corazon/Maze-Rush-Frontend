@@ -47,5 +47,34 @@ export interface ApiErrorShape {
   details?: string[]
 }
 
+// Lobby Types
+export interface LobbyResponse {
+  id: string
+  code: string
+  mazeSize: string
+  maxPlayers: number
+  isPublic: boolean
+  status: string
+  creatorUsername: string
+  createdAt: string
+}
+
+export interface LobbyWithPlayersResponse extends LobbyResponse {
+  players: string[]
+}
+
+export interface LobbyRequest {
+  mazeSize: string
+  maxPlayers: number
+  isPublic: boolean
+  status?: string
+}
+
+export interface ChatMessage {
+  username: string
+  message: string
+  timestamp?: string
+}
+
 // Utilidades
 export type Result<T> = { ok: true; data: T } | { ok: false; error: ApiErrorShape }

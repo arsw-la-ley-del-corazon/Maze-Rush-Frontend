@@ -92,7 +92,7 @@ export default function LoginPage() {
         size: "large",
         text: "signin_with",
         shape: "rectangular",
-        width: "100%",
+        width: "400",
       })
     }
   }, [googleLoaded])
@@ -100,11 +100,16 @@ export default function LoginPage() {
   const handleGoogleResponse = async (response: { credential: string }) => {
     setError("")
     
-    const result = await loginWithGoogle(response.credential)
-    if (result.ok) {
-      navigate("/app")
-    } else {
-      setError(result.error || "Error de autenticación con Google")
+    try {
+      const result = await loginWithGoogle(response.credential)
+      if (result.ok) {
+        navigate("/app")
+      } else {
+        setError(result.error || "Error de autenticación con Google")
+      }
+    } catch (err) {
+      console.error("Error durante autenticación:", err)
+      setError("No se pudo conectar con el servidor. Verifica que el backend esté corriendo en http://localhost:8080")
     }
   }
 
