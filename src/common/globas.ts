@@ -7,8 +7,7 @@ export const API_CONFIG = {
 // URLs de la API
 export const API_ENDPOINTS = {
   AUTH: {
-    LOGIN: '/auth/login',
-    REGISTER: '/auth/register',
+    GOOGLE: '/auth/google',
     REFRESH: '/auth/refresh',
     LOGOUT: '/auth/logout',
     VALIDATE: '/auth/validate',
@@ -27,6 +26,11 @@ export const API_ENDPOINTS = {
 export const AUTH_CONFIG = {
   STORAGE_KEY: import.meta.env.VITE_AUTH_STORAGE_KEY || 'auth_state',
   TOKEN_REFRESH_MARGIN: parseInt(import.meta.env.VITE_AUTH_TOKEN_REFRESH_MARGIN) || 30, // segundos antes de expirar para refrescar token
+} as const;
+
+// Configuración de Google OAuth
+export const GOOGLE_CONFIG = {
+  CLIENT_ID: import.meta.env.VITE_GOOGLE_CLIENT_ID || '',
 } as const;
 
 // Configuración de la aplicación

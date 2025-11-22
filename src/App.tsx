@@ -3,8 +3,6 @@ import { ThemeProvider, CssBaseline, createTheme } from "@mui/material"
 import "./global.css"
 import HomePage from "./features/home/HomePage"
 import LoginPage from "./features/login/LoginPage"
-import SignUpPage from "./features/singup/SignUpPage"
-import ForgotPasswordPage from "./features/forgot/ForgotPasswordPage"
 import { AuthProvider } from "./context/AuthContext"
 import { useAuth } from "./context/useAuth"
 import AppShell from "./components/AppShell"
@@ -88,8 +86,6 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/home" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignUpPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             {/* Autenticado */}
             <Route
               path="/app"
