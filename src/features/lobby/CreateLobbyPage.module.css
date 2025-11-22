@@ -225,6 +225,35 @@
   font-size: 0.75rem;
 }
 
+/* Estilos específicos para el select */
+.inputField[type="number"],
+.inputField select,
+select.inputField {
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: rgba(10, 14, 39, 0.8);
+  color: #4cffb3;
+  font-weight: 500;
+}
+
+select.inputField option {
+  background: #0a0e27;
+  color: #4cffb3;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border: none;
+}
+
+select.inputField option:hover,
+select.inputField option:checked,
+select.inputField option:focus {
+  background: linear-gradient(135deg, rgba(76, 255, 179, 0.2), rgba(0, 217, 255, 0.2));
+  color: #fff;
+}
+
 /* Switch toggle */
 .switchContainer {
   display: flex;

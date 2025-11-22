@@ -57,6 +57,7 @@ export interface LobbyResponse {
   status: string
   creatorUsername: string
   createdAt: string
+  currentPlayers?: number // Número actual de jugadores en la sala
 }
 
 export interface LobbyWithPlayersResponse extends LobbyResponse {

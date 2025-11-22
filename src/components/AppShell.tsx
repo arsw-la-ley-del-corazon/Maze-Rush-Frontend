@@ -23,7 +23,6 @@ import LogoutIcon from "@mui/icons-material/Logout"
 import PlayArrowIcon from "@mui/icons-material/PlayArrow"
 import GroupAddIcon from "@mui/icons-material/GroupAdd"
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents"
-import SettingsIcon from "@mui/icons-material/Settings"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useAuth } from "../context/useAuth"
 import { useSocket } from "../context/SocketContext"
@@ -40,7 +39,6 @@ const navItems: NavItem[] = [
   { label: "Crear Lobby", path: "/app/create-lobby", icon: <GroupAddIcon /> },
   { label: "Perfil", path: "/app/profile", icon: <AccountCircleIcon /> },
   { label: "Leaderboard", path: "/app/leaderboard", icon: <EmojiEventsIcon /> },
-  { label: "Configuración", path: "/app/settings", icon: <SettingsIcon /> },
 ]
 
 export default function AppShell({ children }: { children: ReactNode }) {

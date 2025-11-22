@@ -27,11 +27,24 @@ export default function CreateLobbyPage() {
     setLoading(true)
     setError(null)
 
+    console.log("🎯 CREANDO LOBBY CON DATOS:")
+    console.log("   - mazeSize:", formData.mazeSize)
+    console.log("   - maxPlayers:", formData.maxPlayers)
+    console.log("   - isPublic:", formData.isPublic, typeof formData.isPublic)
+    console.log("   - status:", formData.status)
+    console.log("📦 FormData completo:", JSON.stringify(formData, null, 2))
+
     const result = await createLobby(formData)
 
+    console.log("📡 Respuesta del servidor:", result)
+
     if (result.ok) {
+      console.log("✅ Lobby creado exitosamente!")
+      console.log("   - Código:", result.data.code)
+      console.log("   - isPublic del resultado:", result.data.isPublic)
       navigate(`/app/lobby/${result.data.code}`)
     } else {
+      console.error("❌ Error al crear lobby:", result.error)
       setError(result.error.message)
       setLoading(false)
     }
