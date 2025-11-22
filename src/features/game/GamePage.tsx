@@ -99,24 +99,61 @@ export default function GamePage() {
   }
 
   /**
-   * Initialize maze from backend
+   * Initialize maze from backend or shared maze
    */
   const initializeMaze = useCallback(async () => {
     setIsLoading(true)
     setMazeError(null)
     
-    console.log("Generating maze of size:", mazeSize)
-    const result = await generateMazeFromBackend(mazeSize)
+    // Intentar cargar el laberinto compartido primero
+    const sharedMazeKey = `maze_${code}`
+    const sharedMazeData = sessionStorage.getItem(sharedMazeKey)
     
-    if (!result.ok) {
-      console.error("Failed to generate maze:", result.error)
-      setMazeError(result.error.message)
-      setIsLoading(false)
-      return
-    }
+    let mazeData
+    
+    if (sharedMazeData) {
+      // Usar el laberinto compartido recibido desde el backend
+      console.log("Usando laberinto compartido para lobby:", code)
+      try {
+        const parsedMaze = JSON.parse(sharedMazeData)
+        // El layout puede venir como string o como array
+        const layout = typeof parsedMaze.layout === 'string' 
+          ? JSON.parse(parsedMaze.layout)
+          : parsedMaze.layout
+        
+        mazeData = {
+          layout: layout,
+          startX: parsedMaze.startX,
+          startY: parsedMaze.startY,
+          goalX: parsedMaze.goalX,
+          goalY: parsedMaze.goalY,
+          width: parsedMaze.width,
+          height: parsedMaze.height
+        }
+        console.log("Laberinto compartido cargado exitosamente")
+      } catch (err) {
+        console.error("Error parseando laberinto compartido:", err)
+        setMazeError("Error cargando laberinto compartido")
+        setIsLoading(false)
+        return
+      }
+    } else {
+      // Si no hay laberinto compartido, generar uno nuevo (fallback)
+      console.log("No se encontró laberinto compartido, generando nuevo de tamaño:", mazeSize)
+      const result = await generateMazeFromBackend(mazeSize)
+      
+      if (!result.ok) {
+        console.error("Failed to generate maze:", result.error)
+        setMazeError(result.error.message)
+        setIsLoading(false)
+        return
+      }
 
-    console.log("Maze generated successfully:", result.data)
-    const { layout, startX, startY, goalX, goalY, width, height } = result.data
+      console.log("Maze generated successfully:", result.data)
+      mazeData = result.data
+    }
+    
+    const { layout, startX, startY, goalX, goalY, width, height } = mazeData
     console.log("Maze dimensions:", width, "x", height)
     console.log("Start position:", startX, startY)
     console.log("Goal position:", goalX, goalY)
@@ -133,7 +170,7 @@ export default function GamePage() {
     setGameWon(false)
     setIsLoading(false)
     gameStartedRef.current = true
-  }, [mazeSize])
+  }, [code, mazeSize])
 
   useEffect(() => {
     if (!code) {

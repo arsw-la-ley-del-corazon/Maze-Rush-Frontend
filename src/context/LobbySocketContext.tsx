@@ -177,8 +177,19 @@ export const LobbySocketProvider: React.FC<{ children: React.ReactNode }> = ({ c
               (message: StompMessage) => {
                 try {
                   const data = JSON.parse(message.body)
-                  // Aquí puedes manejar eventos de inicio de juego
-                  console.log("Game event:", data)
+                  console.log("Game event recibido:", data)
+                  
+                  if (data.action === "game_started") {
+                    if (data.maze) {
+                      // Guardar el laberinto en sessionStorage para usarlo en GamePage
+                      sessionStorage.setItem(`maze_${data.lobbyCode}`, JSON.stringify(data.maze))
+                      console.log("Laberinto compartido guardado para lobby:", data.lobbyCode)
+                    }
+                    
+                    // Navegar automáticamente al juego para todos los jugadores
+                    console.log("Navegando a la página de juego...")
+                    window.location.href = `/app/game/${data.lobbyCode}`
+                  }
                 } catch (err) {
                   console.error("Error parsing game message:", err)
                 }
