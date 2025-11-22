@@ -44,6 +44,7 @@ export const LobbySocketProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [players, setPlayers] = useState<string[]>([])
   const [readyPlayers, setReadyPlayers] = useState<Set<string>>(new Set())
   const currentLobbyCodeRef = useRef<string | null>(null)
+  const processedMessageIdsRef = useRef<Set<string>>(new Set())
   const chatSubscriptionRef = useRef<{ unsubscribe: () => void } | null>(null)
   const readySubscriptionRef = useRef<{ unsubscribe: () => void } | null>(null)
   const gameSubscriptionRef = useRef<{ unsubscribe: () => void } | null>(null)
@@ -117,7 +118,21 @@ export const LobbySocketProvider: React.FC<{ children: React.ReactNode }> = ({ c
               (message: StompMessage) => {
                 try {
                   const chatMessage: ChatMessage = JSON.parse(message.body)
-                  setMessages((prev) => [...prev, chatMessage])
+                  
+                  // Crear ID único para el mensaje basado en username, message y timestamp
+                  const messageId = `${chatMessage.username}-${chatMessage.message}-${chatMessage.timestamp || Date.now()}`
+                  
+                  // Prevenir duplicación
+                  if (!processedMessageIdsRef.current.has(messageId)) {
+                    processedMessageIdsRef.current.add(messageId)
+                    setMessages((prev) => [...prev, chatMessage])
+                    
+                    // Limpiar IDs antiguos (mantener solo los últimos 100)
+                    if (processedMessageIdsRef.current.size > 100) {
+                      const idsArray = Array.from(processedMessageIdsRef.current)
+                      processedMessageIdsRef.current = new Set(idsArray.slice(-100))
+                    }
+                  }
                 } catch (err) {
                   console.error("Error parsing chat message:", err)
                 }
@@ -307,6 +322,7 @@ export const LobbySocketProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setMessages([])
     setPlayers([])
     setReadyPlayers(new Set())
+    processedMessageIdsRef.current.clear()
     reconnectAttemptsRef.current = 0
     currentLobbyCodeRef.current = null
     onDisconnectCallbackRef.current = undefined
@@ -377,7 +393,7 @@ export const LobbySocketProvider: React.FC<{ children: React.ReactNode }> = ({ c
     toggleReady,
     startGame,
     updatePlayers,
-    onDisconnectCallback: setOnDisconnectCallback,
+    setOnDisconnectCallback,
   }
 
   return <LobbySocketContext.Provider value={value}>{children}</LobbySocketContext.Provider>
