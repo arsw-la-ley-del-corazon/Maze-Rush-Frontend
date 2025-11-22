@@ -14,6 +14,7 @@ import QuickPlayPage from "./features/quickplay/QuickPlayPage"
 import CreateLobbyPage from "./features/lobby/CreateLobbyPage"
 import JoinLobbyPage from "./features/lobby/JoinLobbyPage"
 import LobbyPage from "./features/lobby/LobbyPage"
+import GamePage from "./features/game/GamePage"
 
 const theme = createTheme({
   palette: {
@@ -149,6 +150,14 @@ function App() {
                       <AppShell>
                         <LobbyPage />
                       </AppShell>
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/app/game/:code"
+                  element={
+                    <Protected>
+                      <GamePage />
                     </Protected>
                   }
                 />

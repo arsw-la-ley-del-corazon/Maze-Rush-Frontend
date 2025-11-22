@@ -126,8 +126,8 @@ export default function LobbyPage() {
   const handleStartGame = () => {
     if (isHost && readyPlayers.size >= 2) {
       startGame()
-      // Aquí puedes navegar a la página del juego cuando esté lista
-      // navigate(`/app/game/${code}`)
+      // Navegar a la página del juego
+      navigate(`/app/game/${code}`)
     }
   }
 
