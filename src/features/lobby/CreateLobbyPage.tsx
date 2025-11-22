@@ -1,22 +1,15 @@
 import { useState } from "react"
-import {
-  Box,
-  Typography,
-  Paper,
-  Stack,
-  TextField,
-  Button,
-  FormControlLabel,
-  Switch,
-  MenuItem,
-  Alert,
-  CircularProgress,
-} from "@mui/material"
 import { useNavigate } from "react-router-dom"
+import { CircularProgress } from "@mui/material"
 import { createLobby } from "./services/lobbyService"
 import type { LobbyRequest } from "../../types/api"
+import styles from "./CreateLobbyPage.module.css"
 
-const MAZE_SIZES = ["Pequeño", "Mediano", "Grande"]
+const MAZE_SIZES = [
+  { value: "Pequeño", label: "Pequeño", description: "10x10 - Rápido" },
+  { value: "Mediano", label: "Mediano", description: "20x20 - Equilibrado" },
+  { value: "Grande", label: "Grande", description: "30x30 - Desafío" },
+]
 
 export default function CreateLobbyPage() {
   const navigate = useNavigate()
@@ -44,73 +37,180 @@ export default function CreateLobbyPage() {
     }
   }
 
-  return (
-    <Box sx={{ maxWidth: 600, mx: "auto", py: 4 }}>
-      <Stack spacing={3}>
-        <Typography variant="h4" fontWeight={700}>
-          Crear Lobby
-        </Typography>
+  const renderPlayerDots = () => {
+    return (
+      <div className={styles.playerCounter}>
+        {[...Array(4)].map((_, index) => (
+          <div
+            key={index}
+            className={`${styles.playerDot} ${index < formData.maxPlayers ? styles.active : ""}`}
+          />
+        ))}
+      </div>
+    )
+  }
 
-        <Paper sx={{ p: 3 }}>
-          <form onSubmit={handleSubmit}>
-            <Stack spacing={3}>
-              <TextField
-                select
-                label="Tamaño del Laberinto"
+  return (
+    <div className={styles.container}>
+      {/* Patrón de laberinto animado */}
+      <div className={styles.mazePattern} />
+
+      {/* Partículas decorativas */}
+      <div className={styles.particle} />
+      <div className={styles.particle} />
+      <div className={styles.particle} />
+      <div className={styles.particle} />
+
+      <div className={styles.card}>
+        <h1 className={styles.title}>Crear Lobby</h1>
+        <p className={styles.subtitle}>Configura tu sala y desafía a tus amigos en el laberinto</p>
+
+        <form onSubmit={handleSubmit} className={styles.form}>
+          {/* Tamaño del Laberinto */}
+          <div className={styles.fieldGroup}>
+            <label className={styles.fieldLabel}>
+              🎯 Tamaño del Laberinto
+            </label>
+            <div className={styles.selectWrapper}>
+              <select
+                className={styles.inputField}
                 value={formData.mazeSize}
                 onChange={(e) => setFormData({ ...formData, mazeSize: e.target.value })}
-                fullWidth
                 required
               >
                 {MAZE_SIZES.map((size) => (
-                  <MenuItem key={size} value={size}>
-                    {size}
-                  </MenuItem>
+                  <option key={size.value} value={size.value}>
+                    {size.label} - {size.description}
+                  </option>
                 ))}
-              </TextField>
+              </select>
+            </div>
+          </div>
 
-              <TextField
-                type="number"
-                label="Máximo de Jugadores"
-                value={formData.maxPlayers}
-                onChange={(e) =>
-                  setFormData({ ...formData, maxPlayers: parseInt(e.target.value) || 2 })
-                }
-                inputProps={{ min: 2, max: 4 }}
-                fullWidth
-                required
+          {/* Máximo de Jugadores */}
+          <div className={styles.fieldGroup}>
+            <label className={styles.fieldLabel}>
+              👥 Máximo de Jugadores
+            </label>
+            <input
+              type="number"
+              className={styles.inputField}
+              value={formData.maxPlayers}
+              onChange={(e) =>
+                setFormData({ ...formData, maxPlayers: parseInt(e.target.value) || 2 })
+              }
+              min={2}
+              max={4}
+              required
+            />
+            {renderPlayerDots()}
+          </div>
+
+          {/* Lobby Público/Privado */}
+          <div className={styles.switchContainer}>
+            <label className={styles.switchLabel}>
+              {formData.isPublic ? "🌐 Lobby Público" : "🔒 Lobby Privado"}
+            </label>
+            <label className="switch">
+              <input
+                type="checkbox"
+                checked={formData.isPublic}
+                onChange={(e) => setFormData({ ...formData, isPublic: e.target.checked })}
               />
+              <span className="slider" />
+            </label>
+          </div>
 
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={formData.isPublic}
-                    onChange={(e) => setFormData({ ...formData, isPublic: e.target.checked })}
-                  />
-                }
-                label="Lobby Público"
-              />
+          {/* Error Alert */}
+          {error && (
+            <div className={styles.alert}>
+              ⚠️ {error}
+            </div>
+          )}
 
-              {error && <Alert severity="error">{error}</Alert>}
+          {/* Botones de Acción */}
+          <div className={styles.actions}>
+            <button
+              type="button"
+              className={`${styles.button} ${styles.buttonCancel}`}
+              onClick={() => navigate("/app")}
+              disabled={loading}
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              className={`${styles.button} ${styles.buttonSubmit}`}
+              disabled={loading}
+            >
+              {loading ? (
+                <span className={styles.loader}>
+                  <CircularProgress size={20} sx={{ color: "#0a0e27" }} />
+                  Creando...
+                </span>
+              ) : (
+                "Crear Lobby"
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
 
-              <Stack direction="row" spacing={2}>
-                <Button
-                  type="button"
-                  variant="outlined"
-                  onClick={() => navigate("/app")}
-                  fullWidth
-                >
-                  Cancelar
-                </Button>
-                <Button type="submit" variant="contained" disabled={loading} fullWidth>
-                  {loading ? <CircularProgress size={24} /> : "Crear Lobby"}
-                </Button>
-              </Stack>
-            </Stack>
-          </form>
-        </Paper>
-      </Stack>
-    </Box>
+      {/* CSS para el switch toggle */}
+      <style>{`
+        .switch {
+          position: relative;
+          display: inline-block;
+          width: 50px;
+          height: 26px;
+        }
+
+        .switch input {
+          opacity: 0;
+          width: 0;
+          height: 0;
+        }
+
+        .slider {
+          position: absolute;
+          cursor: pointer;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(255, 255, 255, 0.1);
+          transition: 0.3s;
+          border-radius: 26px;
+          border: 1.5px solid rgba(76, 255, 179, 0.2);
+        }
+
+        .slider:before {
+          position: absolute;
+          content: "";
+          height: 18px;
+          width: 18px;
+          left: 3px;
+          bottom: 3px;
+          background-color: rgba(255, 255, 255, 0.5);
+          transition: 0.3s;
+          border-radius: 50%;
+        }
+
+        input:checked + .slider {
+          background: linear-gradient(135deg, #4cffb3 0%, #3ecf94 100%);
+          border-color: #4cffb3;
+        }
+
+        input:checked + .slider:before {
+          transform: translateX(24px);
+          background-color: #0a0e27;
+        }
+
+        input:checked + .slider {
+          box-shadow: 0 0 20px rgba(76, 255, 179, 0.4);
+        }
+      `}</style>
+    </div>
   )
 }
 

@@ -103,9 +103,10 @@ export const LobbySocketProvider: React.FC<{ children: React.ReactNode }> = ({ c
           }
 
           // Conectar al lobby
-          if (currentLobbyCodeRef.current) {
+          if (currentLobbyCodeRef.current && user?.username) {
             client.publish({
               destination: `/app/lobby/${currentLobbyCodeRef.current}/connect`,
+              body: JSON.stringify({ username: user.username }),
             })
           }
 
@@ -313,40 +314,42 @@ export const LobbySocketProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const sendMessage = useCallback(
     (message: string) => {
-      if (!clientRef.current?.connected || !currentLobbyCodeRef.current) {
+      if (!clientRef.current?.connected || !currentLobbyCodeRef.current || !user?.username) {
         setError("No conectado al lobby")
         return
       }
 
       clientRef.current.publish({
         destination: `/app/lobby/${currentLobbyCodeRef.current}/chat`,
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ message, username: user.username }),
       })
     },
-    []
+    [user]
   )
 
   const toggleReady = useCallback(() => {
-    if (!clientRef.current?.connected || !currentLobbyCodeRef.current) {
+    if (!clientRef.current?.connected || !currentLobbyCodeRef.current || !user?.username) {
       setError("No conectado al lobby")
       return
     }
 
     clientRef.current.publish({
       destination: `/app/lobby/${currentLobbyCodeRef.current}/ready`,
+      body: JSON.stringify({ username: user.username }),
     })
-  }, [])
+  }, [user])
 
   const startGame = useCallback(() => {
-    if (!clientRef.current?.connected || !currentLobbyCodeRef.current) {
+    if (!clientRef.current?.connected || !currentLobbyCodeRef.current || !user?.username) {
       setError("No conectado al lobby")
       return
     }
 
     clientRef.current.publish({
       destination: `/app/lobby/${currentLobbyCodeRef.current}/start`,
+      body: JSON.stringify({ username: user.username }),
     })
-  }, [])
+  }, [user])
 
   useEffect(() => {
     return () => {

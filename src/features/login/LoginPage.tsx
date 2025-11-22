@@ -128,9 +128,6 @@ export default function LoginPage() {
 
   return (
     <Box className={styles.root}>
-      {/* Halo animado detrás */}
-      <Box className={styles.halo} />
-
       {/* Botón volver */}
       <Button
         component={RouterLink}
@@ -141,11 +138,17 @@ export default function LoginPage() {
           position: "absolute",
           top: 32,
           left: 32,
-          color: "rgba(255,255,255,0.7)",
+          color: "rgba(0, 255, 255, 0.8)",
           zIndex: 3,
           fontWeight: "bold",
           textTransform: "none",
-          "&:hover": { color: "#fff" },
+          textShadow: "0 0 8px rgba(0, 255, 255, 0.6)",
+          transition: "all 0.3s ease",
+          "&:hover": { 
+            color: "#00ffff",
+            textShadow: "0 0 12px rgba(0, 255, 255, 1)",
+            transform: "translateX(-4px)",
+          },
         }}
       >
         Volver
@@ -162,12 +165,31 @@ export default function LoginPage() {
         >
           Bienvenido a Maze Rush
         </Typography>
-        <Typography variant="body2" color="rgba(255,255,255,0.72)" align="center" mb={3}>
+        <Typography 
+          variant="body2" 
+          align="center" 
+          mb={3}
+          sx={{ 
+            color: "rgba(0, 255, 255, 0.7)",
+            textShadow: "0 0 8px rgba(0, 255, 255, 0.3)"
+          }}
+        >
           Inicia sesión con tu cuenta de Google para comenzar
         </Typography>
 
         {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
+          <Alert 
+            severity="error" 
+            sx={{ 
+              mb: 3,
+              backgroundColor: "rgba(255, 0, 0, 0.1)",
+              border: "1px solid rgba(255, 0, 0, 0.3)",
+              color: "#ff6666",
+              "& .MuiAlert-icon": {
+                color: "#ff4444"
+              }
+            }}
+          >
             {error}
           </Alert>
         )}
@@ -181,7 +203,7 @@ export default function LoginPage() {
         {!loading && (
           <>
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5, alignItems: "center" }}>
-              {/* Botón personalizado de Google con diseño mejorado */}
+              {/* Botón personalizado de Google con diseño neón cian */}
               <Button
                 fullWidth
                 onClick={handleGoogleSignIn}
@@ -195,12 +217,13 @@ export default function LoginPage() {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      backgroundColor: "white",
-                      borderRadius: "4px",
-                      padding: "3px",
+                      backgroundColor: "rgba(0, 255, 255, 0.15)",
+                      borderRadius: "6px",
+                      padding: "4px",
+                      border: "1px solid rgba(0, 255, 255, 0.3)",
                     }}
                   >
-                    <GoogleIcon sx={{ color: "#4285F4", fontSize: 18 }} />
+                    <GoogleIcon sx={{ color: "#00ffff", fontSize: 18 }} />
                   </Box>
                 }
                 sx={{
@@ -208,7 +231,7 @@ export default function LoginPage() {
                   fontSize: "1rem",
                   fontWeight: 600,
                   textTransform: "none",
-                  letterSpacing: "0.3px",
+                  letterSpacing: "0.5px",
                 }}
               >
                 {googleLoaded ? "Continuar con Google" : "Cargando Google..."}
@@ -219,29 +242,56 @@ export default function LoginPage() {
                 <Typography
                   variant="caption"
                   sx={{
-                    color: "rgba(76, 255, 150, 0.8)",
+                    color: "rgba(0, 255, 255, 0.9)",
                     display: "flex",
                     alignItems: "center",
                     gap: 0.5,
-                    fontWeight: 500,
+                    fontWeight: 600,
+                    textShadow: "0 0 8px rgba(0, 255, 255, 0.6)",
                   }}
                 >
-                  <span style={{ fontSize: "10px" }}>●</span> Listo para iniciar sesión
+                  <span style={{ fontSize: "10px", animation: "pulse 2s ease-in-out infinite" }}>●</span> 
+                  Listo para iniciar sesión
                 </Typography>
               )}
             </Box>
 
-            <Divider sx={{ my: 3 }}>
-              <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.5)", letterSpacing: 2 }}>
+            <Divider sx={{ my: 3, borderColor: "rgba(0, 255, 255, 0.2)" }}>
+              <Typography 
+                variant="caption" 
+                sx={{ 
+                  color: "rgba(0, 255, 255, 0.6)", 
+                  letterSpacing: 2,
+                  fontWeight: 600,
+                  textShadow: "0 0 8px rgba(0, 255, 255, 0.3)"
+                }}
+              >
                 AUTENTICACIÓN SEGURA
               </Typography>
             </Divider>
 
             <Box sx={{ textAlign: "center" }}>
-              <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.6)", mb: 2 }}>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  color: "rgba(255, 255, 255, 0.7)", 
+                  mb: 2,
+                  lineHeight: 1.6
+                }}
+              >
                 Al continuar, aceptas nuestros términos de servicio y política de privacidad.
               </Typography>
-              <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.5)" }}>
+              <Typography 
+                variant="caption" 
+                sx={{ 
+                  color: "rgba(0, 255, 255, 0.7)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 0.5,
+                  textShadow: "0 0 8px rgba(0, 255, 255, 0.3)"
+                }}
+              >
                 🔒 Autenticación segura proporcionada por Google
               </Typography>
             </Box>

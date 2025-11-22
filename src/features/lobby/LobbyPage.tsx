@@ -1,25 +1,6 @@
 import { useEffect, useState, useRef } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import {
-  Box,
-  Typography,
-  Paper,
-  Stack,
-  Button,
-  TextField,
-  Chip,
-  Avatar,
-  IconButton,
-  Alert,
-  CircularProgress,
-  Divider,
-  Tooltip,
-} from "@mui/material"
-import SendIcon from "@mui/icons-material/Send"
-import ExitToAppIcon from "@mui/icons-material/ExitToApp"
-import PlayArrowIcon from "@mui/icons-material/PlayArrow"
-import CheckCircleIcon from "@mui/icons-material/CheckCircle"
-import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked"
+import { CircularProgress } from "@mui/material"
 import { useLobbySocket } from "../../context/LobbySocketContext"
 import { getLobbyByCode, leaveLobby } from "./services/lobbyService"
 import { useAuth } from "../../context/useAuth"
@@ -156,263 +137,209 @@ export default function LobbyPage() {
 
   if (loading) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
-        <CircularProgress />
-      </Box>
+      <div className={styles.loadingContainer}>
+        <CircularProgress sx={{ color: '#4cffb3' }} />
+      </div>
     )
   }
 
   if (error || !lobby) {
     return (
-      <Box sx={{ maxWidth: 600, mx: "auto", py: 4 }}>
-        <Alert severity="error">{error || "Lobby no encontrado"}</Alert>
-        <Button onClick={() => navigate("/app")} sx={{ mt: 2 }}>
-          Volver al Dashboard
-        </Button>
-      </Box>
+      <div className={styles.errorContainer}>
+        <div className={styles.errorCard}>
+          <h2 className={styles.errorTitle}>⚠️ Error</h2>
+          <p className={styles.errorMessage}>{error || "Lobby no encontrado"}</p>
+          <button onClick={() => navigate("/app")} className={styles.primaryButton}>
+            Volver al Dashboard
+          </button>
+        </div>
+      </div>
     )
   }
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: "auto", py: 4, px: 2 }}>
-      <Stack spacing={3}>
-        {/* Header */}
-        <Paper sx={{ p: 3 }}>
-          <Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={2}>
-            <Box>
-              <Typography variant="h4" fontWeight={700} gutterBottom>
-                Lobby: {lobby.code}
-              </Typography>
-              <Stack direction="row" spacing={1} flexWrap="wrap">
-                <Chip label={`Laberinto: ${lobby.mazeSize}`} size="small" />
-                <Chip
-                label={`${currentPlayers.length}/${lobby.maxPlayers} Jugadores`}
-                size="small"
-                color={currentPlayers.length === lobby.maxPlayers ? "success" : "primary"}
-                icon={
-                  isConnected ? (
-                    <Box
-                      sx={{
-                        width: 8,
-                        height: 8,
-                        borderRadius: "50%",
-                        bgcolor: "success.main",
-                        ml: 0.5,
-                      }}
-                    />
-                  ) : undefined
-                }
-              />
-                <Chip label={lobby.isPublic ? "Público" : "Privado"} size="small" variant="outlined" />
-              </Stack>
-            </Box>
-            <Button
-              variant="outlined"
-              color="error"
-              startIcon={<ExitToAppIcon />}
-              onClick={handleLeave}
-            >
-              Salir
-            </Button>
-          </Stack>
-        </Paper>
+    <div className={styles.container}>
+      {/* Header */}
+      <div className={styles.header}>
+        <div className={styles.headerContent}>
+          <div className={styles.lobbyInfo}>
+            <h1 className={styles.lobbyTitle}>
+              <span className={styles.lobbyLabel}>Lobby</span>
+              <span className={styles.lobbyCode}>{lobby.code}</span>
+            </h1>
+            <div className={styles.badges}>
+              <span className={styles.badge}>🎯 Laberinto: {lobby.mazeSize}</span>
+              <span className={`${styles.badge} ${currentPlayers.length === lobby.maxPlayers ? styles.badgeFull : ''}`}>
+                {isConnected && <span className={styles.statusDot} />}
+                👥 {currentPlayers.length}/{lobby.maxPlayers} Jugadores
+              </span>
+              <span className={styles.badge}>
+                {lobby.isPublic ? '🌍 Público' : '🔒 Privado'}
+              </span>
+            </div>
+          </div>
+          <button onClick={handleLeave} className={styles.leaveButton}>
+            <span>🚪</span>
+            Salir
+          </button>
+        </div>
+      </div>
 
-        <Stack direction={{ xs: "column", md: "row" }} spacing={3}>
-          {/* Panel de Jugadores */}
-          <Paper sx={{ p: 3, flex: 1, minWidth: 300 }}>
-            <Typography variant="h6" gutterBottom>
-              Jugadores
-            </Typography>
-            <Divider sx={{ my: 2 }} />
-            <Stack spacing={2}>
-              {currentPlayers.length === 0 ? (
-                <Typography variant="body2" color="text.secondary">
-                  No hay jugadores conectados
-                </Typography>
-              ) : (
-                currentPlayers.map((player) => (
-                  <Stack
-                    key={player}
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="space-between"
-                    sx={{
-                      p: 1.5,
-                      borderRadius: 2,
-                      bgcolor: player === user?.username ? "action.selected" : "transparent",
-                    }}
-                  >
-                    <Stack direction="row" alignItems="center" spacing={1.5}>
-                      <Tooltip title={player === user?.username ? "Tú" : player}>
-                        <Avatar sx={{ width: 32, height: 32, bgcolor: "primary.main" }}>
-                          {player.charAt(0).toUpperCase()}
-                        </Avatar>
-                      </Tooltip>
-                      <Box>
-                        <Typography variant="body1" fontWeight={player === user?.username ? 600 : 400}>
-                          {player}
-                        </Typography>
-                        {player === lobby.creatorUsername && (
-                          <Chip label="Host" size="small" sx={{ mt: 0.5, height: 20 }} />
-                        )}
-                      </Box>
-                    </Stack>
-                    <Tooltip title={readyPlayers.has(player) ? "Listo" : "No listo"}>
-                      {readyPlayers.has(player) ? (
-                        <CheckCircleIcon color="success" />
-                      ) : (
-                        <RadioButtonUncheckedIcon color="disabled" />
+      <div className={styles.mainContent}>
+        {/* Panel de Jugadores */}
+        <div className={styles.playersPanel}>
+          <div className={styles.panelHeader}>
+            <h2 className={styles.panelTitle}>👥 Jugadores</h2>
+            <span className={styles.playerCount}>{currentPlayers.length}/{lobby.maxPlayers}</span>
+          </div>
+
+          <div className={styles.playersList}>
+            {currentPlayers.length === 0 ? (
+              <p className={styles.emptyMessage}>No hay jugadores conectados</p>
+            ) : (
+              currentPlayers.map((player) => (
+                <div
+                  key={player}
+                  className={`${styles.playerCard} ${player === user?.username ? styles.playerCardMe : ''}`}
+                >
+                  <div className={styles.playerInfo}>
+                    <div className={styles.playerAvatar}>
+                      {player.charAt(0).toUpperCase()}
+                    </div>
+                    <div className={styles.playerDetails}>
+                      <span className={styles.playerName}>{player}</span>
+                      {player === lobby.creatorUsername && (
+                        <span className={styles.hostBadge}>👑 Host</span>
                       )}
-                    </Tooltip>
-                  </Stack>
-                ))
-              )}
-            </Stack>
+                    </div>
+                  </div>
+                  <div className={styles.playerStatus}>
+                    {readyPlayers.has(player) ? (
+                      <span className={styles.statusReady}>✓ Listo</span>
+                    ) : (
+                      <span className={styles.statusNotReady}>○ Esperando</span>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
 
-            {isHost && (
-              <Box sx={{ mt: 3 }}>
-                <Button
-                  variant="contained"
-                  fullWidth
-                  startIcon={<PlayArrowIcon />}
+          {/* Botón de acción */}
+          <div className={styles.actionSection}>
+            {isHost ? (
+              <>
+                <button
                   onClick={handleStartGame}
                   disabled={!allPlayersReady || !isConnected}
+                  className={`${styles.primaryButton} ${styles.startButton} ${!allPlayersReady || !isConnected ? styles.buttonDisabled : ''}`}
                 >
+                  <span>▶</span>
                   Iniciar Juego
-                </Button>
+                </button>
                 {!allPlayersReady && (
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: "block" }}>
+                  <p className={styles.helperText}>
                     Todos los jugadores deben estar listos
-                  </Typography>
+                  </p>
                 )}
-              </Box>
+              </>
+            ) : (
+              <button
+                onClick={toggleReady}
+                disabled={!isConnected}
+                className={`${isReady ? styles.secondaryButton : styles.primaryButton} ${!isConnected ? styles.buttonDisabled : ''}`}
+              >
+                <span>{isReady ? '✓' : '○'}</span>
+                {isReady ? 'No Listo' : 'Listo'}
+              </button>
             )}
+          </div>
+        </div>
 
-            {!isHost && (
-              <Box sx={{ mt: 3 }}>
-                <Button
-                  variant={isReady ? "outlined" : "contained"}
-                  fullWidth
-                  onClick={toggleReady}
-                  disabled={!isConnected}
-                  startIcon={isReady ? <CheckCircleIcon /> : <RadioButtonUncheckedIcon />}
-                >
-                  {isReady ? "No Listo" : "Listo"}
-                </Button>
-              </Box>
+        {/* Panel de Chat */}
+        <div className={styles.chatPanel}>
+          <div className={styles.panelHeader}>
+            <h2 className={styles.panelTitle}>💬 Chat en Vivo</h2>
+            {isConnected ? (
+              <span className={styles.statusConnected}>● Conectado</span>
+            ) : (
+              <span className={styles.statusDisconnected}>○ Desconectado</span>
             )}
-          </Paper>
+          </div>
 
-          {/* Panel de Chat */}
-          <Paper sx={{ p: 3, flex: 1, minWidth: 300, display: "flex", flexDirection: "column", height: 600 }}>
-            <Typography variant="h6" gutterBottom>
-              Chat en Vivo
-            </Typography>
-            <Divider sx={{ my: 2 }} />
+          {/* Alertas */}
+          {socketError && (
+            <div className={styles.alert}>
+              ⚠️ {socketError}
+            </div>
+          )}
 
-            {socketError && (
-              <Alert severity="warning" sx={{ mb: 2 }}>
-                {socketError}
-              </Alert>
-            )}
+          {!isConnected && (
+            <div className={styles.alertReconnecting}>
+              <CircularProgress size={16} sx={{ color: '#4cffb3' }} />
+              <span>Reconectando...</span>
+            </div>
+          )}
 
-            {!isConnected && (
-              <Alert severity="warning" sx={{ mb: 2 }}>
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <CircularProgress size={16} />
-                  <Typography variant="body2">Reconectando...</Typography>
-                </Stack>
-              </Alert>
-            )}
-
-            {/* Mensajes */}
-            <Box
-              sx={{
-                flex: 1,
-                overflowY: "auto",
-                mb: 2,
-                p: 1,
-                bgcolor: "background.default",
-                borderRadius: 1,
-                maxHeight: 400,
-              }}
-              className={styles.chatContainer}
-            >
-              {messages.length === 0 ? (
-                <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ py: 4 }}>
-                  No hay mensajes aún. ¡Sé el primero en escribir!
-                </Typography>
-              ) : (
-                <Stack spacing={1.5}>
-                  {messages.map((msg, idx) => {
-                    const isSystem = "isSystem" in msg && msg.isSystem
-                    return (
-                      <Box
-                        key={idx}
-                        sx={{
-                          p: isSystem ? 1 : 1.5,
-                          borderRadius: 2,
-                          bgcolor: isSystem
-                            ? "warning.dark"
-                            : msg.username === user?.username
-                            ? "primary.dark"
-                            : "action.hover",
-                          alignSelf: msg.username === user?.username ? "flex-end" : "flex-start",
-                          maxWidth: isSystem ? "100%" : "80%",
-                          opacity: isSystem ? 0.8 : 1,
-                          border: isSystem ? "1px solid" : "none",
-                          borderColor: isSystem ? "warning.main" : "transparent",
-                        }}
-                      >
-                        <Typography
-                          variant="caption"
-                          fontWeight={isSystem ? 500 : 600}
-                          display="block"
-                          gutterBottom
-                          color={isSystem ? "warning.contrastText" : "inherit"}
-                        >
-                          {msg.username}
-                        </Typography>
-                        <Typography variant="body2" sx={{ fontStyle: isSystem ? "italic" : "normal" }}>
-                          {msg.message}
-                        </Typography>
+          {/* Mensajes */}
+          <div className={styles.messagesContainer}>
+            {messages.length === 0 ? (
+              <p className={styles.emptyChat}>
+                No hay mensajes aún. ¡Sé el primero en escribir!
+              </p>
+            ) : (
+              <div className={styles.messagesList}>
+                {messages.map((msg, idx) => {
+                  const isSystem = "isSystem" in msg && msg.isSystem
+                  const isMe = msg.username === user?.username
+                  return (
+                    <div
+                      key={idx}
+                      className={`${styles.message} ${
+                        isSystem ? styles.messageSystem :
+                        isMe ? styles.messageMe : styles.messageOther
+                      }`}
+                    >
+                      <div className={styles.messageHeader}>
+                        <span className={styles.messageUsername}>
+                          {isSystem ? '🤖' : isMe ? '👤' : '👥'} {msg.username}
+                        </span>
                         {msg.timestamp && (
-                          <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.7rem" }}>
+                          <span className={styles.messageTime}>
                             {new Date(msg.timestamp).toLocaleTimeString()}
-                          </Typography>
+                          </span>
                         )}
-                      </Box>
-                    )
-                  })}
-                  <div ref={messagesEndRef} />
-                </Stack>
-              )}
-            </Box>
+                      </div>
+                      <p className={styles.messageText}>{msg.message}</p>
+                    </div>
+                  )
+                })}
+                <div ref={messagesEndRef} />
+              </div>
+            )}
+          </div>
 
-            {/* Input de mensaje */}
-            <form onSubmit={handleSendMessage}>
-              <Stack direction="row" spacing={1}>
-                <TextField
-                  fullWidth
-                  size="small"
-                  placeholder="Escribe un mensaje..."
-                  value={messageInput}
-                  onChange={(e) => setMessageInput(e.target.value)}
-                  disabled={!isConnected}
-                />
-                <IconButton
-                  type="submit"
-                  color="primary"
-                  disabled={!messageInput.trim() || !isConnected}
-                >
-                  <SendIcon />
-                </IconButton>
-              </Stack>
-            </form>
-          </Paper>
-        </Stack>
-      </Stack>
-    </Box>
+          {/* Input de mensaje */}
+          <form onSubmit={handleSendMessage} className={styles.chatForm}>
+            <input
+              type="text"
+              placeholder="Escribe un mensaje..."
+              value={messageInput}
+              onChange={(e) => setMessageInput(e.target.value)}
+              disabled={!isConnected}
+              className={styles.chatInput}
+            />
+            <button
+              type="submit"
+              disabled={!messageInput.trim() || !isConnected}
+              className={`${styles.sendButton} ${!messageInput.trim() || !isConnected ? styles.buttonDisabled : ''}`}
+            >
+              📤
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
   )
 }
 
