@@ -152,7 +152,6 @@ export default function ProfilePage() {
   }, [email, user?.email])
 
   const randomizeColor = () => {
-    const currentIndex = avatarPalette.indexOf(avatarColor)
     let newColor
     do {
       newColor = avatarPalette[Math.floor(Math.random() * avatarPalette.length)]

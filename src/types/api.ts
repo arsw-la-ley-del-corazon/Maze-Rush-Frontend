@@ -100,6 +100,9 @@ export interface MazeEntity {
   goalY: number
 }
 
+// Tipo de datos del laberinto (simplificado para el juego)
+export type MazeData = MazeEntity
+
 export interface PlayerGameState {
   username: string
   position: { x: number; y: number }

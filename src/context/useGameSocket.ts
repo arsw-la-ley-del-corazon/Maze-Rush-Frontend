@@ -111,9 +111,8 @@ export function useGameSocket(options: UseGameSocketOptions) {
                   return updated
                 })
               } else if (event.type === "start") {
-                if (event.maze) {
-                  onMazeReceived?.(event.maze)
-                }
+                // El evento start contiene mazeId, no maze directamente
+                // El laberinto debe ser obtenido por otra vía usando el mazeId
               } else if (event.type === "player_joined") {
                 onPlayerJoined?.(event.username)
               } else if (event.type === "player_left") {

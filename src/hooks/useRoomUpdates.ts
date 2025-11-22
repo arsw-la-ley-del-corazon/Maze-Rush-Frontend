@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react"
 import { Client } from "@stomp/stompjs"
-// @ts-expect-error - SockJS types are not required, following project pattern
 import SockJS from "sockjs-client"
 import { SOCKET_CONFIG } from "../common/globas"
 

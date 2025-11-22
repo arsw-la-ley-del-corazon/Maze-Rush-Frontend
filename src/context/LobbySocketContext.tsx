@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useRef, useState, useCallb
 import { Client } from "@stomp/stompjs"
 import SockJS from "sockjs-client"
 import { useAuth } from "./useAuth"
-import { API_CONFIG, SOCKET_CONFIG } from "../common/globas"
+import { SOCKET_CONFIG } from "../common/globas"
 import type { ChatMessage } from "../types/api"
 
 // Tipo para mensajes STOMP
@@ -277,7 +277,7 @@ export const LobbySocketProvider: React.FC<{ children: React.ReactNode }> = ({ c
           setError(`Error STOMP: ${frame.headers["message"] || "Error desconocido"}`)
           setIsConnected(false)
         },
-        onWebSocketError: (event) => {
+        onWebSocketError: (_event) => {
           setError("Error de conexión WebSocket")
           setIsConnected(false)
         },
