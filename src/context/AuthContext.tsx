@@ -11,6 +11,7 @@ import { AUTH_CONFIG } from "../common/globas"
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(false)
+  const [initializing, setInitializing] = useState(true)
 
   const accessRef = useRef<string | null>(null)
   const refreshRef = useRef<string | null>(null)
@@ -90,29 +91,65 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Rehidratación al montar
   useEffect(() => {
-    const raw = localStorage.getItem(AUTH_CONFIG.STORAGE_KEY)
-    if (!raw) return
-    try {
-      const parsed = JSON.parse(raw)
-      if (parsed.expiresAt && Date.parse(parsed.expiresAt) > Date.now()) {
-        applyAuth({
-          accessToken: parsed.accessToken,
-          refreshToken: parsed.refreshToken,
-          tokenType: "Bearer",
-          expiresIn: Math.floor((Date.parse(parsed.expiresAt) - Date.now()) / 1000),
-          expiresAt: parsed.expiresAt,
-          user: parsed.user,
-        })
-      } else {
-        localStorage.removeItem(AUTH_CONFIG.STORAGE_KEY)
+    const restoreSession = async () => {
+      setInitializing(true)
+      const raw = localStorage.getItem(AUTH_CONFIG.STORAGE_KEY)
+      
+      if (!raw) {
+        setInitializing(false)
+        return
       }
-    } catch {
-      // ignorar
+
+      try {
+        const parsed = JSON.parse(raw)
+        const expiresAt = parsed.expiresAt ? Date.parse(parsed.expiresAt) : null
+        const now = Date.now()
+
+        // Si el token aún es válido, restaurar directamente
+        if (expiresAt && expiresAt > now) {
+          applyAuth({
+            accessToken: parsed.accessToken,
+            refreshToken: parsed.refreshToken,
+            tokenType: "Bearer",
+            expiresIn: Math.floor((expiresAt - now) / 1000),
+            expiresAt: parsed.expiresAt,
+            user: parsed.user,
+          })
+          setInitializing(false)
+        } 
+        // Si el token expiró pero tenemos refreshToken, intentar refrescar
+        else if (parsed.refreshToken) {
+          try {
+            const result = await apiRefresh({ refreshToken: parsed.refreshToken })
+            if (result.ok) {
+              applyAuth(result.data)
+            } else {
+              // Si el refresh falla, limpiar todo
+              localStorage.removeItem(AUTH_CONFIG.STORAGE_KEY)
+            }
+          } catch (error) {
+            // Si hay error al refrescar, limpiar todo
+            localStorage.removeItem(AUTH_CONFIG.STORAGE_KEY)
+          }
+          setInitializing(false)
+        } 
+        // Si no hay refreshToken, limpiar
+        else {
+          localStorage.removeItem(AUTH_CONFIG.STORAGE_KEY)
+          setInitializing(false)
+        }
+      } catch (error) {
+        // Si hay error al parsear, limpiar
+        localStorage.removeItem(AUTH_CONFIG.STORAGE_KEY)
+        setInitializing(false)
+      }
     }
+
+    restoreSession()
   }, [applyAuth])
 
   return (
-    <AuthContext.Provider value={{ user, loading, loginWithGoogle, logout, updateProfile }}>
+    <AuthContext.Provider value={{ user, loading: loading || initializing, loginWithGoogle, logout, updateProfile }}>
       {children}
     </AuthContext.Provider>
   )

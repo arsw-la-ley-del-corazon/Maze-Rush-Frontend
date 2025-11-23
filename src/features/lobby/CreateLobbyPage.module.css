@@ -1,0 +1,438 @@
+/* Contenedor principal con efecto de laberinto animado */
+.container {
+  min-height: calc(100vh - 64px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1729 100%);
+}
+
+/* Patrón de laberinto animado en el fondo */
+.mazePattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  background-image: 
+    repeating-linear-gradient(90deg, transparent 0px, transparent 48px, #4cffb3 48px, #4cffb3 52px, transparent 52px, transparent 100px),
+    repeating-linear-gradient(0deg, transparent 0px, transparent 48px, #4cffb3 48px, #4cffb3 52px, transparent 52px, transparent 100px);
+  animation: mazeDrift 30s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes mazeDrift {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(100px, 100px);
+  }
+}
+
+/* Partículas brillantes */
+.particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: #4cffb3;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #4cffb3;
+  animation: float 15s infinite;
+  opacity: 0.6;
+}
+
+.particle:nth-child(1) {
+  top: 20%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.particle:nth-child(2) {
+  top: 60%;
+  left: 80%;
+  animation-delay: 3s;
+}
+
+.particle:nth-child(3) {
+  top: 40%;
+  left: 30%;
+  animation-delay: 6s;
+}
+
+.particle:nth-child(4) {
+  top: 80%;
+  left: 60%;
+  animation-delay: 9s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translate(50px, -50px) scale(1.5);
+    opacity: 1;
+  }
+}
+
+/* Card principal */
+.card {
+  position: relative;
+  max-width: 520px;
+  width: 100%;
+  padding: 3rem 2.5rem;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  border: 1px solid rgba(76, 255, 179, 0.1);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 0 80px rgba(76, 255, 179, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  z-index: 1;
+  animation: cardEntry 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes cardEntry {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Borde brillante animado */
+.card::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 24px;
+  padding: 2px;
+  background: linear-gradient(135deg, #4cffb3, #4d7fff, #4cffb3);
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  animation: borderGlow 3s ease-in-out infinite;
+}
+
+.card:hover::before {
+  opacity: 0.3;
+}
+
+@keyframes borderGlow {
+  0%, 100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Título */
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #4cffb3 0%, #5dffca 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 30px rgba(76, 255, 179, 0.3);
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.875rem;
+  margin-bottom: 2.5rem;
+  font-weight: 400;
+}
+
+/* Formulario */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+/* Grupos de campos */
+.fieldGroup {
+  position: relative;
+}
+
+.fieldLabel {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Estilos personalizados para inputs */
+.inputField {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1.5px solid rgba(76, 255, 179, 0.15);
+  border-radius: 12px;
+  color: #fff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.inputField:hover {
+  border-color: rgba(76, 255, 179, 0.3);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.inputField:focus {
+  border-color: #4cffb3;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 20px rgba(76, 255, 179, 0.15);
+}
+
+/* Select personalizado */
+.selectWrapper {
+  position: relative;
+}
+
+.selectWrapper::after {
+  content: '▼';
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #4cffb3;
+  pointer-events: none;
+  font-size: 0.75rem;
+}
+
+/* Estilos específicos para el select */
+.inputField[type="number"],
+.inputField select,
+select.inputField {
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: rgba(10, 14, 39, 0.8);
+  color: #4cffb3;
+  font-weight: 500;
+}
+
+select.inputField option {
+  background: #0a0e27;
+  color: #4cffb3;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border: none;
+}
+
+select.inputField option:hover,
+select.inputField option:checked,
+select.inputField option:focus {
+  background: linear-gradient(135deg, rgba(76, 255, 179, 0.2), rgba(0, 217, 255, 0.2));
+  color: #fff;
+}
+
+/* Switch toggle */
+.switchContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1.5px solid rgba(76, 255, 179, 0.1);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.switchContainer:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(76, 255, 179, 0.2);
+}
+
+.switchLabel {
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+  font-size: 0.9375rem;
+}
+
+/* Botones de acción */
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.button {
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+}
+
+.buttonCancel {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.7);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+}
+
+.buttonCancel:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.buttonSubmit {
+  background: linear-gradient(135deg, #4cffb3 0%, #3ecf94 100%);
+  color: #0a0e27;
+  font-weight: 700;
+  box-shadow: 0 4px 20px rgba(76, 255, 179, 0.3);
+}
+
+.buttonSubmit:hover:not(:disabled) {
+  background: linear-gradient(135deg, #5dffca 0%, #4cffb3 100%);
+  box-shadow: 0 6px 30px rgba(76, 255, 179, 0.5);
+  transform: translateY(-2px);
+}
+
+.buttonSubmit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Efecto de brillo en el botón */
+.buttonSubmit::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.buttonSubmit:hover::before {
+  left: 100%;
+}
+
+/* Loader */
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Alert de error */
+.alert {
+  padding: 1rem 1.25rem;
+  background: rgba(255, 82, 82, 0.1);
+  border: 1.5px solid rgba(255, 82, 82, 0.3);
+  border-radius: 12px;
+  color: #ff8a8a;
+  font-size: 0.875rem;
+  animation: alertShake 0.5s ease;
+}
+
+@keyframes alertShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* Iconos decorativos de laberinto */
+.mazeIcon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 0.5rem;
+  opacity: 0.6;
+}
+
+/* Contador de jugadores visual */
+.playerCounter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(76, 255, 179, 0.05);
+  border-radius: 8px;
+}
+
+.playerDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #4cffb3;
+  opacity: 0.3;
+  transition: all 0.3s ease;
+}
+
+.playerDot.active {
+  opacity: 1;
+  box-shadow: 0 0 10px #4cffb3;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .card {
+    padding: 2rem 1.5rem;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .actions {
+    grid-template-columns: 1fr;
+  }
+}

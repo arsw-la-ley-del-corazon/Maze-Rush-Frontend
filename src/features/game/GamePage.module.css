@@ -1,0 +1,66 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  gap: 2rem;
+  background: linear-gradient(135deg, rgba(20, 11, 31, 1) 0%, rgba(38, 23, 62, 1) 100%);
+}
+
+.header {
+  width: 100%;
+  max-width: 1200px;
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 16px;
+  background: rgba(38, 23, 62, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(164, 106, 255, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.mazeContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  padding: 1rem;
+}
+
+.mobileControls {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobileControls {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .controlGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    justify-items: center;
+    align-items: center;
+  }
+
+  .header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+.loadingContainer {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(20, 11, 31, 1) 0%, rgba(38, 23, 62, 1) 100%);
+}
