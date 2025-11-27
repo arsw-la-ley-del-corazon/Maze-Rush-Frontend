@@ -1,10 +1,9 @@
 import { useState, useCallback, useEffect, useRef, type ReactNode } from "react"
 import { AuthContext, type UserProfile } from "./AuthTypes"
 import { 
-  login as apiLogin, 
+  loginWithGoogle as apiLoginWithGoogle, 
   refresh as apiRefresh, 
-  logout as apiLogout,
-  register as apiRegister 
+  logout as apiLogout
 } from "../features/login/services/realAuthService"
 import type { AuthResponse } from "../types/api"
 import { AUTH_CONFIG } from "../common/globas"
@@ -12,6 +11,7 @@ import { AUTH_CONFIG } from "../common/globas"
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(false)
+  const [initializing, setInitializing] = useState(true)
 
   const accessRef = useRef<string | null>(null)
   const refreshRef = useRef<string | null>(null)
@@ -57,10 +57,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     )
   }, [scheduleRefresh])
 
-  const login = useCallback(async (email: string, password: string): Promise<{ ok: boolean; error?: string }> => {
+  const loginWithGoogle = useCallback(async (credential: string): Promise<{ ok: boolean; error?: string }> => {
     setLoading(true)
     try {
-      const result = await apiLogin({ email, password })
+      const result = await apiLoginWithGoogle(credential)
       if (result.ok) {
         applyAuth(result.data)
         setLoading(false)
@@ -74,7 +74,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return { ok: false, error: 'Error de conexión' }
     }
   }, [applyAuth])
-
 
   const logout = useCallback(() => {
     if (accessRef.current) apiLogout(accessRef.current)
@@ -86,53 +85,71 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem(AUTH_CONFIG.STORAGE_KEY)
   }, [])
 
-  const register = useCallback(async (username: string, email: string, password: string): Promise<{ ok: boolean; error?: string }> => {
-    setLoading(true)
-    try {
-      const result = await apiRegister({ username, email, password })
-      if (result.ok) {
-        applyAuth(result.data)
-        setLoading(false)
-        return { ok: true }
-      } else {
-        setLoading(false)
-        return { ok: false, error: result.error.message }
-      }
-    } catch (error) {
-      setLoading(false)
-      return { ok: false, error: 'Error de conexión' }
-    }
-  }, [applyAuth])
-
   const updateProfile = useCallback((data: Partial<UserProfile>) => {
     setUser((prev) => (prev ? { ...prev, ...data } : prev))
   }, [])
 
   // Rehidratación al montar
   useEffect(() => {
-    const raw = localStorage.getItem(AUTH_CONFIG.STORAGE_KEY)
-    if (!raw) return
-    try {
-      const parsed = JSON.parse(raw)
-      if (parsed.expiresAt && Date.parse(parsed.expiresAt) > Date.now()) {
-        applyAuth({
-          accessToken: parsed.accessToken,
-          refreshToken: parsed.refreshToken,
-          tokenType: "Bearer",
-          expiresIn: Math.floor((Date.parse(parsed.expiresAt) - Date.now()) / 1000),
-          expiresAt: parsed.expiresAt,
-          user: parsed.user,
-        })
-      } else {
-        localStorage.removeItem(AUTH_CONFIG.STORAGE_KEY)
+    const restoreSession = async () => {
+      setInitializing(true)
+      const raw = localStorage.getItem(AUTH_CONFIG.STORAGE_KEY)
+      
+      if (!raw) {
+        setInitializing(false)
+        return
       }
-    } catch {
-      // ignorar
+
+      try {
+        const parsed = JSON.parse(raw)
+        const expiresAt = parsed.expiresAt ? Date.parse(parsed.expiresAt) : null
+        const now = Date.now()
+
+        // Si el token aún es válido, restaurar directamente
+        if (expiresAt && expiresAt > now) {
+          applyAuth({
+            accessToken: parsed.accessToken,
+            refreshToken: parsed.refreshToken,
+            tokenType: "Bearer",
+            expiresIn: Math.floor((expiresAt - now) / 1000),
+            expiresAt: parsed.expiresAt,
+            user: parsed.user,
+          })
+          setInitializing(false)
+        } 
+        // Si el token expiró pero tenemos refreshToken, intentar refrescar
+        else if (parsed.refreshToken) {
+          try {
+            const result = await apiRefresh({ refreshToken: parsed.refreshToken })
+            if (result.ok) {
+              applyAuth(result.data)
+            } else {
+              // Si el refresh falla, limpiar todo
+              localStorage.removeItem(AUTH_CONFIG.STORAGE_KEY)
+            }
+          } catch (error) {
+            // Si hay error al refrescar, limpiar todo
+            localStorage.removeItem(AUTH_CONFIG.STORAGE_KEY)
+          }
+          setInitializing(false)
+        } 
+        // Si no hay refreshToken, limpiar
+        else {
+          localStorage.removeItem(AUTH_CONFIG.STORAGE_KEY)
+          setInitializing(false)
+        }
+      } catch (error) {
+        // Si hay error al parsear, limpiar
+        localStorage.removeItem(AUTH_CONFIG.STORAGE_KEY)
+        setInitializing(false)
+      }
     }
+
+    restoreSession()
   }, [applyAuth])
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, updateProfile, register }}>
+    <AuthContext.Provider value={{ user, loading: loading || initializing, loginWithGoogle, logout, updateProfile }}>
       {children}
     </AuthContext.Provider>
   )

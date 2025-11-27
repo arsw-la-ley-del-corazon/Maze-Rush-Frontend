@@ -24,7 +24,7 @@ export async function login(req: LoginRequest): Promise<Result<AuthResponse>> {
     return error(400, "Faltan credenciales", "/api/v1/auth/login")
   }
   const user = mockDB.users.find(
-    (u) => u.email === req.email || u.username === req.username,
+    (u: InternalUser) => u.email === req.email || u.username === req.username,
   )
   if (!user || user.password !== req.password) {
     return error(401, "Credenciales inválidas", "/api/v1/auth/login")
@@ -33,7 +33,7 @@ export async function login(req: LoginRequest): Promise<Result<AuthResponse>> {
 }
 
 export async function register(req: RegisterRequest): Promise<Result<AuthResponse>> {
-  if (mockDB.users.some((u) => u.email === req.email || u.username === req.username)) {
+  if (mockDB.users.some((u: InternalUser) => u.email === req.email || u.username === req.username)) {
     return error(409, "El username o email ya están en uso", "/api/v1/auth/register")
   }
   const user = {
@@ -51,14 +51,14 @@ export async function register(req: RegisterRequest): Promise<Result<AuthRespons
 export async function refresh(
   req: RefreshTokenRequest,
 ): Promise<Result<AuthResponse>> {
-  const session = mockDB.refreshTokens.find((r) => r.token === req.refreshToken)
+  const session = mockDB.refreshTokens.find((r: { token: string; userId: string; expiresAt: number }) => r.token === req.refreshToken)
   if (!session) return error(401, "Refresh token inválido", "/api/v1/auth/refresh")
   if (session.expiresAt < Date.now())
     return error(401, "Refresh token expirado", "/api/v1/auth/refresh")
-  const user = mockDB.users.find((u) => u.id === session.userId)
+  const user = mockDB.users.find((u: InternalUser) => u.id === session.userId)
   if (!user) return error(404, "Usuario no encontrado", "/api/v1/auth/refresh")
   // Rotación simple (invalida el anterior)
-  mockDB.refreshTokens = mockDB.refreshTokens.filter((r) => r !== session)
+  mockDB.refreshTokens = mockDB.refreshTokens.filter((r: { token: string; userId: string; expiresAt: number }) => r !== session)
   return success(authPayload(user))
 }
 
@@ -67,7 +67,7 @@ export async function logout(accessToken: string): Promise<Result<null>> {
   const parts = accessToken.split(".")
   if (parts.length < 3) return error(400, "Token inválido", "/api/v1/auth/logout")
   const userId = parts[1]
-  mockDB.refreshTokens = mockDB.refreshTokens.filter((r) => r.userId !== userId)
+  mockDB.refreshTokens = mockDB.refreshTokens.filter((r: { token: string; userId: string; expiresAt: number }) => r.userId !== userId)
   return { ok: true, data: null }
 }
 
