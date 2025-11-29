@@ -47,6 +47,7 @@ export default function GamePage() {
   const [mazeSize] = useState("MEDIUM") // SMALL, MEDIUM, LARGE - Por ahora hardcodeado, luego vendrá del lobby
   const [otherPlayers, setOtherPlayers] = useState<PlayerGameState[]>([])
   const [mazeError, setMazeError] = useState<string | null>(null)
+  const [winner, setWinner] = useState<{ username: string; time: number } | null>(null)
 
   const gameStartedRef = useRef(false)
   const lastMoveTimeRef = useRef(0)
@@ -81,15 +82,17 @@ export default function GamePage() {
       })
     },
     onPlayerFinish: (username, finishTime) => {
-      // 1) Actualizar estado del jugador que terminó
+      // 1) marcar jugador que terminó
       setOtherPlayers((prev) =>
         prev.map((p) =>
           p.username === username ? { ...p, isFinished: true, finishTime } : p
         )
       )
 
-      // 2) Sincronizar el tiempo del juego en ESTE cliente
-      //    (aunque yo no haya llegado a la meta)
+      // 2) guardar ganador (para mostrarlo en todos)
+      setWinner({ username, time: finishTime })
+
+      // 3) sincronizar tiempo y estado en ESTE cliente
       setIsTimerRunning(false)
       setTimer(finishTime)
       setGameWon(true)
@@ -129,6 +132,9 @@ export default function GamePage() {
   const initializeMaze = useCallback(async () => {
     setIsLoading(true)
     setMazeError(null)
+    setWinner(null)
+    setGameWon(false)
+    setTimer(0)
 
     // Intentar cargar el laberinto compartido primero
     const sharedMazeKey = `maze_${code}`
@@ -137,11 +143,9 @@ export default function GamePage() {
     let mazeData
 
     if (sharedMazeData) {
-      // Usar el laberinto compartido recibido desde el backend
       console.log("Usando laberinto compartido para lobby:", code)
       try {
         const parsedMaze = JSON.parse(sharedMazeData)
-        // El layout puede venir como string o como array
         const layout =
           typeof parsedMaze.layout === "string"
             ? JSON.parse(parsedMaze.layout)
@@ -164,7 +168,6 @@ export default function GamePage() {
         return
       }
     } else {
-      // Si no hay laberinto compartido, generar uno nuevo (fallback)
       console.log("No se encontró laberinto compartido, generando nuevo de tamaño:", mazeSize)
       const result = await generateMazeFromBackend(mazeSize)
 
@@ -191,9 +194,7 @@ export default function GamePage() {
     setMaze(mazeCells)
     setPlayerPosition({ x: startX, y: startY })
     setEndPosition({ x: goalX, y: goalY })
-    setTimer(0)
     setIsTimerRunning(true)
-    setGameWon(false)
     setIsLoading(false)
     gameStartedRef.current = true
   }, [code, mazeSize])
@@ -221,7 +222,7 @@ export default function GamePage() {
   }, [isTimerRunning])
 
   /**
-   * Check for win condition
+   * Check for win condition (solo avisa al server; el fin real se maneja en onPlayerFinish)
    */
   useEffect(() => {
     if (
@@ -231,7 +232,7 @@ export default function GamePage() {
       playerPosition.y === endPosition.y
     ) {
       setIsTimerRunning(false)
-      setGameWon(true)
+      // no hacemos setGameWon aquí, esperamos el broadcast del server
       sendFinish(timer)
     }
   }, [playerPosition, endPosition, isLoading, timer, sendFinish])
@@ -247,9 +248,7 @@ export default function GamePage() {
         const { x, y } = prev
         let newPos = { ...prev }
 
-        // Check if movement is valid
         if (direction === "Up" && y > 0 && !maze[y][x].top) {
-          // Also check that destination cell is not a wall
           const destCell = maze[y - 1][x]
           const isDestWall =
             destCell.top && destCell.right && destCell.bottom && destCell.left
@@ -279,7 +278,6 @@ export default function GamePage() {
           }
         }
 
-        // Send move to server (with throttling)
         if (newPos.x !== prev.x || newPos.y !== prev.y) {
           const now = Date.now()
           if (now - lastMoveTimeRef.current > 100) {
@@ -468,11 +466,11 @@ export default function GamePage() {
       {/* Win Dialog */}
       <WinDialog
         isOpen={gameWon}
-        time={timer}
+        time={winner?.time ?? timer}
         onRestart={() => {
           initializeMaze()
         }}
-        playerName={user?.username}
+        playerName={winner?.username ?? user?.username}
       />
     </Box>
   )
