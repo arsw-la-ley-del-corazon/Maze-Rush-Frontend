@@ -212,13 +212,13 @@
   height: 80%;
   background: transparent;
 
-  /* Color por defecto del jugador local; en otros jugadores se sobreescribe vía style="color: ..." */
+  /* Color por defecto del jugador local; los otros se pintan por inline style "color" */
   color: #f7ff3c;
 
   /* Glow neón */
   filter:
     drop-shadow(0 0 4px currentColor)
-    drop-shadow(0 0 10px currentColor);
+    drop-shadow(0 0 12px currentColor);
   transition: transform 200ms ease-out, opacity 200ms ease-out;
 }
 
@@ -261,29 +261,31 @@
       65% 80% / 10% 40% no-repeat;
 }
 
-/* Jugador local: un poco más de brillo y prioridad de z-index */
+/* Jugador local: más brillo y prioridad de z-index */
 .playerToken {
   filter:
-    drop-shadow(0 0 6px currentColor)
-    drop-shadow(0 0 14px currentColor);
+    drop-shadow(0 0 8px currentColor)
+    drop-shadow(0 0 18px currentColor);
   z-index: 20;
 }
 
-/* Estado cuando gana */
+/* Estado cuando gana (se agranda un poco y se apaga) */
 .playerTokenWinning {
-  transform: scale(1.2);
-  opacity: 0.4;
+  transform: scale(1.18);
+  opacity: 0.45;
 }
 
-/* Otros jugadores: mismo sprite pero con animación suave */
+/* Otros jugadores: solo monito, un poco más pequeño para diferenciar */
 .otherPlayerToken {
-  opacity: 0.9;
+  width: 60%;
+  height: 60%;
+  opacity: 0.95;
   z-index: 18;
 }
 
 .otherPlayerToken:hover {
   opacity: 1;
-  transform: scale(1.05) !important;
+  transform: scale(1.07) !important;
 }
 
 /* === FIN PERSONAJES === */
