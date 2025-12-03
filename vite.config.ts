@@ -6,6 +6,9 @@ export default defineConfig({
   base: "/", // 👈 importante
   server: {
     host: true,
-    port: 5173,
+    port: 3000,
+  },
+  define: {
+    global: "globalThis",
   },
 });

@@ -1,0 +1,400 @@
+/* Contenedor principal con efecto de laberinto animado */
+.container {
+  min-height: calc(100vh - 64px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1729 100%);
+}
+
+/* Patrón de laberinto animado en el fondo */
+.mazePattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  background-image: 
+    repeating-linear-gradient(90deg, transparent 0px, transparent 48px, #4cffb3 48px, #4cffb3 52px, transparent 52px, transparent 100px),
+    repeating-linear-gradient(0deg, transparent 0px, transparent 48px, #4cffb3 48px, #4cffb3 52px, transparent 52px, transparent 100px);
+  animation: mazeDrift 30s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes mazeDrift {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(100px, 100px);
+  }
+}
+
+/* Partículas brillantes */
+.particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: #4cffb3;
+  border-radius: 50%;
+  box-shadow: 0 0 15px #4cffb3;
+  animation: float 15s infinite;
+  opacity: 0.6;
+}
+
+.particle:nth-child(1) {
+  top: 20%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.particle:nth-child(2) {
+  top: 60%;
+  left: 80%;
+  animation-delay: 3s;
+}
+
+.particle:nth-child(3) {
+  top: 40%;
+  left: 30%;
+  animation-delay: 6s;
+}
+
+.particle:nth-child(4) {
+  top: 80%;
+  left: 60%;
+  animation-delay: 9s;
+}
+
+.particle:nth-child(5) {
+  top: 30%;
+  left: 90%;
+  animation-delay: 12s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.6;
+  }
+  25% {
+    transform: translate(30px, -40px) scale(1.2);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translate(-20px, -80px) scale(0.8);
+    opacity: 0.4;
+  }
+  75% {
+    transform: translate(-40px, -40px) scale(1.1);
+    opacity: 0.7;
+  }
+}
+
+/* Contenedor del contenido */
+.content {
+  position: relative;
+  z-index: 1;
+  max-width: 500px;
+  width: 100%;
+}
+
+/* Título principal con efecto neón */
+.title {
+  text-align: center;
+  font-size: clamp(1.75rem, 5vw, 2.25rem);
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #4cffb3 0%, #00d9ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 40px rgba(76, 255, 179, 0.5);
+  letter-spacing: -0.02em;
+  animation: glow 3s ease-in-out infinite;
+}
+
+@keyframes glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 20px rgba(76, 255, 179, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 30px rgba(76, 255, 179, 0.8));
+  }
+}
+
+.subtitle {
+  text-align: center;
+  color: #a0aec0;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+  font-weight: 400;
+}
+
+/* Paper principal con efecto glassmorphism */
+.paper {
+  background: rgba(15, 23, 42, 0.85) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(76, 255, 179, 0.2) !important;
+  border-radius: 24px !important;
+  padding: 2rem !important;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 0 60px rgba(76, 255, 179, 0.1),
+    inset 0 0 80px rgba(76, 255, 179, 0.03) !important;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.paper::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(76, 255, 179, 0.1), 
+    transparent
+  );
+  transition: left 0.6s;
+}
+
+.paper:hover::before {
+  left: 100%;
+}
+
+.paper:hover {
+  border-color: rgba(76, 255, 179, 0.4);
+  box-shadow: 
+    0 12px 48px rgba(0, 0, 0, 0.5),
+    0 0 80px rgba(76, 255, 179, 0.2),
+    inset 0 0 100px rgba(76, 255, 179, 0.05);
+  transform: translateY(-4px);
+}
+
+/* Instrucciones visuales */
+.instructions {
+  background: linear-gradient(135deg, rgba(76, 255, 179, 0.08), rgba(0, 217, 255, 0.08));
+  border: 1px solid rgba(76, 255, 179, 0.2);
+  border-radius: 16px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.instructionIcon {
+  font-size: 2rem;
+  filter: drop-shadow(0 0 10px rgba(76, 255, 179, 0.5));
+}
+
+.instructionText {
+  flex: 1;
+}
+
+.instructionTitle {
+  color: #4cffb3;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+}
+
+.instructionSubtitle {
+  color: #a0aec0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+/* Input del código con estilo personalizado */
+.codeInputWrapper {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+/* Sección de ejemplo */
+.exampleSection {
+  background: rgba(76, 255, 179, 0.05);
+  border: 1px dashed rgba(76, 255, 179, 0.3);
+  border-radius: 12px;
+  padding: 0.75rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.exampleLabel {
+  color: #a0aec0;
+  font-size: 0.75rem;
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.exampleCode {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.4rem;
+  color: #4cffb3;
+  font-family: 'Courier New', monospace;
+  text-shadow: 0 0 20px rgba(76, 255, 179, 0.5);
+}
+
+/* Botones con estilo mejorado */
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.cancelButton {
+  flex: 1;
+  padding: 1rem !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+  text-transform: none !important;
+  border: 2px solid rgba(76, 255, 179, 0.3) !important;
+  color: #4cffb3 !important;
+  transition: all 0.3s ease !important;
+  background: rgba(76, 255, 179, 0.05) !important;
+}
+
+.cancelButton:hover {
+  background: rgba(76, 255, 179, 0.1) !important;
+  border-color: rgba(76, 255, 179, 0.5) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(76, 255, 179, 0.2);
+}
+
+.joinButton {
+  flex: 1;
+  padding: 1rem !important;
+  border-radius: 12px !important;
+  font-weight: 700 !important;
+  font-size: 1rem !important;
+  text-transform: none !important;
+  background: linear-gradient(135deg, #4cffb3 0%, #00d9ff 100%) !important;
+  color: #0a0e27 !important;
+  border: none !important;
+  box-shadow: 
+    0 4px 20px rgba(76, 255, 179, 0.3),
+    0 0 40px rgba(76, 255, 179, 0.2) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.joinButton::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.3), 
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.joinButton:hover::before {
+  left: 100%;
+}
+
+.joinButton:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 
+    0 8px 30px rgba(76, 255, 179, 0.4),
+    0 0 60px rgba(76, 255, 179, 0.3);
+}
+
+.joinButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Alert de error mejorado */
+.errorAlert {
+  border-radius: 12px !important;
+  background: rgba(239, 68, 68, 0.1) !important;
+  border: 1px solid rgba(239, 68, 68, 0.3) !important;
+  color: #fca5a5 !important;
+  margin-bottom: 1.5rem !important;
+}
+
+/* Indicador de caracteres */
+.characterCounter {
+  text-align: center;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #a0aec0;
+}
+
+.characterCounter span {
+  color: #4cffb3;
+  font-weight: 600;
+}
+
+/* Animación de entrada */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.content {
+  animation: slideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .paper {
+    padding: 2rem 1.5rem !important;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .codeInput {
+    font-size: 1.5rem !important;
+    letter-spacing: 0.3rem !important;
+  }
+
+  .exampleCode {
+    font-size: 1.5rem;
+    letter-spacing: 0.3rem;
+  }
+
+  .buttonGroup {
+    flex-direction: column;
+  }
+
+  .instructions {
+    flex-direction: column;
+    text-align: center;
+  }
+}

@@ -3,15 +3,18 @@ import { ThemeProvider, CssBaseline, createTheme } from "@mui/material"
 import "./global.css"
 import HomePage from "./features/home/HomePage"
 import LoginPage from "./features/login/LoginPage"
-import SignUpPage from "./features/singup/SignUpPage"
-import ForgotPasswordPage from "./features/forgot/ForgotPasswordPage"
 import { AuthProvider } from "./context/AuthContext"
 import { useAuth } from "./context/useAuth"
 import AppShell from "./components/AppShell"
 import DashboardPage from "./features/dashboard/DashboardPage"
 import ProfilePage from "./features/profile/ProfilePage"
 import { SocketProvider } from "./context/SocketContext"
+import { LobbySocketProvider } from "./context/LobbySocketContext"
 import QuickPlayPage from "./features/quickplay/QuickPlayPage"
+import CreateLobbyPage from "./features/lobby/CreateLobbyPage"
+import JoinLobbyPage from "./features/lobby/JoinLobbyPage"
+import LobbyPage from "./features/lobby/LobbyPage"
+import GamePage from "./features/game/GamePage"
 
 const theme = createTheme({
   palette: {
@@ -82,62 +85,100 @@ function App() {
       <CssBaseline />
       <AuthProvider>
         <SocketProvider>
-        <BrowserRouter>
-          <Routes>
-            {/* Público */}
-            <Route path="/" element={<HomePage />} />
-            <Route path="/home" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignUpPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            {/* Autenticado */}
-            <Route
-              path="/app"
-              element={
-                <Protected>
-                  <AppShell>
-                    <DashboardPage />
-                  </AppShell>
-                </Protected>
-              }
-            />
-            <Route
-              path="/app/profile"
-              element={
-                <Protected>
-                  <AppShell>
-                    <ProfilePage />
-                  </AppShell>
-                </Protected>
-              }
-            />
-            <Route
-              path="/app/quick-play"
-              element={
-                <Protected>
-                  <AppShell>
-                    <QuickPlayPage />
-                  </AppShell>
-                </Protected>
-              }
-            />
-            {/* Placeholders futuros */}
-            <Route
-              path="/app/:stub"
-              element={
-                <Protected>
-                  <AppShell>
-                    <div style={{ padding: 24 }}>
-                      <h2>En construcción</h2>
-                      <p>Esta sección estará disponible próximamente.</p>
-                    </div>
-                  </AppShell>
-                </Protected>
-              }
-            />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </BrowserRouter>
+          <LobbySocketProvider>
+            <BrowserRouter>
+              <Routes>
+                {/* Público */}
+                <Route path="/" element={<HomePage />} />
+                <Route path="/home" element={<HomePage />} />
+                <Route path="/login" element={<LoginPage />} />
+                {/* Autenticado */}
+                <Route
+                  path="/app"
+                  element={
+                    <Protected>
+                      <AppShell>
+                        <DashboardPage />
+                      </AppShell>
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/app/profile"
+                  element={
+                    <Protected>
+                      <AppShell>
+                        <ProfilePage />
+                      </AppShell>
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/app/quick-play"
+                  element={
+                    <Protected>
+                      <AppShell>
+                        <QuickPlayPage />
+                      </AppShell>
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/app/create-lobby"
+                  element={
+                    <Protected>
+                      <AppShell>
+                        <CreateLobbyPage />
+                      </AppShell>
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/app/join"
+                  element={
+                    <Protected>
+                      <AppShell>
+                        <JoinLobbyPage />
+                      </AppShell>
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/app/lobby/:code"
+                  element={
+                    <Protected>
+                      <AppShell>
+                        <LobbyPage />
+                      </AppShell>
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/app/game/:code"
+                  element={
+                    <Protected>
+                      <GamePage />
+                    </Protected>
+                  }
+                />
+                {/* Placeholders futuros */}
+                <Route
+                  path="/app/:stub"
+                  element={
+                    <Protected>
+                      <AppShell>
+                        <div style={{ padding: 24 }}>
+                          <h2>En construcción</h2>
+                          <p>Esta sección estará disponible próximamente.</p>
+                        </div>
+                      </AppShell>
+                    </Protected>
+                  }
+                />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </BrowserRouter>
+          </LobbySocketProvider>
         </SocketProvider>
       </AuthProvider>
     </ThemeProvider>

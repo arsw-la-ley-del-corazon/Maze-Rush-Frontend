@@ -2,32 +2,19 @@ import axiosInstance from '../../../common/AxiosIntance';
 import { API_ENDPOINTS } from '../../../common/globas';
 import type {
   AuthResponse,
-  LoginRequest,
-  RegisterRequest,
   RefreshTokenRequest,
   Result,
   ApiErrorShape,
 } from "../../../types/api";
 
 // Servicio de autenticación que se conecta al backend real
-export async function login(req: LoginRequest): Promise<Result<AuthResponse>> {
+export async function loginWithGoogle(credential: string): Promise<Result<AuthResponse>> {
   try {
-    const response = await axiosInstance.post(API_ENDPOINTS.AUTH.LOGIN, req);
-    
+    const response = await axiosInstance.post(API_ENDPOINTS.AUTH.GOOGLE, { idToken: credential });
     
     return success(mapBackendAuthResponse(response.data));
   } catch (error: any) {
-    return handleApiError(error, API_ENDPOINTS.AUTH.LOGIN);
-  }
-}
-
-export async function register(req: RegisterRequest): Promise<Result<AuthResponse>> {
-  try {
-    const response = await axiosInstance.post(API_ENDPOINTS.AUTH.REGISTER, req);
-    
-    return success(mapBackendAuthResponse(response.data));
-  } catch (error: any) {
-    return handleApiError(error, API_ENDPOINTS.AUTH.REGISTER);
+    return handleApiError(error, API_ENDPOINTS.AUTH.GOOGLE);
   }
 }
 
@@ -53,20 +40,6 @@ export async function logout(accessToken: string): Promise<Result<null>> {
   } catch (error: any) {
     // Incluso si el logout falla en el backend, limpiamos el estado local
     return { ok: true, data: null };
-  }
-}
-
-export async function validateToken(accessToken: string): Promise<boolean> {
-  try {
-    const response = await axiosInstance.get(API_ENDPOINTS.AUTH.VALIDATE, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`
-      }
-    });
-    
-    return response.data === true;
-  } catch (error) {
-    return false;
   }
 }
 
