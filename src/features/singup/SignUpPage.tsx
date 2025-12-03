@@ -17,7 +17,6 @@ import LockIcon from "@mui/icons-material/Lock"
 import Loader from "../../components/Loader"
 import styles from "./SignUpPage.module.css"
 
-import { useNavigate } from "react-router-dom"
 import { useAuth } from "../../context/useAuth"
 import PersonIcon from "@mui/icons-material/Person"
 
@@ -27,8 +26,7 @@ const SignUpPage = () => {
   const [password, setPassword] = useState("")
   const [confirm, setConfirm] = useState("")
   const [error, setError] = useState("")
-  const navigate = useNavigate()
-  const { register, loading } = useAuth()
+  const {loading } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -38,19 +36,8 @@ const SignUpPage = () => {
       setError("Las contraseñas no coinciden")
       return
     }
-    
-    if (!register) {
-      setError("Función de registro no disponible")
-      return
-    }
-    
-    const result = await register(username, email, password)
-    if (result.ok) {
-      navigate("/app")
-    } else {
-      setError(result.error || "Error al registrar usuario")
-    }
   }
+    
 
   return (
     <Box className={styles.root}>
