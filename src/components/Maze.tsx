@@ -1,140 +1,98 @@
 // src/components/Maze.tsx
-import type { PlayerGameState } from "../types/api"
-import type { MazeCell } from "../features/game/services/mazeService"
-import { cn } from "../lib/utils"
+import React from "react"
 import styles from "./Maze.module.css"
+import { PlayerState } from "../types/powerUps"
 
 interface MazeProps {
-  maze: MazeCell[][]
-  playerPosition: { x: number; y: number }
-  endPosition: { x: number; y: number }
-  isGameWon: boolean
-  otherPlayers?: PlayerGameState[]
+  layout: string          // string del backend (con 0,1,F,P, etc.)
+  players: PlayerState[]  // jugadores con posición y efectos
+  myUsername: string
+  hasClearFog: boolean    // efecto CLEAR_FOG
 }
 
-/**
- * Maze component that renders the maze grid and player position
- * Adapts to different maze sizes and displays walls based on cell data
- * Supports multiplayer by rendering other players' positions
- * Implements fog of war for limited visibility
- */
-export function Maze({
-  maze,
-  playerPosition,
-  endPosition,
-  isGameWon,
-  otherPlayers = [],
-}: MazeProps) {
-  if (!maze || maze.length === 0) {
-    return null
-  }
+const Maze: React.FC<MazeProps> = ({
+  layout,
+  players,
+  myUsername,
+  hasClearFog,
+}) => {
+  // Cada fila del layout es una línea del string
+  const rows = layout.trim().split("\n")
 
-  const width = maze[0].length
-  const height = maze.length
-
-  // Fog of war radius - adjust this value to change visibility range
-  const VISION_RADIUS = 3
-
-  /**
-   * Calculate if a cell is visible based on player position
-   * Uses Manhattan distance for fog of war effect
-   */
-  const isCellVisible = (cellX: number, cellY: number): boolean => {
-    const distance = Math.abs(cellX - playerPosition.x) + Math.abs(cellY - playerPosition.y)
-    return distance <= VISION_RADIUS
-  }
-
-  /**
-   * Calculate visibility level for gradual fog effect
-   * Returns a value between 0 (invisible) and 1 (fully visible)
-   */
-  const getVisibilityLevel = (cellX: number, cellY: number): number => {
-    const distance = Math.abs(cellX - playerPosition.x) + Math.abs(cellY - playerPosition.y)
-    if (distance > VISION_RADIUS) return 0
-    if (distance === 0) return 1
-    // Much steeper falloff for dramatic fog effect
-    return Math.max(0, 1 - (distance / VISION_RADIUS) * 0.95)
-  }
+  // Todos los jugadores en una celda (soporta varios)
+  const getPlayersAt = (x: number, y: number) =>
+    players.filter((p) => p.position.x === x && p.position.y === y)
 
   return (
-    <div
-      className={styles.mazeContainer}
-      style={{
-        gridTemplateColumns: `repeat(${width}, minmax(0, 1fr))`,
-        gridTemplateRows: `repeat(${height}, minmax(0, 1fr))`,
-      }}
-    >
-      {maze.map((row, y) =>
-        row.map((cell, x) => {
-          const isPlayer = playerPosition.x === x && playerPosition.y === y
-          const isEnd = endPosition.x === x && endPosition.y === y
-          const otherPlayersHere = otherPlayers.filter(
-            (p) => p.position.x === x && p.position.y === y,
-          )
+    <div className={styles.mazeWrapper}>
+      {/* 🌫 Niebla global: si NO tengo CLEAR_FOG, mostramos overlay */}
+      {!hasClearFog && <div className={styles.fogOverlay} />}
 
-          // Check if this cell is a wall (all borders are true)
-          const isWall = cell.top && cell.right && cell.bottom && cell.left
+      <div className={styles.mazeGrid}>
+        {rows.map((row, y) =>
+          row.split("").map((cell, x) => {
+            const cellKey = `${x}-${y}`
+            const playersHere = getPlayersAt(x, y)
 
-          // Calculate visibility
-          const isVisible = isCellVisible(x, y)
-          const visibilityLevel = getVisibilityLevel(x, y)
+            // Clases base de celda
+            let cellClass = styles.cell
+            if (cell === "1") cellClass += ` ${styles.wall}`
+            if (cell === "0") cellClass += ` ${styles.path}`
+            if (cell === "F") cellClass += ` ${styles.finish}`
 
-          return (
-            <div
-              key={`${y}-${x}`}
-              className={cn(
-                styles.cell,
-                isWall ? styles.wallCell : styles.pathCell,
-                !isWall && cell.top && styles.cellWallTop,
-                !isWall && cell.right && styles.cellWallRight,
-                !isWall && cell.bottom && styles.cellWallBottom,
-                !isWall && cell.left && styles.cellWallLeft,
-                isEnd && !isWall && styles.endPosition,
-                !isVisible && styles.foggedCell,
-                isPlayer && styles.playerCell,
-              )}
-              style={{
-                opacity: isVisible ? visibilityLevel : 0,
-                transition: "opacity 0.4s ease-in-out",
-                filter: isVisible ? "none" : "blur(8px)",
-              }}
-            >
-              {/* Solo renderizar contenido si la celda es visible */}
-              {isVisible && (
-                <>
-                  {isEnd && !isWall && <div className={styles.endToken} />}
+            const hasPowerUp = cell === "P"
 
-                  {/* Otros jugadores en esta celda: SOLO el monito de color */}
-                  {!isWall &&
-                    otherPlayersHere.map((player, idx) => (
-                      <div
-                        key={player.username}
-                        className={styles.otherPlayerToken}
-                        style={{
-                          // MUY IMPORTANTE: usar "color" para que afecte currentColor
-                          color: player.avatarColor || "#FF6B6B",
-                          transform: `translate(${idx * 4}px, ${idx * 4}px)`,
-                          zIndex: 10 + idx,
-                        }}
-                        title={player.username}
-                      />
-                    ))}
+            return (
+              <div key={cellKey} className={cellClass}>
+                {/* 🎁 Caja sorpresa / Power-Up */}
+                {hasPowerUp && (
+                  <div className={styles.powerUpBox}>
+                    🎁
+                  </div>
+                )}
 
-                  {/* Jugador actual: celda brillante + monito amarillo */}
-                  {isPlayer && !isWall && (
-                    <div
-                      className={cn(
-                        styles.playerToken,
-                        isGameWon && styles.playerTokenWinning,
+                {/* 👥 Jugadores en esta celda */}
+                {playersHere.map((player, idx) => (
+                  <div
+                    key={player.username}
+                    className={[
+                      styles.playerAvatar,
+                      player.username === myUsername ? styles.playerAvatarMe : "",
+                      player.activeEffects?.FREEZE ? styles.playerFrozen : "",
+                      player.activeEffects?.CONFUSION ? styles.playerConfused : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                    style={{
+                      zIndex: 10 + idx,
+                      transform: `translate(${idx * 4}px, ${idx * 4}px)`,
+                    }}
+                  >
+                    <span className={styles.playerInitials}>
+                      {player.username[0]?.toUpperCase()}
+                    </span>
+
+                    {/* Badges mini con efectos */}
+                    <div className={styles.effectsBadges}>
+                      {player.activeEffects?.FREEZE && (
+                        <span className={styles.effectBadge}>❄️</span>
                       )}
-                    />
-                  )}
-                </>
-              )}
-            </div>
-          )
-        }),
-      )}
+                      {player.activeEffects?.CONFUSION && (
+                        <span className={styles.effectBadge}>❓</span>
+                      )}
+                      {player.activeEffects?.CLEAR_FOG && (
+                        <span className={styles.effectBadge}>🔦</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )
+          }),
+        )}
+      </div>
     </div>
   )
 }
+
+export default Maze
