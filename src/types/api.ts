@@ -1,3 +1,5 @@
+import type { ActiveEffectsMap } from "./powerUps"
+
 // Tipos alineados con el OpenAPI proporcionado (v1.0.0) — solo simulación local
 export interface UserInfo {
   id: string
@@ -11,8 +13,8 @@ export interface AuthResponse {
   accessToken: string
   refreshToken: string
   tokenType: string
-  expiresIn: number // segundos
-  expiresAt: string // ISO date-time
+  expiresIn: number
+  expiresAt: string
   user: UserInfo
 }
 
@@ -110,6 +112,7 @@ export interface PlayerGameState {
   finishTime?: number
   score?: number
   avatarColor?: string
+  activeEffects?: ActiveEffectsMap
 }
 
 export interface GameMoveEvent {
@@ -141,10 +144,12 @@ export interface GamePlayerEvent {
 
 export type GameEvent = GameMoveEvent | GameFinishEvent | GameStartEvent | GamePlayerEvent
 
+// Estado que llega por WebSocket desde el backend para sincronizar el juego
 export interface GameSyncMessage {
-  type: "sync"
+  gameId: string
+  status: string
+  currentLayout: string
   players: PlayerGameState[]
-  timestamp: string
 }
 
 // Utilidades

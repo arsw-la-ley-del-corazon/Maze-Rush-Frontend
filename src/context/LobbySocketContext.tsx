@@ -18,19 +18,12 @@ export interface SystemMessage extends ChatMessage {
   type: "player_joined" | "player_left" | "connection_lost" | "connection_restored"
 }
 
-// Información del juego iniciado
-export interface GameStartedInfo {
-  lobbyCode: string
-  mazeData: unknown
-}
-
 interface LobbySocketContextValue {
   isConnected: boolean
   error: string | null
   messages: (ChatMessage | SystemMessage)[]
   players: string[]
   readyPlayers: Set<string>
-  gameStarted: GameStartedInfo | null
   connect: (lobbyCode: string) => void
   disconnect: () => void
   sendMessage: (message: string) => void
@@ -38,7 +31,6 @@ interface LobbySocketContextValue {
   startGame: () => void
   updatePlayers: (players: string[]) => void
   setOnDisconnectCallback?: (callback: (lobbyCode: string) => Promise<void>) => void
-  clearGameStarted: () => void
 }
 
 const LobbySocketContext = createContext<LobbySocketContextValue | undefined>(undefined)
@@ -51,7 +43,6 @@ export const LobbySocketProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [messages, setMessages] = useState<(ChatMessage | SystemMessage)[]>([])
   const [players, setPlayers] = useState<string[]>([])
   const [readyPlayers, setReadyPlayers] = useState<Set<string>>(new Set())
-  const [gameStarted, setGameStarted] = useState<GameStartedInfo | null>(null)
   const currentLobbyCodeRef = useRef<string | null>(null)
   const processedMessageIdsRef = useRef<Set<string>>(new Set())
   const chatSubscriptionRef = useRef<{ unsubscribe: () => void } | null>(null)
@@ -61,10 +52,6 @@ export const LobbySocketProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const onDisconnectCallbackRef = useRef<((lobbyCode: string) => Promise<void>) | undefined>(undefined)
   const reconnectTimeoutRef = useRef<number | null>(null)
   const reconnectAttemptsRef = useRef(0)
-
-  const clearGameStarted = useCallback(() => {
-    setGameStarted(null)
-  }, [])
 
   const connect = useCallback(
     (lobbyCode: string) => {
@@ -199,13 +186,9 @@ export const LobbySocketProvider: React.FC<{ children: React.ReactNode }> = ({ c
                       console.log("Laberinto compartido guardado para lobby:", data.lobbyCode)
                     }
                     
-                    // Notificar al componente del lobby que el juego ha comenzado
-                    // El componente manejará la navegación usando React Router
-                    console.log("Juego iniciado, notificando al componente...")
-                    setGameStarted({
-                      lobbyCode: data.lobbyCode,
-                      mazeData: data.maze
-                    })
+                    // Navegar automáticamente al juego para todos los jugadores
+                    console.log("Navegando a la página de juego...")
+                    window.location.href = `/app/game/${data.lobbyCode}`
                   }
                 } catch (err) {
                   console.error("Error parsing game message:", err)
@@ -422,7 +405,6 @@ export const LobbySocketProvider: React.FC<{ children: React.ReactNode }> = ({ c
     messages,
     players,
     readyPlayers,
-    gameStarted,
     connect,
     disconnect,
     sendMessage,
@@ -430,7 +412,6 @@ export const LobbySocketProvider: React.FC<{ children: React.ReactNode }> = ({ c
     startGame,
     updatePlayers,
     setOnDisconnectCallback,
-    clearGameStarted,
   }
 
   return <LobbySocketContext.Provider value={value}>{children}</LobbySocketContext.Provider>
