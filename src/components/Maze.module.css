@@ -1,47 +1,111 @@
 .mazeContainer {
-  background: linear-gradient(135deg, rgba(147, 51, 234, 0.2) 0%, rgba(79, 70, 229, 0.2) 100%);
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  background: 
+    linear-gradient(135deg, rgba(10, 2, 25, 1) 0%, rgba(20, 5, 45, 1) 50%, rgba(10, 2, 25, 1) 100%),
+    radial-gradient(circle at 50% 50%, rgba(147, 51, 234, 0.15) 0%, transparent 70%);
+  padding: 1.5rem;
+  border-radius: 1.5rem;
+  box-shadow: 
+    0 0 80px rgba(147, 51, 234, 0.6),
+    0 0 120px rgba(79, 70, 229, 0.4),
+    0 30px 60px -15px rgba(0, 0, 0, 0.9),
+    inset 0 0 60px rgba(147, 51, 234, 0.2),
+    inset 0 2px 4px rgba(255, 255, 255, 0.1);
   display: inline-grid;
   gap: 0;
-  border: 2px solid rgba(168, 85, 247, 0.3);
+  border: 4px solid;
+  border-image: linear-gradient(135deg, 
+    rgba(168, 85, 247, 0.8) 0%, 
+    rgba(236, 72, 153, 0.8) 50%, 
+    rgba(168, 85, 247, 0.8) 100%) 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.mazeContainer::before {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  background: 
+    radial-gradient(circle at 30% 30%, rgba(147, 51, 234, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 70% 70%, rgba(236, 72, 153, 0.2) 0%, transparent 50%);
+  animation: mazeGlow 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.mazeContainer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 1.5rem;
+  background: linear-gradient(135deg, transparent 0%, rgba(147, 51, 234, 0.1) 50%, transparent 100%);
+  animation: shimmer 3s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes mazeGlow {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1) rotate(180deg);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 .cell {
   position: relative;
   aspect-ratio: 1;
-  width: 16px;
-  height: 16px;
-  transition: background-color 300ms ease-in-out;
+  width: 18px;
+  height: 18px;
+  transition: all 400ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @media (min-width: 640px) {
   .cell {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
   }
 }
 
 @media (min-width: 768px) {
   .cell {
-    width: 24px;
-    height: 24px;
+    width: 26px;
+    height: 26px;
   }
 }
 
-/* Wall cells - solid dark color */
+/* Wall cells - solid dark color with texture */
 .wallCell {
-  background-color: rgba(30, 20, 50, 0.9);
+  background: 
+    linear-gradient(135deg, rgba(15, 10, 30, 1) 0%, rgba(25, 15, 45, 1) 50%, rgba(15, 10, 30, 1) 100%),
+    repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0, 0, 0, 0.3) 2px, rgba(0, 0, 0, 0.3) 4px);
   border: none;
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.8),
+    inset 0 -1px 2px rgba(147, 51, 234, 0.1);
 }
 
-/* Path cells - lighter color with potential borders */
+/* Path cells - lighter color with potential borders and glow */
 .pathCell {
-  background-color: rgba(88, 28, 135, 0.3);
-  border-color: rgba(168, 85, 247, 0.8);
+  background: 
+    linear-gradient(135deg, rgba(88, 28, 135, 0.5) 0%, rgba(70, 20, 110, 0.5) 50%, rgba(88, 28, 135, 0.5) 100%),
+    radial-gradient(circle at center, rgba(147, 51, 234, 0.15) 0%, transparent 70%);
+  border-color: rgba(168, 85, 247, 1);
   border-style: solid;
   border-width: 0;
+  box-shadow: 
+    inset 0 0 10px rgba(147, 51, 234, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.1);
 }
 
 .cellWallTop {
@@ -60,67 +124,240 @@
   border-left-width: 2px;
 }
 
+/* Fog of war effect - completely opaque */
+.foggedCell {
+  background: rgba(5, 2, 15, 1) !important;
+  filter: grayscale(1) brightness(0.1);
+  pointer-events: none;
+  border-color: rgba(50, 30, 80, 0.3) !important;
+}
+
+/* Player's current cell with intense glow effect */
+.playerCell {
+  background: 
+    radial-gradient(circle at center, 
+      rgba(192, 132, 252, 0.6) 0%, 
+      rgba(147, 51, 234, 0.5) 50%, 
+      rgba(88, 28, 135, 0.5) 100%) !important;
+  box-shadow: 
+    0 0 30px rgba(192, 132, 252, 0.9),
+    0 0 60px rgba(236, 72, 153, 0.6),
+    inset 0 0 20px rgba(192, 132, 252, 0.5),
+    inset 0 0 40px rgba(147, 51, 234, 0.3);
+  animation: playerCellPulse 1.5s ease-in-out infinite;
+  z-index: 1;
+}
+
+@keyframes playerCellPulse {
+  0%, 100% {
+    box-shadow: 
+      0 0 30px rgba(192, 132, 252, 0.9),
+      0 0 60px rgba(236, 72, 153, 0.6),
+      inset 0 0 20px rgba(192, 132, 252, 0.5),
+      inset 0 0 40px rgba(147, 51, 234, 0.3);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 
+      0 0 50px rgba(192, 132, 252, 1),
+      0 0 100px rgba(236, 72, 153, 0.8),
+      inset 0 0 30px rgba(192, 132, 252, 0.7),
+      inset 0 0 60px rgba(147, 51, 234, 0.5);
+    transform: scale(1.05);
+  }
+}
+
 .endPosition {
-  background-color: rgba(134, 239, 172, 0.5);
+  background: 
+    radial-gradient(circle at center, 
+      rgba(134, 239, 172, 0.8) 0%, 
+      rgba(74, 222, 128, 0.6) 50%, 
+      rgba(34, 197, 94, 0.5) 100%);
+  box-shadow: 
+    0 0 40px rgba(74, 222, 128, 0.9),
+    0 0 80px rgba(134, 239, 172, 0.6),
+    inset 0 0 25px rgba(134, 239, 172, 0.6),
+    inset 0 0 50px rgba(74, 222, 128, 0.4);
+  animation: endPositionPulse 1.2s ease-in-out infinite;
+  z-index: 1;
 }
 
-.playerToken {
-  position: absolute;
-  inset: 0;
-  margin: auto;
-  height: 75%;
-  width: 75%;
-  border-radius: 9999px;
-  background: linear-gradient(135deg, rgb(192, 132, 252) 0%, rgb(236, 72, 153) 100%);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-  transition: all 300ms ease-in-out;
-  transition-delay: 150ms;
-  scale: 1;
-  opacity: 1;
-  z-index: 20;
+@keyframes endPositionPulse {
+  0%, 100% {
+    box-shadow: 
+      0 0 40px rgba(74, 222, 128, 0.9),
+      0 0 80px rgba(134, 239, 172, 0.6),
+      inset 0 0 25px rgba(134, 239, 172, 0.6),
+      inset 0 0 50px rgba(74, 222, 128, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 
+      0 0 60px rgba(74, 222, 128, 1),
+      0 0 120px rgba(134, 239, 172, 0.8),
+      inset 0 0 40px rgba(134, 239, 172, 0.8),
+      inset 0 0 80px rgba(74, 222, 128, 0.6);
+    transform: scale(1.08);
+  }
 }
 
-.playerTokenWinning {
-  scale: 1.5;
-  opacity: 0;
-  transition-delay: 0s;
-}
+/* === PERSONAJES TIPO MONITO NEÓN === */
 
+.playerToken,
 .otherPlayerToken {
   position: absolute;
   inset: 0;
   margin: auto;
-  height: 70%;
-  width: 70%;
+  width: 80%;
+  height: 80%;
+  background: transparent;
+
+  /* Color por defecto del jugador local; los otros se pintan por inline style "color" */
+  color: #f7ff3c;
+
+  /* Glow neón */
+  filter:
+    drop-shadow(0 0 4px currentColor)
+    drop-shadow(0 0 12px currentColor);
+  transition: transform 200ms ease-out, opacity 200ms ease-out;
+}
+
+/* Cabeza circular */
+.playerToken::before,
+.otherPlayerToken::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 32%;
+  height: 32%;
   border-radius: 9999px;
-  box-shadow: 0 4px 8px -2px rgba(0, 0, 0, 0.3);
-  transition: all 200ms ease-in-out;
-  opacity: 0.85;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  background-color: currentColor;
+  transform: translate(-50%, 10%);
+}
+
+/* Cuerpo, brazos y piernas */
+.playerToken::after,
+.otherPlayerToken::after {
+  content: "";
+  position: absolute;
+  bottom: 6%;
+  left: 50%;
+  width: 100%;
+  height: 70%;
+  transform: translateX(-50%);
+  background:
+    /* torso */
+    linear-gradient(currentColor, currentColor)
+      50% 20% / 10% 55% no-repeat,
+    /* brazos */
+    linear-gradient(currentColor, currentColor)
+      50% 35% / 70% 10% no-repeat,
+    /* pierna izquierda */
+    linear-gradient(currentColor, currentColor)
+      35% 80% / 10% 40% no-repeat,
+    /* pierna derecha */
+    linear-gradient(currentColor, currentColor)
+      65% 80% / 10% 40% no-repeat;
+}
+
+/* Jugador local: más brillo y prioridad de z-index */
+.playerToken {
+  filter:
+    drop-shadow(0 0 8px currentColor)
+    drop-shadow(0 0 18px currentColor);
+  z-index: 20;
+}
+
+/* Estado cuando gana (se agranda un poco y se apaga) */
+.playerTokenWinning {
+  transform: scale(1.18);
+  opacity: 0.45;
+}
+
+/* Otros jugadores: solo monito, un poco más pequeño para diferenciar */
+.otherPlayerToken {
+  width: 60%;
+  height: 60%;
+  opacity: 0.95;
+  z-index: 18;
 }
 
 .otherPlayerToken:hover {
   opacity: 1;
-  transform: scale(1.1);
+  transform: scale(1.07) !important;
 }
+
+/* === FIN PERSONAJES === */
 
 .endToken {
   position: absolute;
   inset: 0;
   margin: auto;
-  height: 75%;
-  width: 75%;
+  height: 80%;
+  width: 80%;
   border-radius: 9999px;
-  background: linear-gradient(135deg, rgb(74, 222, 128) 0%, rgb(5, 150, 105) 100%);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  background: 
+    linear-gradient(135deg, 
+      rgb(134, 239, 172) 0%, 
+      rgb(74, 222, 128) 25%,
+      rgb(34, 197, 94) 75%,
+      rgb(5, 150, 105) 100%);
+  box-shadow: 
+    0 0 40px rgba(74, 222, 128, 1),
+    0 0 80px rgba(134, 239, 172, 0.8),
+    0 0 120px rgba(34, 197, 94, 0.6),
+    0 10px 20px -3px rgba(0, 0, 0, 0.5),
+    inset 0 2px 4px rgba(255, 255, 255, 0.4),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+  border: 4px solid rgba(255, 255, 255, 0.6);
+  animation: endTokenPulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  position: relative;
 }
 
-@keyframes pulse {
+.endToken::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, rgba(134, 239, 172, 0.5), rgba(34, 197, 94, 0.5));
+  filter: blur(12px);
+  z-index: -1;
+  animation: endTokenHalo 2s ease-in-out infinite;
+}
+
+@keyframes endTokenPulse {
   0%, 100% {
     opacity: 1;
+    transform: scale(1) rotate(0deg);
+    box-shadow: 
+      0 0 40px rgba(74, 222, 128, 1),
+      0 0 80px rgba(134, 239, 172, 0.8),
+      0 0 120px rgba(34, 197, 94, 0.6),
+      0 10px 20px -3px rgba(0, 0, 0, 0.5),
+      inset 0 2px 4px rgba(255, 255, 255, 0.4),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.3);
   }
   50% {
-    opacity: 0.5;
+    opacity: 0.8;
+    transform: scale(1.15) rotate(180deg);
+    box-shadow: 
+      0 0 60px rgba(74, 222, 128, 1),
+      0 0 120px rgba(134, 239, 172, 1),
+      0 0 180px rgba(34, 197, 94, 0.8),
+      0 15px 30px -3px rgba(0, 0, 0, 0.6),
+      inset 0 2px 6px rgba(255, 255, 255, 0.5),
+      inset 0 -2px 6px rgba(0, 0, 0, 0.4);
+  }
+}
+
+@keyframes endTokenHalo {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.3);
   }
 }
