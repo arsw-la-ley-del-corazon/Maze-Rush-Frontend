@@ -17,6 +17,7 @@ export default function LobbyPage() {
     messages,
     players: socketPlayers,
     readyPlayers,
+    gameStarted,
     connect,
     disconnect,
     sendMessage,
@@ -24,6 +25,7 @@ export default function LobbyPage() {
     startGame,
     updatePlayers,
     setOnDisconnectCallback,
+    clearGameStarted,
   } = useLobbySocket()
 
   const [lobby, setLobby] = useState<LobbyWithPlayersResponse | null>(null)
@@ -34,6 +36,15 @@ export default function LobbyPage() {
 
   const isHost = lobby?.creatorUsername === user?.username
   const isReady = readyPlayers.has(user?.username || "")
+
+  // Efecto para navegar al juego cuando se recibe el evento game_started
+  useEffect(() => {
+    if (gameStarted && gameStarted.lobbyCode) {
+      console.log("Navegando al juego desde LobbyPage:", gameStarted.lobbyCode)
+      clearGameStarted() // Limpiar el estado antes de navegar
+      navigate(`/app/game/${gameStarted.lobbyCode}`, { replace: true })
+    }
+  }, [gameStarted, navigate, clearGameStarted])
 
   useEffect(() => {
     if (!code) {
@@ -132,8 +143,8 @@ export default function LobbyPage() {
   const handleStartGame = () => {
     if (isHost && canStartGame) {
       startGame()
-      // Navegar a la página del juego
-      navigate(`/app/game/${code}`)
+      // NO navegar manualmente - el LobbySocketContext navegará automáticamente
+      // cuando reciba el evento game_started del backend
     }
   }
 
