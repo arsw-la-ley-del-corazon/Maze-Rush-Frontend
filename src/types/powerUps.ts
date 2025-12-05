@@ -8,9 +8,19 @@ export type ActiveEffectsMap = {
 export interface PlayerState {
   username: string;
   position: { x: number; y: number };
+
+  // Campos del backend
+  isFinished?: boolean;
+  finishTime?: number;
+  avatarColor?: string;
+
+  // Campos de poderes
   color?: string;
   activeEffects: ActiveEffectsMap;
-  // ...otros campos que ya tengas (score, id, etc.)
+  activePowerUpId?: string | null;
+  isFrozen?: boolean;
+  isConfused?: boolean;
+  hasClearFog?: boolean;
 }
 
 // Notificación que llega por /notifications

@@ -3,7 +3,6 @@ import {
   TextField, InputAdornment, MenuItem, Select, FormControl, InputLabel,
   Pagination, Chip
 } from "@mui/material"
-import PlayCircleIcon from "@mui/icons-material/PlayCircle"
 import GroupAddIcon from "@mui/icons-material/GroupAdd"
 import KeyIcon from "@mui/icons-material/VpnKey"
 import RefreshIcon from "@mui/icons-material/Refresh"
@@ -301,12 +300,8 @@ export default function DashboardPage() {
       </Box>
 
       {/* Action Buttons */}
+      {/* Action Buttons */}
       <Box className={styles.actionsGrid}>
-        <ActionButton
-          icon={<PlayCircleIcon sx={{ fontSize: 24 }} />}
-          label="QUICK PLAY"
-          onClick={() => navigate("/app/quick-play")}
-        />
         <ActionButton
           icon={<GroupAddIcon sx={{ fontSize: 24 }} />}
           label="CREAR SALA"
@@ -318,6 +313,7 @@ export default function DashboardPage() {
           onClick={() => navigate("/app/join")}
         />
       </Box>
+
 
       {/* Search and Filters Section */}
       <Box className={styles.filtersSection}>

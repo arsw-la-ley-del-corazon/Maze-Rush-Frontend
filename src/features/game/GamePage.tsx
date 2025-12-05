@@ -13,19 +13,19 @@ import {
 import TimerIcon from "@mui/icons-material/Timer"
 import ExitToAppIcon from "@mui/icons-material/ExitToApp"
 
-import Maze from "../../components/Maze" // 👈 asegúrate de que Maze tenga export default
+import Maze from "../../components/Maze"
 import { WinDialog } from "../../components/WinDialog"
 import PowerUpToast from "../../components/PowerUpToast"
 import { useAuth } from "../../context/useAuth"
-import { useGameSocket, Direction } from "../../context/useGameSocket"
+import { useGameSocket, type Direction } from "../../context/useGameSocket"
 import styles from "./GamePage.module.css"
+import type { PlayerState } from "../../types/powerUps"
 
 export default function GamePage() {
   const { code } = useParams<{ code: string }>()
   const navigate = useNavigate()
   const { user } = useAuth()
 
-  // usamos el mismo code como lobbyCode y gameId (ajusta si tu backend separa esto)
   const lobbyCode = code || ""
   const gameId = code || ""
   const username = user?.username ?? ""
@@ -44,7 +44,6 @@ export default function GamePage() {
     isConnected,
     disconnect,
     gameState,
-    myPlayer,
     isMyPlayerFrozen,
     hasClearFog,
     lastNotification,
@@ -52,14 +51,14 @@ export default function GamePage() {
     sendMove,
   } = useGameSocket({ lobbyCode, gameId })
 
-  // -------- redirección si no hay código ----------
+  // 🔹 Redirección si NO hay código (hook SIEMPRE llamado)
   useEffect(() => {
     if (!code) {
       navigate("/app", { replace: true })
     }
   }, [code, navigate])
 
-  // -------- iniciar timer al recibir el primer estado ----------
+  // 🔹 Iniciar timer cuando llegue el primer gameState
   useEffect(() => {
     if (gameState && !gameStartedRef.current) {
       setTimer(0)
@@ -72,7 +71,7 @@ export default function GamePage() {
     }
   }, [gameState])
 
-  // -------- timer MM:SS ----------
+  // 🔹 Timer MM:SS
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | undefined
 
@@ -87,7 +86,7 @@ export default function GamePage() {
     }
   }, [isTimerRunning, gameOver])
 
-  // -------- detectar ganador desde gameState ----------
+  // 🔹 Detectar ganador desde gameState (sin hooks condicionales)
   useEffect(() => {
     if (!gameState || winnerSetRef.current) return
 
@@ -115,7 +114,7 @@ export default function GamePage() {
     setWinnerTime(winPlayer.finishTime ?? timer)
   }, [gameState, timer])
 
-  // -------- controles de teclado (direction) ----------
+  // 🔹 Controles de teclado
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (!gameState) return
@@ -151,7 +150,7 @@ export default function GamePage() {
 
       if (direction) {
         e.preventDefault()
-        // CONFUSION lo maneja el backend, aquí no invertimos nada
+        // CONFUSION lo maneja el backend
         sendMove(direction)
       }
     },
@@ -163,7 +162,7 @@ export default function GamePage() {
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [handleKeyDown])
 
-  // -------- salir del juego ----------
+  // 🔹 Salir del juego
   const handleLeaveGame = useCallback(() => {
     try {
       if (isConnected) {
@@ -184,14 +183,13 @@ export default function GamePage() {
     }
   }, [isConnected, disconnect])
 
-  // -------- util: formato de tiempo ----------
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
   }
 
-  // -------- loading inicial (sin gameState) ----------
+  // 🔹 Loading inicial si aún no hay gameState
   if (!gameState) {
     return (
       <Box className={styles.container}>
@@ -199,6 +197,18 @@ export default function GamePage() {
       </Box>
     )
   }
+
+  // 🔹 Adaptar players del backend a PlayerState del Maze
+  const mappedPlayers: PlayerState[] = gameState.players.map((p) => ({
+    username: p.username,
+    position: p.position,
+    color: p.avatarColor,       // si el backend lo manda
+    activeEffects: {},          // de momento vacío; se irá llenando con power-ups
+    activePowerUpId: null,
+    isFrozen: false,
+    isConfused: false,
+    hasClearFog: false,
+  }))
 
   return (
     <Box className={styles.container}>
@@ -252,7 +262,7 @@ export default function GamePage() {
       <Box className={styles.mazeContainer}>
         <Maze
           layout={gameState.currentLayout}
-          players={gameState.players}
+          players={mappedPlayers}
           myUsername={username}
           hasClearFog={hasClearFog}
         />
@@ -263,8 +273,6 @@ export default function GamePage() {
         isOpen={gameOver}
         time={winnerTime ?? timer}
         onRestart={() => {
-          // si quieres reiniciar lógica de partida local, resetea flags;
-          // el backend debe encargarse de mandar un nuevo estado/layout si hay "replay"
           gameStartedRef.current = false
           winnerSetRef.current = false
           setGameOver(false)

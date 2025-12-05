@@ -1,7 +1,7 @@
 // src/components/Maze.tsx
 import React from "react"
 import styles from "./Maze.module.css"
-import { PlayerState } from "../types/powerUps"
+import type { PlayerState } from "../types/powerUps"
 
 interface MazeProps {
   layout: string          // string del backend (con 0,1,F,P, etc.)

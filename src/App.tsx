@@ -10,7 +10,6 @@ import DashboardPage from "./features/dashboard/DashboardPage"
 import ProfilePage from "./features/profile/ProfilePage"
 import { SocketProvider } from "./context/SocketContext"
 import { LobbySocketProvider } from "./context/LobbySocketContext"
-import QuickPlayPage from "./features/quickplay/QuickPlayPage"
 import CreateLobbyPage from "./features/lobby/CreateLobbyPage"
 import JoinLobbyPage from "./features/lobby/JoinLobbyPage"
 import LobbyPage from "./features/lobby/LobbyPage"
@@ -109,16 +108,6 @@ function App() {
                     <Protected>
                       <AppShell>
                         <ProfilePage />
-                      </AppShell>
-                    </Protected>
-                  }
-                />
-                <Route
-                  path="/app/quick-play"
-                  element={
-                    <Protected>
-                      <AppShell>
-                        <QuickPlayPage />
                       </AppShell>
                     </Protected>
                   }
