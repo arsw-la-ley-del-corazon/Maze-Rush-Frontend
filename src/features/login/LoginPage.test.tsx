@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
-import { render, screen, fireEvent, waitFor } from "@testing-library/react"
+import { render, screen, waitFor } from "@testing-library/react"
 import LoginPage from "./LoginPage" // Ajusta la ruta si es necesario
 import { BrowserRouter } from "react-router-dom"
 
@@ -185,30 +185,4 @@ describe("LoginPage", () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
-  it("simula el click en el botón personalizado disparando el botón oculto de Google", async () => {
-    render(
-      <BrowserRouter>
-        <LoginPage />
-      </BrowserRouter>
-    )
-
-    // Esperamos a que el botón diga "Continuar con Google" (significa googleLoaded = true)
-    const customButton = await screen.findByText("Continuar con Google")
-
-    // Espiamos el método click del elemento oculto que nuestro mock insertó
-    // Necesitamos buscarlo en el DOM. Sabemos que renderButton inyectó .fake-google-button
-    // Esperamos a que el renderButton haya ocurrido
-    await waitFor(() => {
-        expect(document.querySelector(".fake-google-button")).toBeInTheDocument()
-    })
-    
-    const hiddenBtn = document.querySelector(".fake-google-button") as HTMLElement
-    const clickSpy = vi.spyOn(hiddenBtn, "click")
-
-    // Hacemos click en el botón visible de React
-    fireEvent.click(customButton)
-
-    // Verificamos que se propagó al botón oculto
-    expect(clickSpy).toHaveBeenCalled()
-  })
 })

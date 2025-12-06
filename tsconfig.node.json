@@ -17,6 +17,9 @@
     "noEmit": true,
     "isolatedModules": true,
     "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
 
     /* Linting */
     "strict": true,
@@ -24,7 +27,9 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+    "noImplicitReturns": true,
+    "noImplicitOverride": true
   },
-  "include": ["vite.config.ts"]
+  "include": ["vite.config.ts", "*.config.ts", "*.config.js", "*.config.mjs"]
 }
