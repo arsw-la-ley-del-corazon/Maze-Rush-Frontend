@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
-import { generateMaze, type Maze, type Cell } from "./maze-generator"
+import { generateMaze } from "./maze-generator"
 
 describe("generateMaze", () => {
   beforeEach(() => {

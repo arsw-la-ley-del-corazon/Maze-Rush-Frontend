@@ -49,10 +49,12 @@ describe("lobbyService", () => {
         data: {
           id: "lobby-1",
           code: "ABC123",
-          name: "Test Lobby",
+          mazeSize: "MEDIUM",
           maxPlayers: 4,
           isPublic: true,
-          hostId: "user-1",
+          status: "WAITING",
+          creatorUsername: "user1",
+          createdAt: new Date().toISOString(),
           players: [],
         },
       }
@@ -60,17 +62,15 @@ describe("lobbyService", () => {
       vi.mocked(axiosInstance.post).mockResolvedValue(mockResponse)
 
       const result = await createLobby({
-        name: "Test Lobby",
+        mazeSize: "MEDIUM",
         maxPlayers: 4,
         isPublic: true,
-        hostId: "user-1",
-        mazeSize: "MEDIUM",
       })
 
       expect(result.ok).toBe(true)
       if (result.ok) {
         expect(result.data.code).toBe("ABC123")
-        expect(result.data.name).toBe("Test Lobby")
+        expect(result.data.mazeSize).toBe("MEDIUM")
         expect(result.data.isPublic).toBe(true)
       }
     })
@@ -80,9 +80,11 @@ describe("lobbyService", () => {
         data: {
           id: "lobby-1",
           code: "ABC123",
-          name: "Test Lobby",
+          mazeSize: "MEDIUM",
           maxPlayers: 4,
-          hostId: "user-1",
+          status: "WAITING",
+          creatorUsername: "user1",
+          createdAt: new Date().toISOString(),
           players: [],
           // isPublic is missing
         },
@@ -91,11 +93,9 @@ describe("lobbyService", () => {
       vi.mocked(axiosInstance.post).mockResolvedValue(mockResponse)
 
       const result = await createLobby({
-        name: "Test Lobby",
+        mazeSize: "MEDIUM",
         maxPlayers: 4,
         isPublic: false,
-        hostId: "user-1",
-        mazeSize: "MEDIUM",
       })
 
       expect(result.ok).toBe(true)
@@ -113,11 +113,9 @@ describe("lobbyService", () => {
       })
 
       const result = await createLobby({
-        name: "",
+        mazeSize: "MEDIUM",
         maxPlayers: 4,
         isPublic: true,
-        hostId: "user-1",
-        mazeSize: "MEDIUM",
       })
 
       expect(result.ok).toBe(false)
@@ -133,11 +131,9 @@ describe("lobbyService", () => {
       })
 
       const result = await createLobby({
-        name: "Test",
+        mazeSize: "MEDIUM",
         maxPlayers: 4,
         isPublic: true,
-        hostId: "user-1",
-        mazeSize: "MEDIUM",
       })
 
       expect(result.ok).toBe(false)
@@ -150,8 +146,8 @@ describe("lobbyService", () => {
   describe("getAllLobbies", () => {
     it("should successfully retrieve all lobbies", async () => {
       const mockLobbies = [
-        { id: "1", code: "ABC123", name: "Lobby 1", maxPlayers: 4, isPublic: true },
-        { id: "2", code: "DEF456", name: "Lobby 2", maxPlayers: 2, isPublic: false },
+        { id: "1", code: "ABC123", mazeSize: "MEDIUM", maxPlayers: 4, isPublic: true, status: "WAITING", creatorUsername: "user1", createdAt: new Date().toISOString() },
+        { id: "2", code: "DEF456", mazeSize: "SMALL", maxPlayers: 2, isPublic: false, status: "WAITING", creatorUsername: "user2", createdAt: new Date().toISOString() },
       ]
 
       vi.mocked(axiosInstance.get).mockResolvedValue({ data: mockLobbies })
@@ -200,13 +196,13 @@ describe("lobbyService", () => {
       const mockLobby = {
         id: "lobby-1",
         code: "ABC123",
-        name: "Test Lobby",
+        mazeSize: "MEDIUM",
         maxPlayers: 4,
         isPublic: true,
-        players: [
-          { id: "user-1", username: "Player1" },
-          { id: "user-2", username: "Player2" },
-        ],
+        status: "WAITING",
+        creatorUsername: "user1",
+        createdAt: new Date().toISOString(),
+        players: ["Player1", "Player2"],
       }
 
       vi.mocked(axiosInstance.get).mockResolvedValue({ data: mockLobby })
@@ -243,12 +239,13 @@ describe("lobbyService", () => {
       const mockLobby = {
         id: "lobby-1",
         code: "ABC123",
-        name: "Test Lobby",
+        mazeSize: "MEDIUM",
         maxPlayers: 4,
-        players: [
-          { id: "user-1", username: "Host" },
-          { id: "user-2", username: "NewPlayer" },
-        ],
+        isPublic: true,
+        status: "WAITING",
+        creatorUsername: "Host",
+        createdAt: new Date().toISOString(),
+        players: ["Host", "NewPlayer"],
       }
 
       vi.mocked(axiosInstance.post).mockResolvedValue({ data: mockLobby })

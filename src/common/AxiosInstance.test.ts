@@ -1,11 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
-import axios, { type AxiosError, type AxiosResponse } from "axios"
+import axios from "axios"
 
 // Mock axios before importing the instance
 vi.mock("axios", async () => {
-  const actual = await vi.importActual("axios")
+  const actual = await vi.importActual<typeof import("axios")>("axios")
   return {
-    ...actual,
     default: {
       ...actual.default,
       create: vi.fn(() => ({
@@ -132,13 +131,13 @@ describe("AxiosInstance", () => {
   describe("Queue Processing", () => {
     it("should be able to queue failed requests", () => {
       const failedQueue: Array<{
-        resolve: (value?: any) => void
-        reject: (error?: any) => void
+        resolve: (value?: unknown) => void
+        reject: (error?: unknown) => void
       }> = []
 
       // Simulate adding to queue
-      const promise = new Promise((resolve, reject) => {
-        failedQueue.push({ resolve, reject })
+      new Promise((_resolve, _reject) => {
+        failedQueue.push({ resolve: _resolve, reject: _reject })
       })
 
       expect(failedQueue.length).toBe(1)
@@ -146,13 +145,13 @@ describe("AxiosInstance", () => {
 
     it("should process queue on success", () => {
       const failedQueue: Array<{
-        resolve: (value?: any) => void
-        reject: (error?: any) => void
+        resolve: (value?: unknown) => void
+        reject: (error?: unknown) => void
       }> = []
-      const resolvedValues: any[] = []
+      const resolvedValues: unknown[] = []
 
       // Add items to queue
-      const promise1 = new Promise((resolve) => {
+      new Promise((resolve) => {
         failedQueue.push({
           resolve: (value) => {
             resolvedValues.push(value)

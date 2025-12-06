@@ -38,7 +38,6 @@ vi.mock("../../hooks/useRoomUpdates", () => ({
 }))
 
 import { getAllLobbies, joinLobby } from "../lobby/services/lobbyService"
-import { useAuth } from "../../context/useAuth"
 
 describe("DashboardPage", () => {
   beforeEach(() => {
@@ -120,6 +119,7 @@ describe("DashboardPage", () => {
           isPublic: true,
           mazeSize: "MEDIUM",
           status: "WAITING",
+          createdAt: new Date().toISOString(),
         },
         {
           id: "2",
@@ -130,6 +130,7 @@ describe("DashboardPage", () => {
           isPublic: true,
           mazeSize: "SMALL",
           status: "WAITING",
+          createdAt: new Date().toISOString(),
         },
       ]
 
@@ -191,6 +192,7 @@ describe("DashboardPage", () => {
         isPublic: true,
         mazeSize: "MEDIUM",
         status: "WAITING",
+        createdAt: new Date().toISOString(),
       },
       {
         id: "2",
@@ -201,6 +203,7 @@ describe("DashboardPage", () => {
         isPublic: true,
         mazeSize: "SMALL",
         status: "WAITING",
+        createdAt: new Date().toISOString(),
       },
       {
         id: "3",
@@ -211,6 +214,7 @@ describe("DashboardPage", () => {
         isPublic: true,
         mazeSize: "LARGE",
         status: "WAITING",
+        createdAt: new Date().toISOString(),
       },
     ]
 
@@ -246,6 +250,7 @@ describe("DashboardPage", () => {
           isPublic: true,
           mazeSize: "MEDIUM",
           status: "WAITING",
+          createdAt: new Date().toISOString(),
         },
       ]
 
@@ -283,6 +288,7 @@ describe("DashboardPage", () => {
           isPublic: true,
           mazeSize: "MEDIUM",
           status: "WAITING",
+          createdAt: new Date().toISOString(),
         },
       ]
 
@@ -322,6 +328,7 @@ describe("DashboardPage", () => {
           isPublic: true,
           mazeSize: "MEDIUM",
           status: "WAITING",
+          createdAt: new Date().toISOString(),
         },
       ]
 

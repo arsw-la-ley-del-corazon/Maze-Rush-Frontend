@@ -52,26 +52,27 @@ describe("ProfilePage", () => {
         bio: "Test bio",
         preferredMazeSize: "Mediano",
         avatarColor: "#A46AFF",
+        score: 100,
+        level: 5,
       },
     })
     vi.mocked(getUserStats).mockResolvedValue({
       ok: true,
       data: {
-        gamesPlayed: 50,
+        totalGames: 50,
         wins: 25,
         losses: 25,
         winRate: 50,
-        fastestTime: 120,
-        averageTime: 180,
-        totalPlayTime: 3600,
         currentStreak: 3,
         bestStreak: 10,
-        rank: 1,
         totalScore: 1000,
+        level: 5,
+        lobbiesCreated: 5,
+        lobbiesJoined: 10,
       },
     })
-    vi.mocked(validateUsername).mockResolvedValue({ ok: true, data: { available: true } })
-    vi.mocked(validateEmail).mockResolvedValue({ ok: true, data: { available: true } })
+    vi.mocked(validateUsername).mockReturnValue({ valid: true })
+    vi.mocked(validateEmail).mockReturnValue({ valid: true })
   })
 
   afterEach(() => {

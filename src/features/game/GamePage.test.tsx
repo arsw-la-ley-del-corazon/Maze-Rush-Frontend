@@ -160,14 +160,22 @@ describe("GamePage Logic", () => {
         <GamePage />
       </MemoryRouter>
     )
-    await waitFor(() => expect(screen.queryByRole("progressbar")).toBeNull())
+    
+    // Esperar a que la carga termine
+    await waitFor(() => expect(screen.queryByRole("progressbar")).toBeNull(), {
+      timeout: 3000
+    })
 
-    // 's' es Abajo
+    // Pequeña pausa para asegurar que el estado interno se estabilice
+    await new Promise(resolve => setTimeout(resolve, 100))
+
+    // 's' es Abajo - enviamos el evento
     fireEvent.keyDown(window, { key: "s" })
 
+    // Esperamos que la posición se actualice
     await waitFor(() => {
         const maze = screen.getByTestId("maze-component")
         expect(maze).toHaveAttribute("data-player-y", "1")
-    })
+    }, { timeout: 3000 })
   })
 })

@@ -132,6 +132,7 @@ describe("App", () => {
           id: "123",
           username: "TestUser",
           email: "test@test.com",
+          avatarColor: "#A46AFF",
         },
         loading: false,
         loginWithGoogle: vi.fn(),
@@ -159,7 +160,7 @@ describe("App", () => {
 
       window.history.pushState({}, "", "/app")
       
-      const { container } = render(<App />)
+      render(<App />)
 
       // Should not render protected content while loading
       await waitFor(() => {
@@ -186,6 +187,7 @@ describe("App", () => {
           id: "123",
           username: "TestUser",
           email: "test@test.com",
+          avatarColor: "#A46AFF",
         },
         loading: false,
         loginWithGoogle: vi.fn(),
