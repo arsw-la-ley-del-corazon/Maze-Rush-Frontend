@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 import { render, screen, waitFor } from "@testing-library/react"
 import { BrowserRouter } from "react-router-dom"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import ProfilePage from "./ProfilePage"
 
 // Mock useAuth
@@ -33,8 +33,8 @@ vi.mock("./services/profileService", () => ({
 import {
   getCurrentUserProfile,
   getUserStats,
-  validateUsername,
   validateEmail,
+  validateUsername,
 } from "./services/profileService"
 
 describe("ProfilePage", () => {

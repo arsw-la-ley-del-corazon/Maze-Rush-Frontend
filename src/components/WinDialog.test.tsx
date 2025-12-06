@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from "vitest"
-import { render, screen, fireEvent } from "@testing-library/react"
+import { fireEvent, render, screen } from "@testing-library/react"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import { WinDialog } from "./WinDialog"
 
 describe("WinDialog", () => {
@@ -52,14 +52,7 @@ describe("WinDialog", () => {
     })
 
     it("displays message about finding the exit", () => {
-      render(
-        <WinDialog
-          isOpen={true}
-          time={60}
-          onRestart={mockOnRestart}
-          isWinner={true}
-        />
-      )
+      render(<WinDialog isOpen={true} time={60} onRestart={mockOnRestart} isWinner={true} />)
 
       expect(screen.getByText("Encontraste la salida del laberinto.")).toBeInTheDocument()
     })
@@ -99,14 +92,7 @@ describe("WinDialog", () => {
 
   describe("interaction", () => {
     it("calls onRestart when play again button is clicked", () => {
-      render(
-        <WinDialog
-          isOpen={true}
-          time={60}
-          onRestart={mockOnRestart}
-          isWinner={true}
-        />
-      )
+      render(<WinDialog isOpen={true} time={60} onRestart={mockOnRestart} isWinner={true} />)
 
       const restartButton = screen.getByRole("button", { name: /jugar de nuevo/i })
       fireEvent.click(restartButton)
@@ -115,14 +101,7 @@ describe("WinDialog", () => {
     })
 
     it("does not render when closed", () => {
-      render(
-        <WinDialog
-          isOpen={false}
-          time={60}
-          onRestart={mockOnRestart}
-          isWinner={true}
-        />
-      )
+      render(<WinDialog isOpen={false} time={60} onRestart={mockOnRestart} isWinner={true} />)
 
       expect(screen.queryByText("¡Escapaste!")).not.toBeInTheDocument()
     })
@@ -130,27 +109,13 @@ describe("WinDialog", () => {
 
   describe("time formatting", () => {
     it("formats time correctly for zero seconds", () => {
-      render(
-        <WinDialog
-          isOpen={true}
-          time={0}
-          onRestart={mockOnRestart}
-          isWinner={true}
-        />
-      )
+      render(<WinDialog isOpen={true} time={0} onRestart={mockOnRestart} isWinner={true} />)
 
       expect(screen.getByText("00:00")).toBeInTheDocument()
     })
 
     it("formats time correctly for exactly one minute", () => {
-      render(
-        <WinDialog
-          isOpen={true}
-          time={60}
-          onRestart={mockOnRestart}
-          isWinner={true}
-        />
-      )
+      render(<WinDialog isOpen={true} time={60} onRestart={mockOnRestart} isWinner={true} />)
 
       expect(screen.getByText("01:00")).toBeInTheDocument()
     })
@@ -198,14 +163,7 @@ describe("WinDialog", () => {
     })
 
     it("uses default text when no names are provided", () => {
-      render(
-        <WinDialog
-          isOpen={true}
-          time={60}
-          onRestart={mockOnRestart}
-          isWinner={true}
-        />
-      )
+      render(<WinDialog isOpen={true} time={60} onRestart={mockOnRestart} isWinner={true} />)
 
       expect(screen.getByText(/el jugador/)).toBeInTheDocument()
     })

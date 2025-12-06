@@ -15,7 +15,7 @@ export type Maze = Cell[][]
 /**
  * Fisher-Yates shuffle algorithm
  */
-const shuffle = <T,>(array: T[]): T[] => {
+const shuffle = <T>(array: T[]): T[] => {
   const arr = [...array]
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1))
@@ -43,7 +43,7 @@ export const generateMaze = (width: number, height: number): Maze => {
   )
 
   const stack: [number, number][] = []
-  
+
   // Start at the top-left corner (0, 0)
   const startX = 0
   const startY = 0
@@ -57,7 +57,7 @@ export const generateMaze = (width: number, height: number): Maze => {
 
     // Get all unvisited neighbors
     const neighbors: { x: number; y: number; dir: "N" | "E" | "S" | "W" }[] = []
-    
+
     if (y > 0 && !maze[y - 1][x].visited) neighbors.push({ x, y: y - 1, dir: "N" })
     if (x < width - 1 && !maze[y][x + 1].visited) neighbors.push({ x: x + 1, y, dir: "E" })
     if (y < height - 1 && !maze[y + 1][x].visited) neighbors.push({ x, y: y + 1, dir: "S" })
@@ -66,7 +66,7 @@ export const generateMaze = (width: number, height: number): Maze => {
     if (neighbors.length > 0) {
       // Push current cell back to stack
       stack.push([x, y])
-      
+
       // Choose a random unvisited neighbor
       const { x: nextX, y: nextY, dir } = shuffle(neighbors)[0]
 
@@ -93,12 +93,14 @@ export const generateMaze = (width: number, height: number): Maze => {
 
   // Define entry point at top-left
   maze[0][0].top = false
-  
+
   // Define exit point at bottom-right
   maze[height - 1][width - 1].bottom = false
 
   // Remove the 'visited' property before returning
-  return maze.map((row) => row.map(({ top, right, bottom, left }) => ({ top, right, bottom, left })))
+  return maze.map((row) =>
+    row.map(({ top, right, bottom, left }) => ({ top, right, bottom, left }))
+  )
 }
 
 /**

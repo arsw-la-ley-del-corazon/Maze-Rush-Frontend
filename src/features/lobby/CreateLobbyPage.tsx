@@ -1,9 +1,9 @@
+import { CircularProgress } from "@mui/material"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { CircularProgress } from "@mui/material"
-import { createLobby } from "./services/lobbyService"
 import type { LobbyRequest } from "../../types/api"
 import styles from "./CreateLobbyPage.module.css"
+import { createLobby } from "./services/lobbyService"
 
 const MAZE_SIZES = [
   { value: "Pequeño", label: "Pequeño", description: "10x10 - Rápido" },
@@ -81,9 +81,7 @@ export default function CreateLobbyPage() {
         <form onSubmit={handleSubmit} className={styles.form}>
           {/* Tamaño del Laberinto */}
           <div className={styles.fieldGroup}>
-            <label className={styles.fieldLabel}>
-              🎯 Tamaño del Laberinto
-            </label>
+            <label className={styles.fieldLabel}>🎯 Tamaño del Laberinto</label>
             <div className={styles.selectWrapper}>
               <select
                 className={styles.inputField}
@@ -102,15 +100,13 @@ export default function CreateLobbyPage() {
 
           {/* Máximo de Jugadores */}
           <div className={styles.fieldGroup}>
-            <label className={styles.fieldLabel}>
-              👥 Máximo de Jugadores
-            </label>
+            <label className={styles.fieldLabel}>👥 Máximo de Jugadores</label>
             <input
               type="number"
               className={styles.inputField}
               value={formData.maxPlayers}
               onChange={(e) =>
-                setFormData({ ...formData, maxPlayers: parseInt(e.target.value) || 2 })
+                setFormData({ ...formData, maxPlayers: Number.parseInt(e.target.value) || 2 })
               }
               min={2}
               max={4}
@@ -135,11 +131,7 @@ export default function CreateLobbyPage() {
           </div>
 
           {/* Error Alert */}
-          {error && (
-            <div className={styles.alert}>
-              ⚠️ {error}
-            </div>
-          )}
+          {error && <div className={styles.alert}>⚠️ {error}</div>}
 
           {/* Botones de Acción */}
           <div className={styles.actions}>
@@ -226,4 +218,3 @@ export default function CreateLobbyPage() {
     </div>
   )
 }
-

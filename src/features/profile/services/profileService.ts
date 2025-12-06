@@ -1,6 +1,6 @@
 import axiosInstance from "../../../common/AxiosIntance"
-import type { Result } from "../../../types/api"
 import logger from "../../../common/logger"
+import type { Result } from "../../../types/api"
 
 export interface UserProfileData {
   id: string
@@ -59,7 +59,7 @@ export async function getCurrentUserProfile(): Promise<Result<UserProfileData>> 
  * Actualiza el perfil del usuario autenticado
  */
 export async function updateUserProfile(
-  updates: UpdateProfileRequest,
+  updates: UpdateProfileRequest
 ): Promise<Result<UserProfileData>> {
   try {
     logger.info("[profileService] Actualizando perfil:", updates)

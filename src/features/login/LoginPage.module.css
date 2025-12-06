@@ -8,8 +8,7 @@
   position: relative;
   overflow: hidden;
   padding: 24px;
-  background: 
-    radial-gradient(ellipse at top, #001a1a 0%, #000508 100%),
+  background: radial-gradient(ellipse at top, #001a1a 0%, #000508 100%),
     linear-gradient(180deg, #000000 0%, #001214 50%, #000000 100%);
 }
 
@@ -18,28 +17,9 @@
   content: "";
   position: absolute;
   inset: 0;
-  background-image: 
-    /* Líneas verticales del laberinto */
-    repeating-linear-gradient(90deg, 
-      transparent, 
-      transparent 60px, 
-      rgba(0, 255, 255, 0.15) 60px, 
-      rgba(0, 255, 255, 0.15) 61px,
-      rgba(0, 255, 255, 0.4) 61px,
-      rgba(0, 255, 255, 0.4) 63px,
-      rgba(0, 255, 255, 0.15) 63px,
-      rgba(0, 255, 255, 0.15) 64px,
-      transparent 64px,
-      transparent 120px,
-      rgba(0, 200, 255, 0.12) 120px,
-      rgba(0, 200, 255, 0.12) 121px,
-      rgba(0, 200, 255, 0.3) 121px,
-      rgba(0, 200, 255, 0.3) 123px,
-      rgba(0, 200, 255, 0.12) 123px,
-      rgba(0, 200, 255, 0.12) 124px
-    ),
-    /* Líneas horizontales del laberinto */
-    repeating-linear-gradient(0deg,
+  /* Líneas verticales del laberinto */
+  background-image: repeating-linear-gradient(
+      90deg,
       transparent,
       transparent 60px,
       rgba(0, 255, 255, 0.15) 60px,
@@ -56,8 +36,26 @@
       rgba(0, 200, 255, 0.3) 123px,
       rgba(0, 200, 255, 0.12) 123px,
       rgba(0, 200, 255, 0.12) 124px
-    ),
-    /* Intersecciones del laberinto */
+    ), /* Líneas horizontales del laberinto */
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 60px,
+      rgba(0, 255, 255, 0.15) 60px,
+      rgba(0, 255, 255, 0.15) 61px,
+      rgba(0, 255, 255, 0.4) 61px,
+      rgba(0, 255, 255, 0.4) 63px,
+      rgba(0, 255, 255, 0.15) 63px,
+      rgba(0, 255, 255, 0.15) 64px,
+      transparent 64px,
+      transparent 120px,
+      rgba(0, 200, 255, 0.12) 120px,
+      rgba(0, 200, 255, 0.12) 121px,
+      rgba(0, 200, 255, 0.3) 121px,
+      rgba(0, 200, 255, 0.3) 123px,
+      rgba(0, 200, 255, 0.12) 123px,
+      rgba(0, 200, 255, 0.12) 124px
+    ), /* Intersecciones del laberinto */
     radial-gradient(circle at 25% 25%, rgba(0, 255, 255, 0.08), transparent 40%),
     radial-gradient(circle at 75% 75%, rgba(0, 200, 255, 0.06), transparent 40%);
   background-size: 480px 480px, 480px 480px, 100% 100%, 100% 100%;
@@ -65,9 +63,7 @@
   filter: blur(0.3px);
   opacity: 0.85;
   pointer-events: none;
-  animation: 
-    mazeDrift 40s linear infinite, 
-    neonPulse 4s ease-in-out infinite;
+  animation: mazeDrift 40s linear infinite, neonPulse 4s ease-in-out infinite;
   mix-blend-mode: screen;
 }
 
@@ -76,8 +72,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background-image: 
-    radial-gradient(2px 2px at 15% 25%, rgba(0, 255, 255, 0.6), transparent),
+  background-image: radial-gradient(2px 2px at 15% 25%, rgba(0, 255, 255, 0.6), transparent),
     radial-gradient(3px 3px at 45% 60%, rgba(0, 255, 255, 0.7), transparent),
     radial-gradient(2px 2px at 75% 35%, rgba(0, 200, 255, 0.5), transparent),
     radial-gradient(1px 1px at 85% 70%, rgba(0, 255, 255, 0.8), transparent),
@@ -86,9 +81,7 @@
     radial-gradient(1px 1px at 90% 45%, rgba(0, 200, 255, 0.7), transparent);
   background-size: 200% 200%;
   background-position: 0% 0%;
-  animation: 
-    floatParticles 15s ease-in-out infinite,
-    particlePulse 3s ease-in-out infinite;
+  animation: floatParticles 15s ease-in-out infinite, particlePulse 3s ease-in-out infinite;
   pointer-events: none;
   mix-blend-mode: screen;
 }
@@ -105,17 +98,11 @@
   z-index: 2;
   border-radius: 24px;
   padding: 3.5rem 3rem;
-  background: 
-    linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 10, 15, 0.95) 100%);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 10, 15, 0.95) 100%);
   border: 2px solid rgba(0, 255, 255, 0.3);
-  box-shadow: 
-    0 0 30px rgba(0, 255, 255, 0.3),
-    0 0 60px rgba(0, 200, 255, 0.15),
-    0 20px 60px rgba(0, 0, 0, 0.9),
-    inset 0 0 40px rgba(0, 255, 255, 0.03);
-  animation: 
-    cardIn 600ms cubic-bezier(0.16, 0.84, 0.44, 1),
-    cardNeonPulse 5s ease-in-out infinite;
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.3), 0 0 60px rgba(0, 200, 255, 0.15), 0 20px 60px
+    rgba(0, 0, 0, 0.9), inset 0 0 40px rgba(0, 255, 255, 0.03);
+  animation: cardIn 600ms cubic-bezier(0.16, 0.84, 0.44, 1), cardNeonPulse 5s ease-in-out infinite;
   backdrop-filter: blur(10px);
   overflow: visible;
 }
@@ -128,9 +115,9 @@
   right: -2px;
   bottom: -2px;
   background: linear-gradient(
-    45deg, 
-    rgba(0, 255, 255, 0.6) 0%, 
-    rgba(0, 200, 255, 0.4) 50%, 
+    45deg,
+    rgba(0, 255, 255, 0.6) 0%,
+    rgba(0, 200, 255, 0.4) 50%,
     rgba(0, 255, 255, 0.6) 100%
   );
   border-radius: 24px;
@@ -145,12 +132,7 @@
   content: "";
   position: absolute;
   inset: -3px;
-  background: radial-gradient(
-    circle, 
-    rgba(0, 255, 255, 0.2), 
-    rgba(0, 200, 255, 0.1),
-    transparent
-  );
+  background: radial-gradient(circle, rgba(0, 255, 255, 0.2), rgba(0, 200, 255, 0.1), transparent);
   border-radius: 24px;
   z-index: -2;
   opacity: 0;
@@ -163,21 +145,13 @@
 }
 
 .titleGradient {
-  background: linear-gradient(
-    135deg, 
-    #00ffff 0%, 
-    #00d4ff 50%,
-    #00ffff 100%
-  );
+  background: linear-gradient(135deg, #00ffff 0%, #00d4ff 50%, #00ffff 100%);
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
   font-weight: 900;
-  filter: drop-shadow(0 0 12px rgba(0, 255, 255, 0.8))
-         drop-shadow(0 0 24px rgba(0, 200, 255, 0.5));
-  animation: 
-    titlePulse 3s ease-in-out infinite,
-    neonTextGlow 4s ease-in-out infinite;
+  filter: drop-shadow(0 0 12px rgba(0, 255, 255, 0.8)) drop-shadow(0 0 24px rgba(0, 200, 255, 0.5));
+  animation: titlePulse 3s ease-in-out infinite, neonTextGlow 4s ease-in-out infinite;
   background-size: 200% 200%;
 }
 
@@ -187,16 +161,11 @@
   overflow: hidden;
   height: 56px;
   border-radius: 14px;
-  background: linear-gradient(135deg, 
-    rgba(0, 0, 0, 0.6) 0%, 
-    rgba(0, 20, 25, 0.7) 100%
-  );
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 20, 25, 0.7) 100%);
   color: #ffffff !important;
   border: 2px solid rgba(0, 255, 255, 0.3);
-  box-shadow: 
-    0 0 20px rgba(0, 255, 255, 0.2),
-    0 4px 16px rgba(0, 0, 0, 0.4),
-    inset 0 0 20px rgba(0, 255, 255, 0.05);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.2), 0 4px 16px rgba(0, 0, 0, 0.4), inset 0 0 20px
+    rgba(0, 255, 255, 0.05);
   transition: all 0.35s cubic-bezier(0.16, 0.84, 0.44, 1);
   backdrop-filter: blur(10px);
 }
@@ -206,8 +175,8 @@
   position: absolute;
   inset: 0;
   background: linear-gradient(
-    135deg, 
-    rgba(0, 255, 255, 0.15) 0%, 
+    135deg,
+    rgba(0, 255, 255, 0.15) 0%,
     rgba(0, 200, 255, 0.1) 50%,
     rgba(0, 255, 255, 0.15) 100%
   );
@@ -236,16 +205,10 @@
 
 .googleBtn:hover {
   transform: translateY(-3px);
-  background: linear-gradient(135deg, 
-    rgba(0, 10, 15, 0.8) 0%, 
-    rgba(0, 30, 35, 0.9) 100%
-  );
+  background: linear-gradient(135deg, rgba(0, 10, 15, 0.8) 0%, rgba(0, 30, 35, 0.9) 100%);
   border-color: rgba(0, 255, 255, 0.6);
-  box-shadow: 
-    0 0 30px rgba(0, 255, 255, 0.4),
-    0 0 60px rgba(0, 200, 255, 0.2),
-    0 8px 24px rgba(0, 0, 0, 0.5),
-    inset 0 0 30px rgba(0, 255, 255, 0.1);
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.4), 0 0 60px rgba(0, 200, 255, 0.2), 0 8px 24px
+    rgba(0, 0, 0, 0.5), inset 0 0 30px rgba(0, 255, 255, 0.1);
 }
 
 .googleBtn:hover:before {
@@ -258,10 +221,8 @@
 
 .googleBtn:active {
   transform: translateY(0) scale(0.98);
-  box-shadow: 
-    0 0 15px rgba(0, 255, 255, 0.3),
-    0 2px 8px rgba(0, 0, 0, 0.4) inset,
-    inset 0 0 20px rgba(0, 255, 255, 0.15);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.3), 0 2px 8px rgba(0, 0, 0, 0.4) inset, inset 0 0 20px
+    rgba(0, 255, 255, 0.15);
 }
 
 .googleBtn:disabled {
@@ -279,26 +240,51 @@
 
 /* Animaciones */
 @keyframes mazeDrift {
-  0% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(-20px, -10px) scale(1.01); }
-  50% { transform: translate(0, 0) scale(1); }
-  75% { transform: translate(20px, 10px) scale(1.01); }
-  100% { transform: translate(0, 0) scale(1); }
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(-20px, -10px) scale(1.01);
+  }
+  50% {
+    transform: translate(0, 0) scale(1);
+  }
+  75% {
+    transform: translate(20px, 10px) scale(1.01);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
 }
 
 @keyframes neonPulse {
-  0%, 100% { opacity: 0.85; }
-  50% { opacity: 0.95; }
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 0.95;
+  }
 }
 
 @keyframes floatParticles {
-  0%, 100% { background-position: 0% 0%; }
-  50% { background-position: 100% 100%; }
+  0%,
+  100% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
 }
 
 @keyframes particlePulse {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 @keyframes cardIn {
@@ -313,42 +299,48 @@
 }
 
 @keyframes cardNeonPulse {
-  0%, 100% {
-    box-shadow: 
-      0 0 30px rgba(0, 255, 255, 0.3),
-      0 0 60px rgba(0, 200, 255, 0.15),
-      0 20px 60px rgba(0, 0, 0, 0.9),
-      inset 0 0 40px rgba(0, 255, 255, 0.03);
+  0%,
+  100% {
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.3), 0 0 60px rgba(0, 200, 255, 0.15), 0 20px 60px
+      rgba(0, 0, 0, 0.9), inset 0 0 40px rgba(0, 255, 255, 0.03);
   }
   50% {
-    box-shadow: 
-      0 0 40px rgba(0, 255, 255, 0.4),
-      0 0 80px rgba(0, 200, 255, 0.2),
-      0 20px 60px rgba(0, 0, 0, 0.9),
-      inset 0 0 50px rgba(0, 255, 255, 0.05);
+    box-shadow: 0 0 40px rgba(0, 255, 255, 0.4), 0 0 80px rgba(0, 200, 255, 0.2), 0 20px 60px
+      rgba(0, 0, 0, 0.9), inset 0 0 50px rgba(0, 255, 255, 0.05);
   }
 }
 
 @keyframes neonBorderFlow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 @keyframes titlePulse {
-  0%, 100% {
+  0%,
+  100% {
     filter: drop-shadow(0 0 12px rgba(0, 255, 255, 0.8))
-           drop-shadow(0 0 24px rgba(0, 200, 255, 0.5));
+      drop-shadow(0 0 24px rgba(0, 200, 255, 0.5));
   }
   50% {
-    filter: drop-shadow(0 0 16px rgba(0, 255, 255, 1))
-           drop-shadow(0 0 32px rgba(0, 200, 255, 0.7));
+    filter: drop-shadow(0 0 16px rgba(0, 255, 255, 1)) drop-shadow(0 0 32px rgba(0, 200, 255, 0.7));
   }
 }
 
 @keyframes neonTextGlow {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 @media (max-width: 600px) {
@@ -368,4 +360,3 @@
     animation: none;
   }
 }
-

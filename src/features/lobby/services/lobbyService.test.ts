@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 // Mock axios instance before imports
 vi.mock("../../../common/AxiosIntance", () => ({
@@ -22,13 +22,7 @@ vi.mock("../../../common/globas", () => ({
 }))
 
 import axiosInstance from "../../../common/AxiosIntance"
-import {
-  createLobby,
-  getAllLobbies,
-  getLobbyByCode,
-  joinLobby,
-  leaveLobby,
-} from "./lobbyService"
+import { createLobby, getAllLobbies, getLobbyByCode, joinLobby, leaveLobby } from "./lobbyService"
 
 describe("lobbyService", () => {
   beforeEach(() => {
@@ -146,8 +140,26 @@ describe("lobbyService", () => {
   describe("getAllLobbies", () => {
     it("should successfully retrieve all lobbies", async () => {
       const mockLobbies = [
-        { id: "1", code: "ABC123", mazeSize: "MEDIUM", maxPlayers: 4, isPublic: true, status: "WAITING", creatorUsername: "user1", createdAt: new Date().toISOString() },
-        { id: "2", code: "DEF456", mazeSize: "SMALL", maxPlayers: 2, isPublic: false, status: "WAITING", creatorUsername: "user2", createdAt: new Date().toISOString() },
+        {
+          id: "1",
+          code: "ABC123",
+          mazeSize: "MEDIUM",
+          maxPlayers: 4,
+          isPublic: true,
+          status: "WAITING",
+          creatorUsername: "user1",
+          createdAt: new Date().toISOString(),
+        },
+        {
+          id: "2",
+          code: "DEF456",
+          mazeSize: "SMALL",
+          maxPlayers: 2,
+          isPublic: false,
+          status: "WAITING",
+          creatorUsername: "user2",
+          createdAt: new Date().toISOString(),
+        },
       ]
 
       vi.mocked(axiosInstance.get).mockResolvedValue({ data: mockLobbies })

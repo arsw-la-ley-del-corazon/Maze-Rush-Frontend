@@ -15,9 +15,24 @@
   position: absolute;
   inset: 0;
   opacity: 0.03;
-  background-image: 
-    repeating-linear-gradient(90deg, transparent 0px, transparent 48px, #4cffb3 48px, #4cffb3 52px, transparent 52px, transparent 100px),
-    repeating-linear-gradient(0deg, transparent 0px, transparent 48px, #4cffb3 48px, #4cffb3 52px, transparent 52px, transparent 100px);
+  background-image: repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 48px,
+      #4cffb3 48px,
+      #4cffb3 52px,
+      transparent 52px,
+      transparent 100px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 48px,
+      #4cffb3 48px,
+      #4cffb3 52px,
+      transparent 52px,
+      transparent 100px
+    );
   animation: mazeDrift 30s linear infinite;
   pointer-events: none;
 }
@@ -81,7 +96,8 @@
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translate(0, 0) scale(1);
     opacity: 0.6;
   }
@@ -123,7 +139,8 @@
 }
 
 @keyframes glow {
-  0%, 100% {
+  0%,
+  100% {
     filter: drop-shadow(0 0 20px rgba(76, 255, 179, 0.5));
   }
   50% {
@@ -146,10 +163,8 @@
   border: 1px solid rgba(76, 255, 179, 0.2) !important;
   border-radius: 24px !important;
   padding: 2rem !important;
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.4),
-    0 0 60px rgba(76, 255, 179, 0.1),
-    inset 0 0 80px rgba(76, 255, 179, 0.03) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 60px rgba(76, 255, 179, 0.1), inset 0 0 80px
+    rgba(76, 255, 179, 0.03) !important;
   position: relative;
   overflow: hidden;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -162,11 +177,7 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(76, 255, 179, 0.1), 
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(76, 255, 179, 0.1), transparent);
   transition: left 0.6s;
 }
 
@@ -176,10 +187,8 @@
 
 .paper:hover {
   border-color: rgba(76, 255, 179, 0.4);
-  box-shadow: 
-    0 12px 48px rgba(0, 0, 0, 0.5),
-    0 0 80px rgba(76, 255, 179, 0.2),
-    inset 0 0 100px rgba(76, 255, 179, 0.05);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5), 0 0 80px rgba(76, 255, 179, 0.2), inset 0 0 100px
+    rgba(76, 255, 179, 0.05);
   transform: translateY(-4px);
 }
 
@@ -246,7 +255,7 @@
   font-weight: 700;
   letter-spacing: 0.4rem;
   color: #4cffb3;
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   text-shadow: 0 0 20px rgba(76, 255, 179, 0.5);
 }
 
@@ -287,9 +296,7 @@
   background: linear-gradient(135deg, #4cffb3 0%, #00d9ff 100%) !important;
   color: #0a0e27 !important;
   border: none !important;
-  box-shadow: 
-    0 4px 20px rgba(76, 255, 179, 0.3),
-    0 0 40px rgba(76, 255, 179, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(76, 255, 179, 0.3), 0 0 40px rgba(76, 255, 179, 0.2) !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   position: relative;
   overflow: hidden;
@@ -302,11 +309,7 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(255, 255, 255, 0.3), 
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
   transition: left 0.5s;
 }
 
@@ -316,9 +319,7 @@
 
 .joinButton:hover:not(:disabled) {
   transform: translateY(-3px);
-  box-shadow: 
-    0 8px 30px rgba(76, 255, 179, 0.4),
-    0 0 60px rgba(76, 255, 179, 0.3);
+  box-shadow: 0 8px 30px rgba(76, 255, 179, 0.4), 0 0 60px rgba(76, 255, 179, 0.3);
 }
 
 .joinButton:disabled {

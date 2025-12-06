@@ -1,24 +1,34 @@
-import { 
-  Box, Typography, Paper, Button, IconButton, CircularProgress, Alert,
-  TextField, InputAdornment, MenuItem, Select, FormControl, InputLabel,
-  Pagination, Chip
-} from "@mui/material"
+import FilterListIcon from "@mui/icons-material/FilterList"
 import GroupAddIcon from "@mui/icons-material/GroupAdd"
-import KeyIcon from "@mui/icons-material/VpnKey"
-import RefreshIcon from "@mui/icons-material/Refresh"
 import LockIcon from "@mui/icons-material/Lock"
 import PeopleIcon from "@mui/icons-material/People"
+import RefreshIcon from "@mui/icons-material/Refresh"
 import SearchIcon from "@mui/icons-material/Search"
-import FilterListIcon from "@mui/icons-material/FilterList"
-import styles from "./DashboardPage.module.css"
+import KeyIcon from "@mui/icons-material/VpnKey"
+import {
+  Alert,
+  Box,
+  Button,
+  Chip,
+  CircularProgress,
+  FormControl,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  Pagination,
+  Paper,
+  Select,
+  TextField,
+  Typography,
+} from "@mui/material"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { useState, useEffect, useMemo, useCallback } from "react"
 import { useAuth } from "../../context/useAuth"
-import { getAllLobbies, joinLobby } from "../lobby/services/lobbyService"
-import type { LobbyResponse } from "../../types/api"
 import { useRoomUpdates } from "../../hooks/useRoomUpdates"
-
-
+import type { LobbyResponse } from "../../types/api"
+import { getAllLobbies, joinLobby } from "../lobby/services/lobbyService"
+import styles from "./DashboardPage.module.css"
 
 interface RoomCardProps {
   roomName: string
@@ -31,22 +41,33 @@ interface RoomCardProps {
   onJoin: () => void
 }
 
-function RoomCard({ roomName, host, players, maxPlayers, isPrivate, mazeSize, status, onJoin }: RoomCardProps) {
+function RoomCard({
+  roomName,
+  host,
+  players,
+  maxPlayers,
+  isPrivate,
+  mazeSize,
+  status,
+  onJoin,
+}: RoomCardProps) {
   const isWaiting = status === "waiting" || status === "WAITING" || status === "EN_ESPERA"
   const canJoin = isWaiting && players < maxPlayers
-  
+
   return (
-    <Paper 
-      elevation={0} 
-      className={`${styles.roomCard} ${canJoin ? styles.roomCardClickable : ''}`}
+    <Paper
+      elevation={0}
+      className={`${styles.roomCard} ${canJoin ? styles.roomCardClickable : ""}`}
       onClick={canJoin ? onJoin : undefined}
-      sx={{ 
-        cursor: canJoin ? 'pointer' : 'default',
-        transition: 'all 0.2s ease',
-        '&:hover': canJoin ? {
-          transform: 'translateY(-4px)',
-          boxShadow: '0 8px 24px rgba(0,0,0,0.12)'
-        } : {}
+      sx={{
+        cursor: canJoin ? "pointer" : "default",
+        transition: "all 0.2s ease",
+        "&:hover": canJoin
+          ? {
+              transform: "translateY(-4px)",
+              boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+            }
+          : {},
       }}
     >
       <Box className={styles.roomHeader}>
@@ -66,9 +87,7 @@ function RoomCard({ roomName, host, players, maxPlayers, isPrivate, mazeSize, st
             </Typography>
           )}
         </Box>
-        {isPrivate && (
-          <LockIcon className={styles.lockIcon} />
-        )}
+        {isPrivate && <LockIcon className={styles.lockIcon} />}
       </Box>
       <Box className={styles.roomFooter}>
         <Box className={styles.playerCount}>
@@ -97,18 +116,18 @@ function RoomCard({ roomName, host, players, maxPlayers, isPrivate, mazeSize, st
 export default function DashboardPage() {
   const navigate = useNavigate()
   const { user } = useAuth()
-  
+
   const [availableRooms, setAvailableRooms] = useState<LobbyResponse[]>([])
   const [loadingRooms, setLoadingRooms] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  
+
   const [searchQuery, setSearchQuery] = useState("")
   const [mazeSizeFilter, setMazeSizeFilter] = useState("all")
   const [playersFilter, setPlayersFilter] = useState("all")
-  
+
   const [currentPage, setCurrentPage] = useState(1)
   const roomsPerPage = 6
-  
+
   const roomUpdates = useRoomUpdates()
 
   const fetchAvailableRooms = useCallback(async () => {
@@ -117,17 +136,21 @@ export default function DashboardPage() {
     try {
       const result = await getAllLobbies()
       console.log("📡 Respuesta del backend:", result)
-      
+
       if (result.ok) {
         console.log("✅ Total de salas recibidas:", result.data.length)
         console.log("📋 Salas completas:", result.data)
-        
-        const publicRooms = result.data.filter(lobby => 
-          lobby.isPublic && (lobby.status === "EN_ESPERA" || lobby.status === "WAITING" || lobby.status === "waiting")
+
+        const publicRooms = result.data.filter(
+          (lobby) =>
+            lobby.isPublic &&
+            (lobby.status === "EN_ESPERA" ||
+              lobby.status === "WAITING" ||
+              lobby.status === "waiting")
         )
         console.log("🌍 Salas públicas en espera:", publicRooms.length)
         console.log("📊 Salas públicas:", publicRooms)
-        
+
         setAvailableRooms(publicRooms)
       } else {
         console.error("❌ Error del backend:", result.error)
@@ -140,13 +163,13 @@ export default function DashboardPage() {
       setLoadingRooms(false)
     }
   }, [])
-  
+
   useEffect(() => {
     const updateTimer = setTimeout(() => {
       const recentUpdates = Object.values(roomUpdates).filter(
-        update => Date.now() - update.lastUpdate < 2000
+        (update) => Date.now() - update.lastUpdate < 2000
       )
-      
+
       if (recentUpdates.length > 0) {
         console.log("🔄 Actualizaciones recientes detectadas, recargando salas...")
         fetchAvailableRooms()
@@ -155,44 +178,48 @@ export default function DashboardPage() {
 
     return () => clearTimeout(updateTimer)
   }, [roomUpdates, fetchAvailableRooms])
-  
+
   const filteredRooms = useMemo(() => {
     console.log("🔄 Aplicando filtros...")
     console.log("   - Total de salas:", availableRooms.length)
     console.log("   - Búsqueda:", searchQuery)
     console.log("   - Filtro tamaño:", mazeSizeFilter)
     console.log("   - Filtro jugadores:", playersFilter)
-    
+
     let filtered = [...availableRooms]
-    
+
     if (searchQuery) {
-      filtered = filtered.filter(room => 
+      filtered = filtered.filter((room) =>
         room.creatorUsername.toLowerCase().includes(searchQuery.toLowerCase())
       )
       console.log("   ✓ Después de búsqueda:", filtered.length)
     }
-    
+
     if (mazeSizeFilter !== "all") {
-      filtered = filtered.filter(room => room.mazeSize === mazeSizeFilter)
+      filtered = filtered.filter((room) => room.mazeSize === mazeSizeFilter)
       console.log("   ✓ Después de filtro tamaño:", filtered.length)
     }
-    
+
     if (playersFilter !== "all") {
-      filtered = filtered.filter(room => {
+      filtered = filtered.filter((room) => {
         switch (playersFilter) {
-          case "1-2": return room.maxPlayers >= 1 && room.maxPlayers <= 2
-          case "3-4": return room.maxPlayers >= 3 && room.maxPlayers <= 4
-          case "5+": return room.maxPlayers >= 5
-          default: return true
+          case "1-2":
+            return room.maxPlayers >= 1 && room.maxPlayers <= 2
+          case "3-4":
+            return room.maxPlayers >= 3 && room.maxPlayers <= 4
+          case "5+":
+            return room.maxPlayers >= 5
+          default:
+            return true
         }
       })
       console.log("   ✓ Después de filtro jugadores:", filtered.length)
     }
-    
+
     console.log("✅ Salas filtradas final:", filtered.length)
     return filtered
   }, [availableRooms, searchQuery, mazeSizeFilter, playersFilter])
-  
+
   const paginatedRooms = useMemo(() => {
     const startIndex = (currentPage - 1) * roomsPerPage
     const endIndex = startIndex + roomsPerPage
@@ -203,14 +230,14 @@ export default function DashboardPage() {
     console.log("   - Salas en esta página:", paginated.length)
     return paginated
   }, [filteredRooms, currentPage, roomsPerPage])
-  
+
   const totalPages = Math.ceil(filteredRooms.length / roomsPerPage)
-  
+
   const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
     setCurrentPage(value)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    window.scrollTo({ top: 0, behavior: "smooth" })
   }
-  
+
   const handleClearFilters = () => {
     setSearchQuery("")
     setMazeSizeFilter("all")
@@ -227,7 +254,7 @@ export default function DashboardPage() {
     try {
       console.log("🎮 Uniéndose a la sala:", code)
       const result = await joinLobby(code)
-      
+
       if (result.ok) {
         console.log("✅ Unido exitosamente al lobby:", result.data.code)
         navigate(`/app/lobby/${result.data.code}`)
@@ -326,7 +353,6 @@ export default function DashboardPage() {
         </Button>
       </Box>
 
-
       {/* Search and Filters Section */}
       <Box className={styles.filtersSection} sx={{ mt: 2 }}>
         <Box className={styles.searchBar}>
@@ -388,9 +414,9 @@ export default function DashboardPage() {
           </Box>
 
           <Box className={styles.resultsInfo}>
-            <Chip 
+            <Chip
               icon={<FilterListIcon />}
-              label={`${filteredRooms.length} sala${filteredRooms.length !== 1 ? 's' : ''} encontrada${filteredRooms.length !== 1 ? 's' : ''}`}
+              label={`${filteredRooms.length} sala${filteredRooms.length !== 1 ? "s" : ""} encontrada${filteredRooms.length !== 1 ? "s" : ""}`}
               className={styles.resultsChip}
             />
           </Box>
@@ -425,7 +451,7 @@ export default function DashboardPage() {
               */}
             </Typography>
           </Box>
-          <IconButton 
+          <IconButton
             onClick={handleRefreshRooms}
             className={styles.refreshButton}
             size="small"
@@ -454,16 +480,17 @@ export default function DashboardPage() {
           <>
             <Box className={styles.roomsGrid}>
               {paginatedRooms.map((room) => {
-                const currentPlayers = room.currentPlayers ?? roomUpdates[room.code]?.playerCount ?? 0
+                const currentPlayers =
+                  room.currentPlayers ?? roomUpdates[room.code]?.playerCount ?? 0
                 const roomStatus = roomUpdates[room.code]?.status || room.status
-                
+
                 console.log(`🎮 Sala ${room.code}:`, {
                   currentPlayers,
                   fromBackend: room.currentPlayers,
                   fromWebSocket: roomUpdates[room.code]?.playerCount,
-                  status: roomStatus
+                  status: roomStatus,
                 })
-                
+
                 return (
                   <RoomCard
                     key={room.id}

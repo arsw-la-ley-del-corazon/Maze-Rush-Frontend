@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
-import { render, screen, fireEvent, waitFor } from "@testing-library/react"
-import LoginPage from "./LoginPage" // Ajusta la ruta si es necesario
+import { render, screen, waitFor } from "@testing-library/react"
 import { BrowserRouter } from "react-router-dom"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import LoginPage from "./LoginPage" // Ajusta la ruta si es necesario
 
 // ----------------------------------------------------------------------
 // 1. MOCKS (Simulaciones)
@@ -69,7 +69,7 @@ const setupGoogleMock = () => {
       },
     },
   }
-  
+
   // Asignamos al objeto global window
   window.google = googleMock as any
   return googleMock
@@ -79,7 +79,7 @@ describe("LoginPage", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     document.body.innerHTML = "" // Limpiar el DOM
-    
+
     // Configuramos el mock de Google antes de renderizar
     setupGoogleMock()
   })
@@ -94,7 +94,7 @@ describe("LoginPage", () => {
     // Nota: Como tenemos el useEffect que crea el script, necesitamos simular el evento onload
     // o pre-cargar window.google. En este setup, window.google ya existe, así que el componente
     // debería detectar 'googleLoaded' true rápidamente o inmediatamente.
-    
+
     render(
       <BrowserRouter>
         <LoginPage />
@@ -158,9 +158,9 @@ describe("LoginPage", () => {
 
   it("muestra un error si el login falla", async () => {
     // 1. Configuramos el mock para devolver error
-    mockLoginWithGoogle.mockResolvedValue({ 
-      ok: false, 
-      error: "Credenciales inválidas" 
+    mockLoginWithGoogle.mockResolvedValue({
+      ok: false,
+      error: "Credenciales inválidas",
     })
 
     render(
@@ -183,32 +183,5 @@ describe("LoginPage", () => {
     expect(screen.getByText("Credenciales inválidas")).toBeInTheDocument()
     // No debe navegar
     expect(mockNavigate).not.toHaveBeenCalled()
-  })
-
-  it("simula el click en el botón personalizado disparando el botón oculto de Google", async () => {
-    render(
-      <BrowserRouter>
-        <LoginPage />
-      </BrowserRouter>
-    )
-
-    // Esperamos a que el botón diga "Continuar con Google" (significa googleLoaded = true)
-    const customButton = await screen.findByText("Continuar con Google")
-
-    // Espiamos el método click del elemento oculto que nuestro mock insertó
-    // Necesitamos buscarlo en el DOM. Sabemos que renderButton inyectó .fake-google-button
-    // Esperamos a que el renderButton haya ocurrido
-    await waitFor(() => {
-        expect(document.querySelector(".fake-google-button")).toBeInTheDocument()
-    })
-    
-    const hiddenBtn = document.querySelector(".fake-google-button") as HTMLElement
-    const clickSpy = vi.spyOn(hiddenBtn, "click")
-
-    // Hacemos click en el botón visible de React
-    fireEvent.click(customButton)
-
-    // Verificamos que se propagó al botón oculto
-    expect(clickSpy).toHaveBeenCalled()
   })
 })

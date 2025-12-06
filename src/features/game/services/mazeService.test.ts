@@ -1,9 +1,5 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
-import {
-  generateMazeFromBackend,
-  getMazeById,
-  convertLayoutToCells,
-} from "./mazeService"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { convertLayoutToCells, generateMazeFromBackend, getMazeById } from "./mazeService"
 
 // Mock axios instance
 vi.mock("../../../common/AxiosIntance", () => ({

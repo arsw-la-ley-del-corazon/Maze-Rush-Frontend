@@ -1,17 +1,48 @@
 {
   "name": "maze-rush-frontend",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "description": "Maze Rush - A real-time multiplayer maze racing game built with React 19 and TypeScript",
+  "author": "ARSW - La Ley del Corazón",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arsw-la-ley-del-corazon/Maze-Rush-Frontend"
+  },
+  "keywords": ["maze", "game", "react", "typescript", "websocket", "multiplayer"],
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
   "scripts": {
     "dev": "vite",
+    "dev:host": "vite --host",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
+    "build:analyze": "vite build --mode analyze",
     "preview": "vite preview",
+    "preview:host": "vite preview --host",
+    "start": "vite preview --port 3000",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix",
+    "type-check": "tsc --noEmit",
+    "type-check:watch": "tsc --noEmit --watch",
     "biome:check": "biome check .",
-    "biome:fix": "biome check --apply .",
+    "biome:fix": "biome check --write .",
+    "biome:ci": "biome ci .",
     "format": "biome format --write .",
-    "coverage": "vitest run --coverage"
+    "format:check": "biome format .",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:ui": "vitest --ui",
+    "test:watch": "vitest --watch",
+    "coverage": "vitest run --coverage",
+    "coverage:ui": "vitest run --coverage --ui",
+    "validate": "npm run type-check && npm run lint && npm run biome:check && npm run test:run",
+    "ci": "npm run validate && npm run build",
+    "clean": "rimraf dist coverage node_modules/.tmp node_modules/.vite",
+    "clean:all": "rimraf dist coverage node_modules",
+    "prepare": "echo 'Ready to develop!'"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -19,7 +50,6 @@
     "@mui/icons-material": "^7.3.4",
     "@mui/material": "^7.3.4",
     "@stomp/stompjs": "^7.2.1",
-    "@types/styled-components": "^5.1.34",
     "axios": "^1.12.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
@@ -37,16 +67,24 @@
     "@types/react": "^19.1.16",
     "@types/react-dom": "^19.1.9",
     "@types/sockjs-client": "^1.5.4",
+    "@types/styled-components": "^5.1.34",
+    "@types/uuid": "^10.0.0",
     "@vitejs/plugin-react": "^5.0.4",
     "@vitest/coverage-v8": "^4.0.15",
+    "@vitest/ui": "^4.0.15",
     "eslint": "^9.36.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.22",
     "globals": "^16.4.0",
     "jsdom": "^27.2.0",
+    "rimraf": "^6.0.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.45.0",
     "vite": "^7.1.7",
     "vitest": "^4.0.15"
+  },
+  "browserslist": {
+    "production": [">0.2%", "not dead", "not op_mini all"],
+    "development": ["last 1 chrome version", "last 1 firefox version", "last 1 safari version"]
   }
 }

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 // Mock everything before importing the hook
 const mockClose = vi.fn()
@@ -82,10 +82,10 @@ describe("useRoomUpdates", () => {
         user: { id: "1", username: "TestUser" },
       }
       localStorage.setItem("auth_state", JSON.stringify(authState))
-      
+
       const retrieved = localStorage.getItem("auth_state")
       expect(retrieved).not.toBeNull()
-      
+
       const parsed = JSON.parse(retrieved!)
       expect(parsed.token).toBe("test-token")
       expect(parsed.user.username).toBe("TestUser")
@@ -98,7 +98,7 @@ describe("useRoomUpdates", () => {
 
     it("should handle invalid JSON gracefully", () => {
       localStorage.setItem("auth_state", "invalid-json")
-      
+
       expect(() => {
         JSON.parse(localStorage.getItem("auth_state") || "")
       }).toThrow()

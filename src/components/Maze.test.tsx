@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 import { render } from "@testing-library/react"
-import { Maze } from "./Maze"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import type { MazeCell } from "../features/game/services/mazeService"
+import { Maze } from "./Maze"
 
 // Mock CSS modules
 vi.mock("./Maze.module.css", () => ({

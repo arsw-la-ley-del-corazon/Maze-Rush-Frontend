@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from "vitest"
-import { render, screen, fireEvent, waitFor } from "@testing-library/react"
-import GamePage from "./GamePage"
+import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import GamePage from "./GamePage"
 import type { MazeCell } from "./services/mazeService"
 
 // ----------------------------------------------------------------------
@@ -75,8 +75,7 @@ vi.mock("../../components/Maze", () => ({
 }))
 
 vi.mock("../../components/WinDialog", () => ({
-  WinDialog: ({ isOpen }: any) =>
-    isOpen ? <div data-testid="win-dialog">Ganaste</div> : null,
+  WinDialog: ({ isOpen }: any) => (isOpen ? <div data-testid="win-dialog">Ganaste</div> : null),
 }))
 
 const mockNavigate = vi.fn()
@@ -127,11 +126,11 @@ describe("GamePage Logic", () => {
     // Si hay pared, el jugador no se mueve; si no hay, se mueve
     // Verificamos que al menos el componente sigue funcionando
     await waitFor(() => {
-        const maze = screen.getByTestId("maze-component")
-        expect(maze).toBeInTheDocument()
-        // La posición depende del maze generado aleatoriamente
-        expect(maze).toHaveAttribute("data-player-x")
-        expect(maze).toHaveAttribute("data-player-y")
+      const maze = screen.getByTestId("maze-component")
+      expect(maze).toBeInTheDocument()
+      // La posición depende del maze generado aleatoriamente
+      expect(maze).toHaveAttribute("data-player-x")
+      expect(maze).toHaveAttribute("data-player-y")
     })
   })
 
@@ -160,22 +159,25 @@ describe("GamePage Logic", () => {
         <GamePage />
       </MemoryRouter>
     )
-    
+
     // Esperar a que la carga termine
     await waitFor(() => expect(screen.queryByRole("progressbar")).toBeNull(), {
-      timeout: 3000
+      timeout: 3000,
     })
 
     // Pequeña pausa para asegurar que el estado interno se estabilice
-    await new Promise(resolve => setTimeout(resolve, 100))
+    await new Promise((resolve) => setTimeout(resolve, 100))
 
     // 's' es Abajo - enviamos el evento
     fireEvent.keyDown(window, { key: "s" })
 
     // Esperamos que la posición se actualice
-    await waitFor(() => {
+    await waitFor(
+      () => {
         const maze = screen.getByTestId("maze-component")
         expect(maze).toHaveAttribute("data-player-y", "1")
-    }, { timeout: 3000 })
+      },
+      { timeout: 3000 }
+    )
   })
 })

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 // Mock globas config before importing logger
 vi.mock("../common/globas", () => ({
@@ -32,20 +32,13 @@ describe("logger", () => {
 
     it("should include app name prefix in error messages", () => {
       logger.error("Test error")
-      expect(console.error).toHaveBeenCalledWith(
-        expect.stringContaining("ERROR"),
-        "Test error"
-      )
+      expect(console.error).toHaveBeenCalledWith(expect.stringContaining("ERROR"), "Test error")
     })
 
     it("should pass additional arguments to console.error", () => {
       const extraData = { code: 500 }
       logger.error("Test error", extraData)
-      expect(console.error).toHaveBeenCalledWith(
-        expect.anything(),
-        "Test error",
-        extraData
-      )
+      expect(console.error).toHaveBeenCalledWith(expect.anything(), "Test error", extraData)
     })
   })
 
@@ -57,10 +50,7 @@ describe("logger", () => {
 
     it("should include app name prefix in warning messages", () => {
       logger.warn("Test warning")
-      expect(console.warn).toHaveBeenCalledWith(
-        expect.stringContaining("WARN"),
-        "Test warning"
-      )
+      expect(console.warn).toHaveBeenCalledWith(expect.stringContaining("WARN"), "Test warning")
     })
   })
 
@@ -72,10 +62,7 @@ describe("logger", () => {
 
     it("should include app name prefix in info messages", () => {
       logger.info("Test info")
-      expect(console.info).toHaveBeenCalledWith(
-        expect.stringContaining("INFO"),
-        "Test info"
-      )
+      expect(console.info).toHaveBeenCalledWith(expect.stringContaining("INFO"), "Test info")
     })
   })
 
@@ -87,10 +74,7 @@ describe("logger", () => {
 
     it("should include app name prefix in debug messages", () => {
       logger.debug("Test debug")
-      expect(console.debug).toHaveBeenCalledWith(
-        expect.stringContaining("DEBUG"),
-        "Test debug"
-      )
+      expect(console.debug).toHaveBeenCalledWith(expect.stringContaining("DEBUG"), "Test debug")
     })
   })
 
