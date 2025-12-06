@@ -1,3 +1,4 @@
+// src/features/auth/LoginPage.tsx
 import { useState, useEffect, useRef } from "react"
 import {
   Box,
@@ -7,11 +8,10 @@ import {
   Divider,
   Alert,
 } from "@mui/material"
-import { Link as RouterLink } from "react-router-dom"
+import { Link as RouterLink, useNavigate } from "react-router-dom"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import GoogleIcon from "@mui/icons-material/Google"
 import Loader from "../../components/Loader"
-import { useNavigate } from "react-router-dom"
 import { useAuth } from "../../context/useAuth"
 import { GOOGLE_CONFIG } from "../../common/globas"
 import styles from "./LoginPage.module.css"
@@ -53,31 +53,60 @@ export default function LoginPage() {
   const navigate = useNavigate()
   const { loginWithGoogle, loading } = useAuth()
 
+  // 1️⃣ Cargar script de Google una sola vez y NO eliminarlo
   useEffect(() => {
-    // Cargar el script de Google Identity Services
+    // ¿Ya existe el script?
+    const existingScript = document.querySelector<HTMLScriptElement>(
+      'script[data-google-identity="true"]',
+    )
+
+    if (existingScript) {
+      // Si ya está y window.google existe, marcamos como cargado
+      if (window.google?.accounts?.id) {
+        setGoogleLoaded(true)
+      }
+      return
+    }
+
     const script = document.createElement("script")
     script.src = "https://accounts.google.com/gsi/client"
     script.async = true
     script.defer = true
-    script.onload = () => setGoogleLoaded(true)
+    script.dataset.googleIdentity = "true"
+    script.onload = () => {
+      console.log("[LoginPage] Google Identity script cargado")
+      setGoogleLoaded(true)
+    }
+    script.onerror = () => {
+      console.error("[LoginPage] Error cargando script de Google")
+      setError("No se pudo cargar Google Identity Services. Revisa tu conexión.")
+    }
+
     document.head.appendChild(script)
 
-    return () => {
-      document.head.removeChild(script)
-    }
+    // ⚠️ NO lo eliminamos en el cleanup para evitar problemas con StrictMode
   }, [])
 
+  // 2️⃣ Inicializar el botón de Google cuando el script esté listo
   useEffect(() => {
-    if (!googleLoaded || !window.google) return
+    if (!googleLoaded) return
+    if (!window.google?.accounts?.id) {
+      console.warn("[LoginPage] googleLoaded=true pero window.google.accounts.id no está disponible aún")
+      return
+    }
 
     const googleClientId = GOOGLE_CONFIG.CLIENT_ID
 
     if (!googleClientId) {
-      setError("Configuración de Google OAuth no disponible. Por favor, agrega VITE_GOOGLE_CLIENT_ID en tu archivo .env")
+      console.error("[LoginPage] VITE_GOOGLE_CLIENT_ID no está configurado")
+      setError(
+        "Configuración de Google OAuth no disponible. Por favor, agrega VITE_GOOGLE_CLIENT_ID en tu archivo .env",
+      )
       return
     }
 
-    // Inicializar Google Identity Services
+    console.log("[LoginPage] Inicializando Google Identity con CLIENT_ID:", googleClientId)
+
     window.google.accounts.id.initialize({
       client_id: googleClientId,
       callback: handleGoogleResponse,
@@ -85,7 +114,6 @@ export default function LoginPage() {
       cancel_on_tap_outside: true,
     })
 
-    // Renderizar el botón de Google en un div oculto
     if (googleButtonRef.current) {
       window.google.accounts.id.renderButton(googleButtonRef.current, {
         theme: "filled_blue",
@@ -99,7 +127,7 @@ export default function LoginPage() {
 
   const handleGoogleResponse = async (response: { credential: string }) => {
     setError("")
-    
+
     try {
       const result = await loginWithGoogle(response.credential)
       if (result.ok) {
@@ -109,20 +137,39 @@ export default function LoginPage() {
       }
     } catch (err) {
       console.error("Error durante autenticación:", err)
-      setError("No se pudo conectar con el servidor. Verifica que el backend esté corriendo en http://localhost:8080")
+      setError(
+        "No se pudo conectar con el servidor. Verifica que el backend esté corriendo en http://localhost:8080",
+      )
     }
   }
 
   const handleGoogleSignIn = () => {
-    if (!googleButtonRef.current) {
-      setError("Google Identity Services no está cargado")
+    setError("")
+
+    if (!googleLoaded || !window.google?.accounts?.id) {
+      setError("Google Identity Services no está completamente cargado todavía")
       return
     }
-    
-    // Hacer click en el botón invisible de Google
-    const googleButton = googleButtonRef.current.querySelector('div[role="button"]') as HTMLElement
+
+    if (!googleButtonRef.current) {
+      setError("No se encontró el contenedor del botón de Google")
+      return
+    }
+
+    const googleButton = googleButtonRef.current.querySelector(
+      'div[role="button"]',
+    ) as HTMLElement | null
+
     if (googleButton) {
       googleButton.click()
+    } else {
+      // Fallback: abrir prompt de Google
+      try {
+        window.google.accounts.id.prompt()
+      } catch (e) {
+        console.error("[LoginPage] Error lanzando prompt de Google:", e)
+        setError("No se pudo iniciar el flujo de Google")
+      }
     }
   }
 
@@ -144,7 +191,7 @@ export default function LoginPage() {
           textTransform: "none",
           textShadow: "0 0 8px rgba(0, 255, 255, 0.6)",
           transition: "all 0.3s ease",
-          "&:hover": { 
+          "&:hover": {
             color: "#00ffff",
             textShadow: "0 0 12px rgba(0, 255, 255, 1)",
             transform: "translateX(-4px)",
@@ -165,29 +212,29 @@ export default function LoginPage() {
         >
           Bienvenido a Maze Rush
         </Typography>
-        <Typography 
-          variant="body2" 
-          align="center" 
+        <Typography
+          variant="body2"
+          align="center"
           mb={3}
-          sx={{ 
+          sx={{
             color: "rgba(0, 255, 255, 0.7)",
-            textShadow: "0 0 8px rgba(0, 255, 255, 0.3)"
+            textShadow: "0 0 8px rgba(0, 255, 255, 0.3)",
           }}
         >
           Inicia sesión con tu cuenta de Google para comenzar
         </Typography>
 
         {error && (
-          <Alert 
-            severity="error" 
-            sx={{ 
+          <Alert
+            severity="error"
+            sx={{
               mb: 3,
               backgroundColor: "rgba(255, 0, 0, 0.1)",
               border: "1px solid rgba(255, 0, 0, 0.3)",
               color: "#ff6666",
               "& .MuiAlert-icon": {
-                color: "#ff4444"
-              }
+                color: "#ff4444",
+              },
             }}
           >
             {error}
@@ -202,8 +249,14 @@ export default function LoginPage() {
 
         {!loading && (
           <>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5, alignItems: "center" }}>
-              {/* Botón personalizado de Google con diseño neón cian */}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 2.5,
+                alignItems: "center",
+              }}
+            >
               <Button
                 fullWidth
                 onClick={handleGoogleSignIn}
@@ -237,7 +290,6 @@ export default function LoginPage() {
                 {googleLoaded ? "Continuar con Google" : "Cargando Google..."}
               </Button>
 
-              {/* Indicador visual de estado */}
               {googleLoaded && (
                 <Typography
                   variant="caption"
@@ -250,20 +302,27 @@ export default function LoginPage() {
                     textShadow: "0 0 8px rgba(0, 255, 255, 0.6)",
                   }}
                 >
-                  <span style={{ fontSize: "10px", animation: "pulse 2s ease-in-out infinite" }}>●</span> 
+                  <span
+                    style={{
+                      fontSize: "10px",
+                      animation: "pulse 2s ease-in-out infinite",
+                    }}
+                  >
+                    ●
+                  </span>
                   Listo para iniciar sesión
                 </Typography>
               )}
             </Box>
 
             <Divider sx={{ my: 3, borderColor: "rgba(0, 255, 255, 0.2)" }}>
-              <Typography 
-                variant="caption" 
-                sx={{ 
-                  color: "rgba(0, 255, 255, 0.6)", 
+              <Typography
+                variant="caption"
+                sx={{
+                  color: "rgba(0, 255, 255, 0.6)",
                   letterSpacing: 2,
                   fontWeight: 600,
-                  textShadow: "0 0 8px rgba(0, 255, 255, 0.3)"
+                  textShadow: "0 0 8px rgba(0, 255, 255, 0.3)",
                 }}
               >
                 AUTENTICACIÓN SEGURA
@@ -271,25 +330,26 @@ export default function LoginPage() {
             </Divider>
 
             <Box sx={{ textAlign: "center" }}>
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  color: "rgba(255, 255, 255, 0.7)", 
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "rgba(255, 255, 255, 0.7)",
                   mb: 2,
-                  lineHeight: 1.6
+                  lineHeight: 1.6,
                 }}
               >
-                Al continuar, aceptas nuestros términos de servicio y política de privacidad.
+                Al continuar, aceptas nuestros términos de servicio y política
+                de privacidad.
               </Typography>
-              <Typography 
-                variant="caption" 
-                sx={{ 
+              <Typography
+                variant="caption"
+                sx={{
                   color: "rgba(0, 255, 255, 0.7)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   gap: 0.5,
-                  textShadow: "0 0 8px rgba(0, 255, 255, 0.3)"
+                  textShadow: "0 0 8px rgba(0, 255, 255, 0.3)",
                 }}
               >
                 🔒 Autenticación segura proporcionada por Google

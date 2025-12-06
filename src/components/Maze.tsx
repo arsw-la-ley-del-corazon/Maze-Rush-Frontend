@@ -4,19 +4,27 @@ import type { MazeCell } from "../features/game/services/mazeService"
 import { cn } from "../lib/utils"
 import styles from "./Maze.module.css"
 
+type PowerUpType = "CLEAR_FOG" | "FREEZE" | "CONFUSION"
+
+interface PowerUpInstance {
+  id: string
+  x: number
+  y: number
+  type: PowerUpType
+}
+
 interface MazeProps {
   maze: MazeCell[][]
   playerPosition: { x: number; y: number }
   endPosition: { x: number; y: number }
   isGameWon: boolean
   otherPlayers?: PlayerGameState[]
+  hasClearFog?: boolean
+  powerUps?: PowerUpInstance[]
 }
 
 /**
- * Maze component that renders the maze grid and player position
- * Adapts to different maze sizes and displays walls based on cell data
- * Supports multiplayer by rendering other players' positions
- * Implements fog of war for limited visibility
+ * Maze con niebla, meta visible, jugadores y poderes.
  */
 export function Maze({
   maze,
@@ -24,6 +32,8 @@ export function Maze({
   endPosition,
   isGameWon,
   otherPlayers = [],
+  hasClearFog = false,
+  powerUps = [],
 }: MazeProps) {
   if (!maze || maze.length === 0) {
     return null
@@ -32,29 +42,27 @@ export function Maze({
   const width = maze[0].length
   const height = maze.length
 
-  // Fog of war radius - adjust this value to change visibility range
+  // radio de visión
   const VISION_RADIUS = 3
 
-  /**
-   * Calculate if a cell is visible based on player position
-   * Uses Manhattan distance for fog of war effect
-   */
   const isCellVisible = (cellX: number, cellY: number): boolean => {
-    const distance = Math.abs(cellX - playerPosition.x) + Math.abs(cellY - playerPosition.y)
+    if (hasClearFog) return true
+    const distance =
+      Math.abs(cellX - playerPosition.x) + Math.abs(cellY - playerPosition.y)
     return distance <= VISION_RADIUS
   }
 
-  /**
-   * Calculate visibility level for gradual fog effect
-   * Returns a value between 0 (invisible) and 1 (fully visible)
-   */
   const getVisibilityLevel = (cellX: number, cellY: number): number => {
-    const distance = Math.abs(cellX - playerPosition.x) + Math.abs(cellY - playerPosition.y)
+    if (hasClearFog) return 1
+    const distance =
+      Math.abs(cellX - playerPosition.x) + Math.abs(cellY - playerPosition.y)
     if (distance > VISION_RADIUS) return 0
     if (distance === 0) return 1
-    // Much steeper falloff for dramatic fog effect
     return Math.max(0, 1 - (distance / VISION_RADIUS) * 0.95)
   }
+
+  const getPowerUpsAt = (x: number, y: number) =>
+    powerUps.filter((p) => p.x === x && p.y === y)
 
   return (
     <div
@@ -72,12 +80,15 @@ export function Maze({
             (p) => p.position.x === x && p.position.y === y,
           )
 
-          // Check if this cell is a wall (all borders are true)
+          const powerUpsHere = getPowerUpsAt(x, y)
+
           const isWall = cell.top && cell.right && cell.bottom && cell.left
 
-          // Calculate visibility
-          const isVisible = isCellVisible(x, y)
+          const baseVisible = isCellVisible(x, y)
           const visibilityLevel = getVisibilityLevel(x, y)
+
+          // la meta siempre es visible
+          const isVisible = isEnd ? true : baseVisible
 
           return (
             <div
@@ -90,28 +101,65 @@ export function Maze({
                 !isWall && cell.bottom && styles.cellWallBottom,
                 !isWall && cell.left && styles.cellWallLeft,
                 isEnd && !isWall && styles.endPosition,
-                !isVisible && styles.foggedCell,
+                !isVisible && !isEnd && styles.foggedCell,
                 isPlayer && styles.playerCell,
               )}
               style={{
-                opacity: isVisible ? visibilityLevel : 0,
+                opacity: isVisible ? visibilityLevel || 1 : isEnd ? 1 : 0,
                 transition: "opacity 0.4s ease-in-out",
-                filter: isVisible ? "none" : "blur(8px)",
+                filter: isVisible || isEnd ? "none" : "blur(8px)",
               }}
             >
-              {/* Solo renderizar contenido si la celda es visible */}
-              {isVisible && (
+              {/* Contenido solo si la celda es visible o es la meta */}
+              {(isVisible || isEnd) && (
                 <>
+                  {/* META */}
                   {isEnd && !isWall && <div className={styles.endToken} />}
 
-                  {/* Otros jugadores en esta celda: SOLO el monito de color */}
+                  {/* ⭐ / ⬜ / • Poderes */}
+                  {!isWall &&
+                    powerUpsHere.map((pu) => {
+                      if (pu.type === "CLEAR_FOG") {
+                        // ⬜ cuadrado blanco
+                        return (
+                          <div
+                            key={pu.id}
+                            className={styles.powerUpFog}
+                            title="Quitar niebla"
+                          />
+                        )
+                      }
+
+                      if (pu.type === "CONFUSION") {
+                        // ★ estrella blanca
+                        return (
+                          <div
+                            key={pu.id}
+                            className={styles.powerUpConfusion}
+                            title="Confusión"
+                          >
+                            ★
+                          </div>
+                        )
+                      }
+
+                      // FREEZE → punto blanco
+                      return (
+                        <div
+                          key={pu.id}
+                          className={styles.powerUpFreeze}
+                          title="Congelamiento"
+                        />
+                      )
+                    })}
+
+                  {/* Otros jugadores */}
                   {!isWall &&
                     otherPlayersHere.map((player, idx) => (
                       <div
                         key={player.username}
                         className={styles.otherPlayerToken}
                         style={{
-                          // MUY IMPORTANTE: usar "color" para que afecte currentColor
                           color: player.avatarColor || "#FF6B6B",
                           transform: `translate(${idx * 4}px, ${idx * 4}px)`,
                           zIndex: 10 + idx,
@@ -120,7 +168,7 @@ export function Maze({
                       />
                     ))}
 
-                  {/* Jugador actual: celda brillante + monito amarillo */}
+                  {/* Jugador actual */}
                   {isPlayer && !isWall && (
                     <div
                       className={cn(
