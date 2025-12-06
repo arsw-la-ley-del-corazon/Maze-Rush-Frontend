@@ -4,7 +4,12 @@ import { Client } from "@stomp/stompjs"
 import SockJS from "sockjs-client"
 import { useAuth } from "./useAuth"
 import { SOCKET_CONFIG } from "../common/globas"
-import type { GameEvent, PlayerGameState, GameSyncMessage, MazeData } from "../types/api"
+import type {
+  GameEvent,
+  PlayerGameState,
+  GameSyncMessage,
+  MazeData,
+} from "../types/api"
 
 interface UseGameSocketOptions {
   lobbyCode: string
@@ -43,7 +48,9 @@ export function useGameSocket(options: UseGameSocketOptions) {
 
   const [isConnected, setIsConnected] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [otherPlayers, setOtherPlayers] = useState<Map<string, PlayerGameState>>(new Map())
+  const [otherPlayers, setOtherPlayers] = useState<Map<string, PlayerGameState>>(
+    new Map(),
+  )
 
   // Mantener SIEMPRE las callbacks más recientes sin cambiar la referencia de connect()
   useEffect(() => {
@@ -66,35 +73,51 @@ export function useGameSocket(options: UseGameSocketOptions) {
 
   // ---------- helpers ----------
   const classifyMessage = (
-    raw: any,
+    raw: unknown,
   ): "move" | "finish" | "player_joined" | "player_left" | "unknown" => {
     if (!raw || typeof raw !== "object") return "unknown"
+    const obj = raw as Record<string, unknown>
 
     if (
-      raw.type === "move" ||
-      raw.type === "finish" ||
-      raw.type === "player_joined" ||
-      raw.type === "player_left"
+      obj.type === "move" ||
+      obj.type === "finish" ||
+      obj.type === "player_joined" ||
+      obj.type === "player_left"
     ) {
-      return raw.type
+      return obj.type as
+        | "move"
+        | "finish"
+        | "player_joined"
+        | "player_left"
     }
 
-    if (raw.position && typeof raw.position.x === "number" && typeof raw.position.y === "number") {
+    if (
+      obj.position &&
+      typeof (obj.position as any).x === "number" &&
+      typeof (obj.position as any).y === "number"
+    ) {
       return "move"
     }
 
-    if ("finishTime" in raw) {
+    if ("finishTime" in obj) {
       return "finish"
     }
 
-    if (raw.event === "player_joined") return "player_joined"
-    if (raw.event === "player_left") return "player_left"
+    if (obj.event === "player_joined") return "player_joined"
+    if (obj.event === "player_left") return "player_left"
 
     return "unknown"
   }
 
   const generatePlayerColor = (username: string) => {
-    const colors = ["#F7FF3C", "#22D3EE", "#A855F7", "#FB7185", "#98D8C8", "#F7DC6F"]
+    const colors = [
+      "#22D3EE", // cyan
+      "#A855F7", // violeta
+      "#FB7185", // rosado
+      "#F97316", // naranja
+      "#4ADE80", // verde
+      "#38BDF8", // azul claro
+    ]
     let hash = 0
     for (let i = 0; i < username.length; i++) {
       hash = username.charCodeAt(i) + ((hash << 5) - hash)
@@ -155,7 +178,10 @@ export function useGameSocket(options: UseGameSocketOptions) {
               switch (kind) {
                 case "move": {
                   if (!username || !raw.position) return
-                  const position = { x: raw.position.x, y: raw.position.y }
+                  const position = {
+                    x: raw.position.x as number,
+                    y: raw.position.y as number,
+                  }
 
                   onPlayerMove?.(username, position)
 
@@ -167,7 +193,8 @@ export function useGameSocket(options: UseGameSocketOptions) {
                       position,
                       isFinished: existing?.isFinished ?? false,
                       finishTime: existing?.finishTime,
-                      avatarColor: existing?.avatarColor ?? generatePlayerColor(username),
+                      avatarColor:
+                        existing?.avatarColor ?? generatePlayerColor(username),
                     })
                     return updated
                   })
@@ -179,7 +206,7 @@ export function useGameSocket(options: UseGameSocketOptions) {
                   const finishTime: number =
                     typeof raw.finishTime === "number" ? raw.finishTime : 0
 
-                  // 🔴 esto se ejecuta en TODOS los clientes conectados
+                  // esto se ejecuta en TODOS los clientes conectados
                   onPlayerFinish?.(username, finishTime)
 
                   setOtherPlayers((prev) => {
@@ -190,7 +217,8 @@ export function useGameSocket(options: UseGameSocketOptions) {
                       position: existing?.position ?? { x: 0, y: 0 },
                       isFinished: true,
                       finishTime,
-                      avatarColor: existing?.avatarColor ?? generatePlayerColor(username),
+                      avatarColor:
+                        existing?.avatarColor ?? generatePlayerColor(username),
                     })
                     return updated
                   })
@@ -227,10 +255,16 @@ export function useGameSocket(options: UseGameSocketOptions) {
                 }
 
                 default:
-                  console.warn("[useGameSocket] mensaje desconocido en /move:", raw)
+                  console.warn(
+                    "[useGameSocket] mensaje desconocido en /move:",
+                    raw,
+                  )
               }
             } catch (err) {
-              console.error("[useGameSocket] Error parseando mensaje /move:", err)
+              console.error(
+                "[useGameSocket] Error parseando mensaje /move:",
+                err,
+              )
             }
           },
         )
@@ -252,7 +286,8 @@ export function useGameSocket(options: UseGameSocketOptions) {
                 if (p.username !== user.username) {
                   playersMap.set(p.username, {
                     ...p,
-                    avatarColor: p.avatarColor ?? generatePlayerColor(p.username),
+                    avatarColor:
+                      p.avatarColor ?? generatePlayerColor(p.username),
                   })
                 }
               })
@@ -279,7 +314,9 @@ export function useGameSocket(options: UseGameSocketOptions) {
       },
       onStompError: (frame) => {
         console.error("[useGameSocket] STOMP error", frame)
-        setError(`Error STOMP: ${frame.headers["message"] ?? "Error desconocido"}`)
+        setError(
+          `Error STOMP: ${frame.headers["message"] ?? "Error desconocido"}`,
+        )
         setIsConnected(false)
       },
       onWebSocketError: () => {

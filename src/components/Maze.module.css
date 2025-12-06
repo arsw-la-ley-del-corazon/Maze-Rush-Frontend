@@ -288,6 +288,60 @@
   transform: scale(1.07) !important;
 }
 
+/* Wrapper para colocar badges de efectos */
+.otherPlayerWrapper {
+  position: absolute;
+  inset: 0;
+}
+
+/* ❄️ FREEZE: tinte azul + brillo */
+.playerFrozen {
+  filter:
+    drop-shadow(0 0 6px rgba(33, 150, 243, 0.9))
+    drop-shadow(0 0 16px rgba(3, 105, 161, 0.9));
+}
+
+/* 😵 CONFUSION: borde y pequeño "temblor" */
+.playerConfused {
+  animation: confusedShake 0.2s infinite;
+}
+
+@keyframes confusedShake {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(-1px, 1px) rotate(-3deg);
+  }
+  50% {
+    transform: translate(1px, -1px) rotate(2deg);
+  }
+  75% {
+    transform: translate(-1px, 0) rotate(-2deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+}
+
+/* Iconitos pequeños de efectos en la esquina */
+.effectsBadges {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  display: flex;
+  gap: 2px;
+}
+
+.effectBadge {
+  width: 12px;
+  height: 12px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* === FIN PERSONAJES === */
 
 .endToken {
@@ -360,4 +414,59 @@
     opacity: 1;
     transform: scale(1.3);
   }
+}
+
+/* ⬜ Poder de quitar niebla (CLEAR_FOG) */
+.powerUpFog {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 65%;
+  height: 65%;
+  border-radius: 6px;
+  background: #ffffff;
+  box-shadow:
+    0 0 4px rgba(255, 255, 255, 0.9),
+    0 0 14px rgba(255, 255, 255, 0.9);
+  opacity: 0.95;
+  pointer-events: none;
+  z-index: 15;
+}
+
+/* ★ Poder de confusión (CONFUSION) */
+.powerUpConfusion {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  height: 65%;
+  width: 65%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: #ffffff;
+  text-shadow:
+    0 0 4px rgba(255, 255, 255, 0.9),
+    0 0 12px rgba(255, 255, 255, 0.9);
+  filter:
+    drop-shadow(0 0 8px rgba(255, 255, 255, 0.9))
+    drop-shadow(0 0 18px rgba(255, 255, 255, 0.9));
+  pointer-events: none;
+  z-index: 15;
+}
+
+/* ● Poder de congelamiento (FREEZE) */
+.powerUpFreeze {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 26%;
+  height: 26%;
+  border-radius: 9999px;
+  background: #ffffff;
+  box-shadow:
+    0 0 4px rgba(255, 255, 255, 0.9),
+    0 0 14px rgba(255, 255, 255, 0.9);
+  pointer-events: none;
+  z-index: 15;
 }

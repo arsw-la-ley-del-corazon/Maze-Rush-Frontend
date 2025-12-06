@@ -3,7 +3,6 @@ import {
   TextField, InputAdornment, MenuItem, Select, FormControl, InputLabel,
   Pagination, Chip
 } from "@mui/material"
-import PlayCircleIcon from "@mui/icons-material/PlayCircle"
 import GroupAddIcon from "@mui/icons-material/GroupAdd"
 import KeyIcon from "@mui/icons-material/VpnKey"
 import RefreshIcon from "@mui/icons-material/Refresh"
@@ -19,25 +18,7 @@ import { getAllLobbies, joinLobby } from "../lobby/services/lobbyService"
 import type { LobbyResponse } from "../../types/api"
 import { useRoomUpdates } from "../../hooks/useRoomUpdates"
 
-interface ActionButtonProps {
-  icon: React.ReactNode
-  label: string
-  onClick: () => void
-}
 
-function ActionButton({ icon, label, onClick }: ActionButtonProps) {
-  return (
-    <Button
-      variant="contained"
-      className={styles.actionButton}
-      onClick={onClick}
-      startIcon={icon}
-      fullWidth
-    >
-      {label}
-    </Button>
-  )
-}
 
 interface RoomCardProps {
   roomName: string
@@ -301,26 +282,53 @@ export default function DashboardPage() {
       </Box>
 
       {/* Action Buttons */}
-      <Box className={styles.actionsGrid}>
-        <ActionButton
-          icon={<PlayCircleIcon sx={{ fontSize: 24 }} />}
-          label="QUICK PLAY"
-          onClick={() => navigate("/app/quick-play")}
-        />
-        <ActionButton
-          icon={<GroupAddIcon sx={{ fontSize: 24 }} />}
-          label="CREAR SALA"
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: { xs: "column", md: "row" },
+          gap: 3,
+          width: "100%",
+          mt: 4,
+        }}
+      >
+        <Button
+          variant="contained"
+          startIcon={<GroupAddIcon />}
           onClick={() => navigate("/app/create-lobby")}
-        />
-        <ActionButton
-          icon={<KeyIcon sx={{ fontSize: 24 }} />}
-          label="UNIRSE"
+          sx={{
+            width: { xs: "100%", md: "380px" },
+            py: 2,
+            fontSize: "1.1rem",
+            fontWeight: 700,
+            borderRadius: "14px",
+            letterSpacing: "1px",
+          }}
+        >
+          CREAR SALA
+        </Button>
+
+        <Button
+          variant="contained"
+          startIcon={<KeyIcon />}
           onClick={() => navigate("/app/join")}
-        />
+          sx={{
+            width: { xs: "100%", md: "380px" },
+            py: 2,
+            fontSize: "1.1rem",
+            fontWeight: 700,
+            borderRadius: "14px",
+            letterSpacing: "1px",
+          }}
+        >
+          UNIRSE
+        </Button>
       </Box>
 
+
       {/* Search and Filters Section */}
-      <Box className={styles.filtersSection}>
+      <Box className={styles.filtersSection} sx={{ mt: 2 }}>
         <Box className={styles.searchBar}>
           <TextField
             fullWidth

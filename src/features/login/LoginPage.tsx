@@ -7,11 +7,10 @@ import {
   Divider,
   Alert,
 } from "@mui/material"
-import { Link as RouterLink } from "react-router-dom"
+import { Link as RouterLink, useNavigate } from "react-router-dom"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import GoogleIcon from "@mui/icons-material/Google"
 import Loader from "../../components/Loader"
-import { useNavigate } from "react-router-dom"
 import { useAuth } from "../../context/useAuth"
 import { GOOGLE_CONFIG } from "../../common/globas"
 import styles from "./LoginPage.module.css"
@@ -238,7 +237,7 @@ export default function LoginPage() {
           textTransform: "none",
           textShadow: "0 0 8px rgba(0, 255, 255, 0.6)",
           transition: "all 0.3s ease",
-          "&:hover": { 
+          "&:hover": {
             color: "#00ffff",
             textShadow: "0 0 12px rgba(0, 255, 255, 1)",
             transform: "translateX(-4px)",
@@ -259,29 +258,29 @@ export default function LoginPage() {
         >
           Bienvenido a Maze Rush
         </Typography>
-        <Typography 
-          variant="body2" 
-          align="center" 
+        <Typography
+          variant="body2"
+          align="center"
           mb={3}
-          sx={{ 
+          sx={{
             color: "rgba(0, 255, 255, 0.7)",
-            textShadow: "0 0 8px rgba(0, 255, 255, 0.3)"
+            textShadow: "0 0 8px rgba(0, 255, 255, 0.3)",
           }}
         >
           Inicia sesión con tu cuenta de Google para comenzar
         </Typography>
 
         {error && (
-          <Alert 
-            severity="error" 
-            sx={{ 
+          <Alert
+            severity="error"
+            sx={{
               mb: 3,
               backgroundColor: "rgba(255, 0, 0, 0.1)",
               border: "1px solid rgba(255, 0, 0, 0.3)",
               color: "#ff6666",
               "& .MuiAlert-icon": {
-                color: "#ff4444"
-              }
+                color: "#ff4444",
+              },
             }}
           >
             {error}
@@ -296,8 +295,14 @@ export default function LoginPage() {
 
         {!loading && (
           <>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5, alignItems: "center" }}>
-              {/* Botón personalizado de Google con diseño neón cian */}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 2.5,
+                alignItems: "center",
+              }}
+            >
               <Button
                 fullWidth
                 onClick={handleGoogleSignIn}
@@ -331,7 +336,6 @@ export default function LoginPage() {
                 {googleLoaded ? "Continuar con Google" : "Cargando Google..."}
               </Button>
 
-              {/* Indicador visual de estado */}
               {googleLoaded && (
                 <Typography
                   variant="caption"
@@ -344,20 +348,27 @@ export default function LoginPage() {
                     textShadow: "0 0 8px rgba(0, 255, 255, 0.6)",
                   }}
                 >
-                  <span style={{ fontSize: "10px", animation: "pulse 2s ease-in-out infinite" }}>●</span> 
+                  <span
+                    style={{
+                      fontSize: "10px",
+                      animation: "pulse 2s ease-in-out infinite",
+                    }}
+                  >
+                    ●
+                  </span>
                   Listo para iniciar sesión
                 </Typography>
               )}
             </Box>
 
             <Divider sx={{ my: 3, borderColor: "rgba(0, 255, 255, 0.2)" }}>
-              <Typography 
-                variant="caption" 
-                sx={{ 
-                  color: "rgba(0, 255, 255, 0.6)", 
+              <Typography
+                variant="caption"
+                sx={{
+                  color: "rgba(0, 255, 255, 0.6)",
                   letterSpacing: 2,
                   fontWeight: 600,
-                  textShadow: "0 0 8px rgba(0, 255, 255, 0.3)"
+                  textShadow: "0 0 8px rgba(0, 255, 255, 0.3)",
                 }}
               >
                 AUTENTICACIÓN SEGURA
@@ -365,25 +376,26 @@ export default function LoginPage() {
             </Divider>
 
             <Box sx={{ textAlign: "center" }}>
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  color: "rgba(255, 255, 255, 0.7)", 
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "rgba(255, 255, 255, 0.7)",
                   mb: 2,
-                  lineHeight: 1.6
+                  lineHeight: 1.6,
                 }}
               >
-                Al continuar, aceptas nuestros términos de servicio y política de privacidad.
+                Al continuar, aceptas nuestros términos de servicio y política
+                de privacidad.
               </Typography>
-              <Typography 
-                variant="caption" 
-                sx={{ 
+              <Typography
+                variant="caption"
+                sx={{
                   color: "rgba(0, 255, 255, 0.7)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   gap: 0.5,
-                  textShadow: "0 0 8px rgba(0, 255, 255, 0.3)"
+                  textShadow: "0 0 8px rgba(0, 255, 255, 0.3)",
                 }}
               >
                 🔒 Autenticación segura proporcionada por Google
