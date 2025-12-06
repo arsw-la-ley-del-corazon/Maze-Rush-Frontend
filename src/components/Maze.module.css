@@ -1,10 +1,13 @@
 .mazeContainer {
-  background: 
-    linear-gradient(135deg, rgba(10, 2, 25, 1) 0%, rgba(20, 5, 45, 1) 50%, rgba(10, 2, 25, 1) 100%),
-    radial-gradient(circle at 50% 50%, rgba(147, 51, 234, 0.15) 0%, transparent 70%);
+  background: linear-gradient(
+      135deg,
+      rgba(10, 2, 25, 1) 0%,
+      rgba(20, 5, 45, 1) 50%,
+      rgba(10, 2, 25, 1) 100%
+    ), radial-gradient(circle at 50% 50%, rgba(147, 51, 234, 0.15) 0%, transparent 70%);
   padding: 1.5rem;
   border-radius: 1.5rem;
-  box-shadow: 
+  box-shadow:
     0 0 80px rgba(147, 51, 234, 0.6),
     0 0 120px rgba(79, 70, 229, 0.4),
     0 30px 60px -15px rgba(0, 0, 0, 0.9),
@@ -13,27 +16,29 @@
   display: inline-grid;
   gap: 0;
   border: 4px solid;
-  border-image: linear-gradient(135deg, 
-    rgba(168, 85, 247, 0.8) 0%, 
-    rgba(236, 72, 153, 0.8) 50%, 
-    rgba(168, 85, 247, 0.8) 100%) 1;
+  border-image: linear-gradient(
+      135deg,
+      rgba(168, 85, 247, 0.8) 0%,
+      rgba(236, 72, 153, 0.8) 50%,
+      rgba(168, 85, 247, 0.8) 100%
+    )
+    1;
   position: relative;
   overflow: hidden;
 }
 
 .mazeContainer::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: -50%;
-  background: 
-    radial-gradient(circle at 30% 30%, rgba(147, 51, 234, 0.3) 0%, transparent 50%),
+  background: radial-gradient(circle at 30% 30%, rgba(147, 51, 234, 0.3) 0%, transparent 50%),
     radial-gradient(circle at 70% 70%, rgba(236, 72, 153, 0.2) 0%, transparent 50%);
   animation: mazeGlow 6s ease-in-out infinite;
   pointer-events: none;
 }
 
 .mazeContainer::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   border-radius: 1.5rem;
@@ -43,7 +48,8 @@
 }
 
 @keyframes mazeGlow {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.6;
     transform: scale(1) rotate(0deg);
   }
@@ -86,26 +92,35 @@
 
 /* Wall cells - solid dark color with texture */
 .wallCell {
-  background: 
-    linear-gradient(135deg, rgba(15, 10, 30, 1) 0%, rgba(25, 15, 45, 1) 50%, rgba(15, 10, 30, 1) 100%),
-    repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0, 0, 0, 0.3) 2px, rgba(0, 0, 0, 0.3) 4px);
+  background: linear-gradient(
+      135deg,
+      rgba(15, 10, 30, 1) 0%,
+      rgba(25, 15, 45, 1) 50%,
+      rgba(15, 10, 30, 1) 100%
+    ),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.3) 2px,
+      rgba(0, 0, 0, 0.3) 4px
+    );
   border: none;
-  box-shadow: 
-    inset 0 2px 4px rgba(0, 0, 0, 0.8),
-    inset 0 -1px 2px rgba(147, 51, 234, 0.1);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8), inset 0 -1px 2px rgba(147, 51, 234, 0.1);
 }
 
 /* Path cells - lighter color with potential borders and glow */
 .pathCell {
-  background: 
-    linear-gradient(135deg, rgba(88, 28, 135, 0.5) 0%, rgba(70, 20, 110, 0.5) 50%, rgba(88, 28, 135, 0.5) 100%),
-    radial-gradient(circle at center, rgba(147, 51, 234, 0.15) 0%, transparent 70%);
+  background: linear-gradient(
+      135deg,
+      rgba(88, 28, 135, 0.5) 0%,
+      rgba(70, 20, 110, 0.5) 50%,
+      rgba(88, 28, 135, 0.5) 100%
+    ), radial-gradient(circle at center, rgba(147, 51, 234, 0.15) 0%, transparent 70%);
   border-color: rgba(168, 85, 247, 1);
   border-style: solid;
   border-width: 0;
-  box-shadow: 
-    inset 0 0 10px rgba(147, 51, 234, 0.3),
-    inset 0 1px 2px rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0 10px rgba(147, 51, 234, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.1);
 }
 
 .cellWallTop {
@@ -134,69 +149,55 @@
 
 /* Player's current cell with intense glow effect */
 .playerCell {
-  background: 
-    radial-gradient(circle at center, 
-      rgba(192, 132, 252, 0.6) 0%, 
-      rgba(147, 51, 234, 0.5) 50%, 
-      rgba(88, 28, 135, 0.5) 100%) !important;
-  box-shadow: 
-    0 0 30px rgba(192, 132, 252, 0.9),
-    0 0 60px rgba(236, 72, 153, 0.6),
-    inset 0 0 20px rgba(192, 132, 252, 0.5),
-    inset 0 0 40px rgba(147, 51, 234, 0.3);
+  background: radial-gradient(
+    circle at center,
+    rgba(192, 132, 252, 0.6) 0%,
+    rgba(147, 51, 234, 0.5) 50%,
+    rgba(88, 28, 135, 0.5) 100%
+  ) !important;
+  box-shadow: 0 0 30px rgba(192, 132, 252, 0.9), 0 0 60px rgba(236, 72, 153, 0.6), inset 0 0 20px
+    rgba(192, 132, 252, 0.5), inset 0 0 40px rgba(147, 51, 234, 0.3);
   animation: playerCellPulse 1.5s ease-in-out infinite;
   z-index: 1;
 }
 
 @keyframes playerCellPulse {
-  0%, 100% {
-    box-shadow: 
-      0 0 30px rgba(192, 132, 252, 0.9),
-      0 0 60px rgba(236, 72, 153, 0.6),
-      inset 0 0 20px rgba(192, 132, 252, 0.5),
-      inset 0 0 40px rgba(147, 51, 234, 0.3);
+  0%,
+  100% {
+    box-shadow: 0 0 30px rgba(192, 132, 252, 0.9), 0 0 60px rgba(236, 72, 153, 0.6), inset 0 0 20px
+      rgba(192, 132, 252, 0.5), inset 0 0 40px rgba(147, 51, 234, 0.3);
     transform: scale(1);
   }
   50% {
-    box-shadow: 
-      0 0 50px rgba(192, 132, 252, 1),
-      0 0 100px rgba(236, 72, 153, 0.8),
-      inset 0 0 30px rgba(192, 132, 252, 0.7),
-      inset 0 0 60px rgba(147, 51, 234, 0.5);
+    box-shadow: 0 0 50px rgba(192, 132, 252, 1), 0 0 100px rgba(236, 72, 153, 0.8), inset 0 0 30px
+      rgba(192, 132, 252, 0.7), inset 0 0 60px rgba(147, 51, 234, 0.5);
     transform: scale(1.05);
   }
 }
 
 .endPosition {
-  background: 
-    radial-gradient(circle at center, 
-      rgba(134, 239, 172, 0.8) 0%, 
-      rgba(74, 222, 128, 0.6) 50%, 
-      rgba(34, 197, 94, 0.5) 100%);
-  box-shadow: 
-    0 0 40px rgba(74, 222, 128, 0.9),
-    0 0 80px rgba(134, 239, 172, 0.6),
-    inset 0 0 25px rgba(134, 239, 172, 0.6),
-    inset 0 0 50px rgba(74, 222, 128, 0.4);
+  background: radial-gradient(
+    circle at center,
+    rgba(134, 239, 172, 0.8) 0%,
+    rgba(74, 222, 128, 0.6) 50%,
+    rgba(34, 197, 94, 0.5) 100%
+  );
+  box-shadow: 0 0 40px rgba(74, 222, 128, 0.9), 0 0 80px rgba(134, 239, 172, 0.6), inset 0 0 25px
+    rgba(134, 239, 172, 0.6), inset 0 0 50px rgba(74, 222, 128, 0.4);
   animation: endPositionPulse 1.2s ease-in-out infinite;
   z-index: 1;
 }
 
 @keyframes endPositionPulse {
-  0%, 100% {
-    box-shadow: 
-      0 0 40px rgba(74, 222, 128, 0.9),
-      0 0 80px rgba(134, 239, 172, 0.6),
-      inset 0 0 25px rgba(134, 239, 172, 0.6),
-      inset 0 0 50px rgba(74, 222, 128, 0.4);
+  0%,
+  100% {
+    box-shadow: 0 0 40px rgba(74, 222, 128, 0.9), 0 0 80px rgba(134, 239, 172, 0.6), inset 0 0 25px
+      rgba(134, 239, 172, 0.6), inset 0 0 50px rgba(74, 222, 128, 0.4);
     transform: scale(1);
   }
   50% {
-    box-shadow: 
-      0 0 60px rgba(74, 222, 128, 1),
-      0 0 120px rgba(134, 239, 172, 0.8),
-      inset 0 0 40px rgba(134, 239, 172, 0.8),
-      inset 0 0 80px rgba(74, 222, 128, 0.6);
+    box-shadow: 0 0 60px rgba(74, 222, 128, 1), 0 0 120px rgba(134, 239, 172, 0.8), inset 0 0 40px
+      rgba(134, 239, 172, 0.8), inset 0 0 80px rgba(74, 222, 128, 0.6);
     transform: scale(1.08);
   }
 }
@@ -216,9 +217,7 @@
   color: #f7ff3c;
 
   /* Glow neón */
-  filter:
-    drop-shadow(0 0 4px currentColor)
-    drop-shadow(0 0 12px currentColor);
+  filter: drop-shadow(0 0 4px currentColor) drop-shadow(0 0 12px currentColor);
   transition: transform 200ms ease-out, opacity 200ms ease-out;
 }
 
@@ -246,26 +245,24 @@
   width: 100%;
   height: 70%;
   transform: translateX(-50%);
+  /* torso */
   background:
-    /* torso */
     linear-gradient(currentColor, currentColor)
-      50% 20% / 10% 55% no-repeat,
+    50% 20% / 10% 55% no-repeat,
     /* brazos */
     linear-gradient(currentColor, currentColor)
-      50% 35% / 70% 10% no-repeat,
+    50% 35% / 70% 10% no-repeat,
     /* pierna izquierda */
     linear-gradient(currentColor, currentColor)
-      35% 80% / 10% 40% no-repeat,
+    35% 80% / 10% 40% no-repeat,
     /* pierna derecha */
     linear-gradient(currentColor, currentColor)
-      65% 80% / 10% 40% no-repeat;
+    65% 80% / 10% 40% no-repeat;
 }
 
 /* Jugador local: más brillo y prioridad de z-index */
 .playerToken {
-  filter:
-    drop-shadow(0 0 8px currentColor)
-    drop-shadow(0 0 18px currentColor);
+  filter: drop-shadow(0 0 8px currentColor) drop-shadow(0 0 18px currentColor);
   z-index: 20;
 }
 
@@ -296,9 +293,7 @@
 
 /* ❄️ FREEZE: tinte azul + brillo */
 .playerFrozen {
-  filter:
-    drop-shadow(0 0 6px rgba(33, 150, 243, 0.9))
-    drop-shadow(0 0 16px rgba(3, 105, 161, 0.9));
+  filter: drop-shadow(0 0 6px rgba(33, 150, 243, 0.9)) drop-shadow(0 0 16px rgba(3, 105, 161, 0.9));
 }
 
 /* 😵 CONFUSION: borde y pequeño "temblor" */
@@ -351,13 +346,14 @@
   height: 80%;
   width: 80%;
   border-radius: 9999px;
-  background: 
-    linear-gradient(135deg, 
-      rgb(134, 239, 172) 0%, 
-      rgb(74, 222, 128) 25%,
-      rgb(34, 197, 94) 75%,
-      rgb(5, 150, 105) 100%);
-  box-shadow: 
+  background: linear-gradient(
+    135deg,
+    rgb(134, 239, 172) 0%,
+    rgb(74, 222, 128) 25%,
+    rgb(34, 197, 94) 75%,
+    rgb(5, 150, 105) 100%
+  );
+  box-shadow:
     0 0 40px rgba(74, 222, 128, 1),
     0 0 80px rgba(134, 239, 172, 0.8),
     0 0 120px rgba(34, 197, 94, 0.6),
@@ -370,7 +366,7 @@
 }
 
 .endToken::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: -6px;
   border-radius: 9999px;
@@ -381,10 +377,11 @@
 }
 
 @keyframes endTokenPulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1) rotate(0deg);
-    box-shadow: 
+    box-shadow:
       0 0 40px rgba(74, 222, 128, 1),
       0 0 80px rgba(134, 239, 172, 0.8),
       0 0 120px rgba(34, 197, 94, 0.6),
@@ -395,7 +392,7 @@
   50% {
     opacity: 0.8;
     transform: scale(1.15) rotate(180deg);
-    box-shadow: 
+    box-shadow:
       0 0 60px rgba(74, 222, 128, 1),
       0 0 120px rgba(134, 239, 172, 1),
       0 0 180px rgba(34, 197, 94, 0.8),
@@ -406,7 +403,8 @@
 }
 
 @keyframes endTokenHalo {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.6;
     transform: scale(1);
   }
@@ -425,9 +423,7 @@
   height: 65%;
   border-radius: 6px;
   background: #ffffff;
-  box-shadow:
-    0 0 4px rgba(255, 255, 255, 0.9),
-    0 0 14px rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.9), 0 0 14px rgba(255, 255, 255, 0.9);
   opacity: 0.95;
   pointer-events: none;
   z-index: 15;
@@ -445,11 +441,8 @@
   justify-content: center;
   font-size: 1rem;
   color: #ffffff;
-  text-shadow:
-    0 0 4px rgba(255, 255, 255, 0.9),
-    0 0 12px rgba(255, 255, 255, 0.9);
-  filter:
-    drop-shadow(0 0 8px rgba(255, 255, 255, 0.9))
+  text-shadow: 0 0 4px rgba(255, 255, 255, 0.9), 0 0 12px rgba(255, 255, 255, 0.9);
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.9))
     drop-shadow(0 0 18px rgba(255, 255, 255, 0.9));
   pointer-events: none;
   z-index: 15;
@@ -464,9 +457,7 @@
   height: 26%;
   border-radius: 9999px;
   background: #ffffff;
-  box-shadow:
-    0 0 4px rgba(255, 255, 255, 0.9),
-    0 0 14px rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.9), 0 0 14px rgba(255, 255, 255, 0.9);
   pointer-events: none;
   z-index: 15;
 }

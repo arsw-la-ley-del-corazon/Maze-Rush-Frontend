@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 import { render, screen } from "@testing-library/react"
 import { BrowserRouter, MemoryRouter } from "react-router-dom"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import HomePage from "./HomePage"
 
 // Mock MUI components to avoid complex rendering issues

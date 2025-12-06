@@ -1,18 +1,11 @@
-import { useState, useEffect, useRef, useCallback } from "react"
-import {
-  Box,
-  Button,
-  Typography,
-  Paper,
-  Divider,
-  Alert,
-} from "@mui/material"
-import { Link as RouterLink, useNavigate } from "react-router-dom"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import GoogleIcon from "@mui/icons-material/Google"
+import { Alert, Box, Button, Divider, Paper, Typography } from "@mui/material"
+import { useCallback, useEffect, useRef, useState } from "react"
+import { Link as RouterLink, useNavigate } from "react-router-dom"
+import { GOOGLE_CONFIG } from "../../common/globas"
 import Loader from "../../components/Loader"
 import { useAuth } from "../../context/useAuth"
-import { GOOGLE_CONFIG } from "../../common/globas"
 import styles from "./LoginPage.module.css"
 
 // Declaración para el objeto global de Google
@@ -40,14 +33,16 @@ declare global {
               width?: string
             }
           ) => void
-          prompt: (callback?: (notification: {
-            isNotDisplayed: () => boolean
-            isSkippedMoment: () => boolean
-            isDismissedMoment: () => boolean
-            getNotDisplayedReason: () => string
-            getSkippedReason: () => string
-            getDismissedReason: () => string
-          }) => void) => void
+          prompt: (
+            callback?: (notification: {
+              isNotDisplayed: () => boolean
+              isSkippedMoment: () => boolean
+              isDismissedMoment: () => boolean
+              getNotDisplayedReason: () => string
+              getSkippedReason: () => string
+              getDismissedReason: () => string
+            }) => void
+          ) => void
           cancel: () => void
         }
       }
@@ -65,34 +60,39 @@ export default function LoginPage() {
   const { loginWithGoogle, loading } = useAuth()
 
   // Callback estable para manejar la respuesta de Google
-  const handleGoogleResponse = useCallback(async (response: { credential: string }) => {
-    setError("")
-    
-    try {
-      const result = await loginWithGoogle(response.credential)
-      if (result.ok) {
-        navigate("/app")
-      } else {
-        setError(result.error || "Error de autenticación con Google")
+  const handleGoogleResponse = useCallback(
+    async (response: { credential: string }) => {
+      setError("")
+
+      try {
+        const result = await loginWithGoogle(response.credential)
+        if (result.ok) {
+          navigate("/app")
+        } else {
+          setError(result.error || "Error de autenticación con Google")
+        }
+      } catch (err) {
+        console.error("Error durante autenticación:", err)
+        setError("No se pudo conectar con el servidor. Verifica tu conexión a internet.")
       }
-    } catch (err) {
-      console.error("Error durante autenticación:", err)
-      setError("No se pudo conectar con el servidor. Verifica tu conexión a internet.")
-    }
-  }, [loginWithGoogle, navigate])
+    },
+    [loginWithGoogle, navigate]
+  )
 
   // Cargar el script de Google Identity Services
   useEffect(() => {
     // Verificar si el script ya está cargado
-    const existingScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]')
-    
+    const existingScript = document.querySelector(
+      'script[src="https://accounts.google.com/gsi/client"]'
+    )
+
     if (existingScript) {
       // El script ya existe, verificar si Google está disponible
       if (window.google?.accounts?.id) {
         setGoogleLoaded(true)
       } else {
         // Esperar a que se cargue
-        existingScript.addEventListener('load', () => setGoogleLoaded(true))
+        existingScript.addEventListener("load", () => setGoogleLoaded(true))
       }
       return
     }
@@ -101,7 +101,7 @@ export default function LoginPage() {
     script.src = "https://accounts.google.com/gsi/client"
     script.async = true
     script.defer = true
-    
+
     script.onload = () => {
       // Pequeño delay para asegurar que el objeto google esté disponible
       setTimeout(() => {
@@ -110,11 +110,11 @@ export default function LoginPage() {
         }
       }, 100)
     }
-    
+
     script.onerror = () => {
       setError("No se pudo cargar Google Identity Services. Por favor, recarga la página.")
     }
-    
+
     document.head.appendChild(script)
 
     return () => {
@@ -141,7 +141,9 @@ export default function LoginPage() {
       const googleClientId = GOOGLE_CONFIG.CLIENT_ID
 
       if (!googleClientId) {
-        setError("Configuración de Google OAuth no disponible. Por favor, verifica la configuración.")
+        setError(
+          "Configuración de Google OAuth no disponible. Por favor, verifica la configuración."
+        )
         return
       }
 
@@ -165,7 +167,7 @@ export default function LoginPage() {
             shape: "rectangular",
             width: "400",
           })
-          
+
           // Esperar un poco para asegurar que el botón esté renderizado
           setTimeout(() => {
             setIsInitialized(true)
@@ -184,7 +186,7 @@ export default function LoginPage() {
 
   const handleGoogleSignIn = useCallback(() => {
     setError("")
-    
+
     if (!window.google?.accounts?.id) {
       setError("Google no está disponible. Por favor, recarga la página.")
       return
@@ -194,11 +196,13 @@ export default function LoginPage() {
       setError("Espera un momento, Google se está cargando...")
       return
     }
-    
+
     // Intentar hacer click directo en el botón renderizado de Google
     // Esto es más confiable que usar prompt() en algunos navegadores
     if (googleButtonRef.current) {
-      const googleButton = googleButtonRef.current.querySelector('div[role="button"]') as HTMLElement
+      const googleButton = googleButtonRef.current.querySelector(
+        'div[role="button"]'
+      ) as HTMLElement
       if (googleButton) {
         googleButton.click()
         return
@@ -384,8 +388,7 @@ export default function LoginPage() {
                   lineHeight: 1.6,
                 }}
               >
-                Al continuar, aceptas nuestros términos de servicio y política
-                de privacidad.
+                Al continuar, aceptas nuestros términos de servicio y política de privacidad.
               </Typography>
               <Typography
                 variant="caption"

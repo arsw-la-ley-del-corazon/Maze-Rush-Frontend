@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
-import { render, screen, waitFor, act } from "@testing-library/react"
+import { act, render, screen, waitFor } from "@testing-library/react"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { AUTH_CONFIG } from "../common/globas"
 import { AuthProvider } from "./AuthContext"
 import { useAuth } from "./useAuth"
-import { AUTH_CONFIG } from "../common/globas"
 
 // Mock del servicio de autenticación
 vi.mock("../features/login/services/realAuthService", () => ({
@@ -13,8 +13,8 @@ vi.mock("../features/login/services/realAuthService", () => ({
 
 import {
   loginWithGoogle as apiLoginWithGoogle,
-  refresh as apiRefresh,
   logout as apiLogout,
+  refresh as apiRefresh,
 } from "../features/login/services/realAuthService"
 
 // Componente de prueba para acceder al contexto
@@ -335,10 +335,7 @@ describe("AuthContext", () => {
         const { updateProfile, user } = useAuth()
         return (
           <div>
-            <button
-              data-testid="update-btn"
-              onClick={() => updateProfile({ username: "NewName" })}
-            >
+            <button data-testid="update-btn" onClick={() => updateProfile({ username: "NewName" })}>
               Update
             </button>
             <div data-testid="username">{user?.username || "no-user"}</div>

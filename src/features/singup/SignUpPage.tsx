@@ -1,24 +1,24 @@
-import { useState } from "react"
-import {
-  Box,
-  Button,
-  TextField,
-  Typography,
-  Paper,
-  Checkbox,
-  FormControlLabel,
-  Divider,
-  Stack,
-} from "@mui/material"
-import { Link as RouterLink } from "react-router-dom"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import EmailIcon from "@mui/icons-material/Email"
 import LockIcon from "@mui/icons-material/Lock"
+import {
+  Box,
+  Button,
+  Checkbox,
+  Divider,
+  FormControlLabel,
+  Paper,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material"
+import { useState } from "react"
+import { Link as RouterLink } from "react-router-dom"
 import Loader from "../../components/Loader"
 import styles from "./SignUpPage.module.css"
 
-import { useAuth } from "../../context/useAuth"
 import PersonIcon from "@mui/icons-material/Person"
+import { useAuth } from "../../context/useAuth"
 
 const SignUpPage = () => {
   const [username, setUsername] = useState("")
@@ -26,18 +26,17 @@ const SignUpPage = () => {
   const [password, setPassword] = useState("")
   const [confirm, setConfirm] = useState("")
   const [error, setError] = useState("")
-  const {loading } = useAuth()
+  const { loading } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
-    
+
     if (password !== confirm) {
       setError("Las contraseñas no coinciden")
       return
     }
   }
-    
 
   return (
     <Box className={styles.root}>

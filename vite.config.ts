@@ -1,13 +1,13 @@
 /// <reference types="vitest" />
 /// <reference types="vite/client" />
 
-import { resolve } from "node:path";
-import react from "@vitejs/plugin-react";
-import { defineConfig } from "vitest/config";
+import { resolve } from "node:path"
+import react from "@vitejs/plugin-react"
+import { defineConfig } from "vitest/config"
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-  const isProduction = mode === "production";
+  const isProduction = mode === "production"
 
   return {
     plugins: [react()],
@@ -78,23 +78,28 @@ export default defineConfig(({ mode }) => {
           entryFileNames: "assets/js/[name]-[hash].js",
           chunkFileNames: "assets/js/[name]-[hash].js",
           assetFileNames: (assetInfo) => {
-            const info = assetInfo.name || "";
+            const info = assetInfo.name || ""
             if (/\.(gif|jpe?g|png|svg|webp|ico)$/.test(info)) {
-              return "assets/images/[name]-[hash][extname]";
+              return "assets/images/[name]-[hash][extname]"
             }
             if (/\.(woff2?|eot|ttf|otf)$/.test(info)) {
-              return "assets/fonts/[name]-[hash][extname]";
+              return "assets/fonts/[name]-[hash][extname]"
             }
             if (/\.css$/.test(info)) {
-              return "assets/css/[name]-[hash][extname]";
+              return "assets/css/[name]-[hash][extname]"
             }
-            return "assets/[name]-[hash][extname]";
+            return "assets/[name]-[hash][extname]"
           },
           // Code splitting manual para mejor caching
           manualChunks: {
             // Vendor chunks para librerías principales
             "vendor-react": ["react", "react-dom", "react-router-dom"],
-            "vendor-mui": ["@mui/material", "@mui/icons-material", "@emotion/react", "@emotion/styled"],
+            "vendor-mui": [
+              "@mui/material",
+              "@mui/icons-material",
+              "@emotion/react",
+              "@emotion/styled",
+            ],
             "vendor-ws": ["@stomp/stompjs", "sockjs-client"],
             "vendor-utils": ["axios", "uuid", "styled-components"],
           },
@@ -121,9 +126,7 @@ export default defineConfig(({ mode }) => {
       devSourcemap: true,
       modules: {
         localsConvention: "camelCase",
-        generateScopedName: isProduction
-          ? "[hash:base64:8]"
-          : "[name]__[local]__[hash:base64:5]",
+        generateScopedName: isProduction ? "[hash:base64:8]" : "[name]__[local]__[hash:base64:5]",
       },
     },
 
@@ -178,5 +181,5 @@ export default defineConfig(({ mode }) => {
         ],
       },
     },
-  };
-});
+  }
+})

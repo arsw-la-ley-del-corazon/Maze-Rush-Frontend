@@ -1,15 +1,15 @@
-// src/components/WinDialog.tsx
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Typography,
-  Box,
-} from "@mui/material"
 import CelebrationIcon from "@mui/icons-material/Celebration"
 import RefreshIcon from "@mui/icons-material/Refresh"
+// src/components/WinDialog.tsx
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Typography,
+} from "@mui/material"
 
 interface WinDialogProps {
   isOpen: boolean

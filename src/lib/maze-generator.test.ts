@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import { generateMaze } from "./maze-generator"
 
 describe("generateMaze", () => {
@@ -41,11 +41,11 @@ describe("generateMaze", () => {
   it("should generate a perfect maze (all cells reachable)", () => {
     vi.spyOn(Math, "random").mockRestore()
     const maze = generateMaze(4, 4)
-    
+
     // In a perfect maze, all cells should have at least one open wall
     // (except the outer boundaries)
     let allCellsHaveOpenWalls = true
-    
+
     for (let y = 0; y < maze.length; y++) {
       for (let x = 0; x < maze[0].length; x++) {
         const cell = maze[y][x]
@@ -55,13 +55,13 @@ describe("generateMaze", () => {
         }
       }
     }
-    
+
     expect(allCellsHaveOpenWalls).toBe(true)
   })
 
   it("should handle 1x1 maze", () => {
     const maze = generateMaze(1, 1)
-    
+
     expect(maze.length).toBe(1)
     expect(maze[0].length).toBe(1)
     expect(maze[0][0].top).toBe(false) // Entry
@@ -70,14 +70,14 @@ describe("generateMaze", () => {
 
   it("should handle rectangular maze (wider than tall)", () => {
     const maze = generateMaze(10, 5)
-    
+
     expect(maze.length).toBe(5)
     expect(maze[0].length).toBe(10)
   })
 
   it("should handle rectangular maze (taller than wide)", () => {
     const maze = generateMaze(5, 10)
-    
+
     expect(maze.length).toBe(10)
     expect(maze[0].length).toBe(5)
   })
@@ -85,17 +85,17 @@ describe("generateMaze", () => {
   it("should create connected paths between adjacent cells", () => {
     vi.spyOn(Math, "random").mockRestore()
     const maze = generateMaze(5, 5)
-    
+
     // Check that when a cell has an open wall, the adjacent cell's corresponding wall is also open
     for (let y = 0; y < maze.length; y++) {
       for (let x = 0; x < maze[0].length; x++) {
         const cell = maze[y][x]
-        
+
         // Check right connection
         if (x < maze[0].length - 1 && !cell.right) {
           expect(maze[y][x + 1].left).toBe(false)
         }
-        
+
         // Check bottom connection
         if (y < maze.length - 1 && !cell.bottom) {
           expect(maze[y + 1][x].top).toBe(false)
@@ -106,7 +106,7 @@ describe("generateMaze", () => {
 
   it("should not have 'visited' property in returned maze cells", () => {
     const maze = generateMaze(3, 3)
-    
+
     for (let y = 0; y < maze.length; y++) {
       for (let x = 0; x < maze[0].length; x++) {
         expect(maze[y][x]).not.toHaveProperty("visited")

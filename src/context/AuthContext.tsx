@@ -1,12 +1,12 @@
-import { useState, useCallback, useEffect, useRef, type ReactNode } from "react"
-import { AuthContext, type UserProfile } from "./AuthTypes"
-import { 
-  loginWithGoogle as apiLoginWithGoogle, 
-  refresh as apiRefresh, 
-  logout as apiLogout
+import { type ReactNode, useCallback, useEffect, useRef, useState } from "react"
+import { AUTH_CONFIG } from "../common/globas"
+import {
+  loginWithGoogle as apiLoginWithGoogle,
+  logout as apiLogout,
+  refresh as apiRefresh,
 } from "../features/login/services/realAuthService"
 import type { AuthResponse } from "../types/api"
-import { AUTH_CONFIG } from "../common/globas"
+import { AuthContext, type UserProfile } from "./AuthTypes"
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserProfile | null>(null)
@@ -30,50 +30,56 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, timeoutMs)
   }, [])
 
-  const applyAuth = useCallback((resp: AuthResponse) => {
-    accessRef.current = resp.accessToken
-    refreshRef.current = resp.refreshToken
-    expiryRef.current = Date.parse(resp.expiresAt)
-    setUser({
-      id: resp.user.id,
-      email: resp.user.email,
-      username: resp.user.username,
-      avatarColor: pickColorFromEmail(resp.user.email),
-      preferredMazeSize: "Mediano",
-      bio: "Nuevo explorador de laberintos",
-      score: resp.user.score,
-      level: resp.user.level,
-    } as UserProfile)
-    scheduleRefresh(resp.expiresIn)
-    // Persistencia mínima
-    localStorage.setItem(
-      AUTH_CONFIG.STORAGE_KEY,
-      JSON.stringify({
-        accessToken: resp.accessToken,
-        refreshToken: resp.refreshToken,
-        expiresAt: resp.expiresAt,
-        user: resp.user,
-      }),
-    )
-  }, [scheduleRefresh])
+  const applyAuth = useCallback(
+    (resp: AuthResponse) => {
+      accessRef.current = resp.accessToken
+      refreshRef.current = resp.refreshToken
+      expiryRef.current = Date.parse(resp.expiresAt)
+      setUser({
+        id: resp.user.id,
+        email: resp.user.email,
+        username: resp.user.username,
+        avatarColor: pickColorFromEmail(resp.user.email),
+        preferredMazeSize: "Mediano",
+        bio: "Nuevo explorador de laberintos",
+        score: resp.user.score,
+        level: resp.user.level,
+      } as UserProfile)
+      scheduleRefresh(resp.expiresIn)
+      // Persistencia mínima
+      localStorage.setItem(
+        AUTH_CONFIG.STORAGE_KEY,
+        JSON.stringify({
+          accessToken: resp.accessToken,
+          refreshToken: resp.refreshToken,
+          expiresAt: resp.expiresAt,
+          user: resp.user,
+        })
+      )
+    },
+    [scheduleRefresh]
+  )
 
-  const loginWithGoogle = useCallback(async (credential: string): Promise<{ ok: boolean; error?: string }> => {
-    setLoading(true)
-    try {
-      const result = await apiLoginWithGoogle(credential)
-      if (result.ok) {
-        applyAuth(result.data)
+  const loginWithGoogle = useCallback(
+    async (credential: string): Promise<{ ok: boolean; error?: string }> => {
+      setLoading(true)
+      try {
+        const result = await apiLoginWithGoogle(credential)
+        if (result.ok) {
+          applyAuth(result.data)
+          setLoading(false)
+          return { ok: true }
+        } else {
+          setLoading(false)
+          return { ok: false, error: result.error.message }
+        }
+      } catch (error) {
         setLoading(false)
-        return { ok: true }
-      } else {
-        setLoading(false)
-        return { ok: false, error: result.error.message }
+        return { ok: false, error: "Error de conexión" }
       }
-    } catch (error) {
-      setLoading(false)
-      return { ok: false, error: 'Error de conexión' }
-    }
-  }, [applyAuth])
+    },
+    [applyAuth]
+  )
 
   const logout = useCallback(() => {
     if (accessRef.current) apiLogout(accessRef.current)
@@ -94,7 +100,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const restoreSession = async () => {
       setInitializing(true)
       const raw = localStorage.getItem(AUTH_CONFIG.STORAGE_KEY)
-      
+
       if (!raw) {
         setInitializing(false)
         return
@@ -116,7 +122,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             user: parsed.user,
           })
           setInitializing(false)
-        } 
+        }
         // Si el token expiró pero tenemos refreshToken, intentar refrescar
         else if (parsed.refreshToken) {
           try {
@@ -132,7 +138,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             localStorage.removeItem(AUTH_CONFIG.STORAGE_KEY)
           }
           setInitializing(false)
-        } 
+        }
         // Si no hay refreshToken, limpiar
         else {
           localStorage.removeItem(AUTH_CONFIG.STORAGE_KEY)
@@ -149,12 +155,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [applyAuth])
 
   return (
-    <AuthContext.Provider value={{ user, loading: loading || initializing, loginWithGoogle, logout, updateProfile }}>
+    <AuthContext.Provider
+      value={{ user, loading: loading || initializing, loginWithGoogle, logout, updateProfile }}
+    >
       {children}
     </AuthContext.Provider>
   )
 }
-
 
 function pickColorFromEmail(email: string) {
   const colors = ["#A46AFF", "#9B51E0", "#C05DFF", "#B675FF", "#8735CF"]

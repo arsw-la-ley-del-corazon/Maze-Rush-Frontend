@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from "react"
 import { Client } from "@stomp/stompjs"
+import { useCallback, useEffect, useRef, useState } from "react"
 import SockJS from "sockjs-client"
 import { SOCKET_CONFIG } from "../common/globas"
 
@@ -29,7 +29,7 @@ export function useRoomUpdates() {
     }
 
     console.log("🔌 Intentando conectar WebSocket para actualizaciones de salas...")
-    
+
     // Obtener token de autenticación (para uso futuro si se requiere autenticación)
     const authState = localStorage.getItem("auth_state")
     if (authState) {
@@ -42,7 +42,7 @@ export function useRoomUpdates() {
 
     const wsUrl = `${SOCKET_CONFIG.URL}/ws`
     console.log("📡 URL WebSocket:", wsUrl)
-    
+
     const socket = new SockJS(wsUrl)
     const client = new Client({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -52,7 +52,7 @@ export function useRoomUpdates() {
       heartbeatOutgoing: 10000,
       onConnect: () => {
         console.log("✅ WebSocket conectado exitosamente para room updates")
-        
+
         // Suscribirse al topic de actualizaciones de salas públicas
         console.log("📬 Suscribiéndose a /topic/lobby/updates")
         client.subscribe("/topic/lobby/updates", (message) => {

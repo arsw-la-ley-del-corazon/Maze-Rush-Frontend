@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 import { render, screen, waitFor } from "@testing-library/react"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import App from "./App"
 
 // Mock all context providers to avoid complex setup
@@ -88,7 +88,7 @@ describe("App", () => {
 
     it("should render home page at /home path", async () => {
       window.history.pushState({}, "", "/home")
-      
+
       render(<App />)
 
       await waitFor(() => {
@@ -98,7 +98,7 @@ describe("App", () => {
 
     it("should render login page at /login path", async () => {
       window.history.pushState({}, "", "/login")
-      
+
       render(<App />)
 
       await waitFor(() => {
@@ -118,7 +118,7 @@ describe("App", () => {
       })
 
       window.history.pushState({}, "", "/app")
-      
+
       render(<App />)
 
       await waitFor(() => {
@@ -141,7 +141,7 @@ describe("App", () => {
       })
 
       window.history.pushState({}, "", "/app")
-      
+
       render(<App />)
 
       await waitFor(() => {
@@ -159,7 +159,7 @@ describe("App", () => {
       })
 
       window.history.pushState({}, "", "/app")
-      
+
       render(<App />)
 
       // Should not render protected content while loading
@@ -196,7 +196,7 @@ describe("App", () => {
       })
 
       window.history.pushState({}, "", "/app")
-      
+
       render(<App />)
 
       await waitFor(() => {

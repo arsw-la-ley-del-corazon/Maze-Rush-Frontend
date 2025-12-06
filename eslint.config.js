@@ -1,20 +1,13 @@
 import js from "@eslint/js"
-import globals from "globals"
 import reactHooks from "eslint-plugin-react-hooks"
 import reactRefresh from "eslint-plugin-react-refresh"
-import tseslint from "typescript-eslint"
 import { defineConfig, globalIgnores } from "eslint/config"
+import globals from "globals"
+import tseslint from "typescript-eslint"
 
 export default defineConfig([
   // Archivos ignorados globalmente
-  globalIgnores([
-    "dist",
-    "coverage",
-    "node_modules",
-    "*.min.js",
-    "public",
-    ".git",
-  ]),
+  globalIgnores(["dist", "coverage", "node_modules", "*.min.js", "public", ".git"]),
 
   // Configuración para archivos TypeScript/TSX
   {
@@ -63,25 +56,27 @@ export default defineConfig([
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-non-null-assertion": "warn",
       "@typescript-eslint/prefer-nullish-coalescing": "off",
-      "@typescript-eslint/prefer-optional-chain": "warn",
+      "@typescript-eslint/prefer-optional-chain": "off",
+      "@typescript-eslint/array-type": "off",
+      "@typescript-eslint/consistent-type-definitions": "off",
+      "@typescript-eslint/consistent-indexed-object-style": "off",
+      "@typescript-eslint/no-empty-function": "off",
+      "@typescript-eslint/prefer-for-of": "off",
 
       // React específicas
-      "react-refresh/only-export-components": [
-        "warn",
-        { allowConstantExport: true },
-      ],
+      "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
 
       // Reglas generales de código
-      "no-console": ["warn", { allow: ["warn", "error", "info"] }],
+      "no-console": "off",
       "no-debugger": "warn",
-      "no-duplicate-imports": "error",
+      "no-duplicate-imports": "warn",
       "no-unused-expressions": "error",
       "prefer-const": "warn",
       "no-var": "error",
-      "eqeqeq": ["error", "always", { null: "ignore" }],
-      "curly": ["warn", "multi-line"],
+      eqeqeq: ["error", "always", { null: "ignore" }],
+      curly: "off",
       "no-throw-literal": "error",
     },
   },

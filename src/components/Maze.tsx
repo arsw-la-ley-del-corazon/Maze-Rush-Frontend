@@ -1,7 +1,7 @@
-// src/components/Maze.tsx
-import type { PlayerGameState } from "../types/api"
 import type { MazeCell } from "../features/game/services/mazeService"
 import { cn } from "../lib/utils"
+// src/components/Maze.tsx
+import type { PlayerGameState } from "../types/api"
 import styles from "./Maze.module.css"
 
 type PowerUpType = "CLEAR_FOG" | "FREEZE" | "CONFUSION"
@@ -47,22 +47,19 @@ export function Maze({
 
   const isCellVisible = (cellX: number, cellY: number): boolean => {
     if (hasClearFog) return true
-    const distance =
-      Math.abs(cellX - playerPosition.x) + Math.abs(cellY - playerPosition.y)
+    const distance = Math.abs(cellX - playerPosition.x) + Math.abs(cellY - playerPosition.y)
     return distance <= VISION_RADIUS
   }
 
   const getVisibilityLevel = (cellX: number, cellY: number): number => {
     if (hasClearFog) return 1
-    const distance =
-      Math.abs(cellX - playerPosition.x) + Math.abs(cellY - playerPosition.y)
+    const distance = Math.abs(cellX - playerPosition.x) + Math.abs(cellY - playerPosition.y)
     if (distance > VISION_RADIUS) return 0
     if (distance === 0) return 1
     return Math.max(0, 1 - (distance / VISION_RADIUS) * 0.95)
   }
 
-  const getPowerUpsAt = (x: number, y: number) =>
-    powerUps.filter((p) => p.x === x && p.y === y)
+  const getPowerUpsAt = (x: number, y: number) => powerUps.filter((p) => p.x === x && p.y === y)
 
   return (
     <div
@@ -77,7 +74,7 @@ export function Maze({
           const isPlayer = playerPosition.x === x && playerPosition.y === y
           const isEnd = endPosition.x === x && endPosition.y === y
           const otherPlayersHere = otherPlayers.filter(
-            (p) => p.position.x === x && p.position.y === y,
+            (p) => p.position.x === x && p.position.y === y
           )
 
           const powerUpsHere = getPowerUpsAt(x, y)
@@ -102,7 +99,7 @@ export function Maze({
                 !isWall && cell.left && styles.cellWallLeft,
                 isEnd && !isWall && styles.endPosition,
                 !isVisible && !isEnd && styles.foggedCell,
-                isPlayer && styles.playerCell,
+                isPlayer && styles.playerCell
               )}
               style={{
                 opacity: isVisible ? visibilityLevel || 1 : isEnd ? 1 : 0,
@@ -122,22 +119,14 @@ export function Maze({
                       if (pu.type === "CLEAR_FOG") {
                         // ⬜ cuadrado blanco
                         return (
-                          <div
-                            key={pu.id}
-                            className={styles.powerUpFog}
-                            title="Quitar niebla"
-                          />
+                          <div key={pu.id} className={styles.powerUpFog} title="Quitar niebla" />
                         )
                       }
 
                       if (pu.type === "CONFUSION") {
                         // ★ estrella blanca
                         return (
-                          <div
-                            key={pu.id}
-                            className={styles.powerUpConfusion}
-                            title="Confusión"
-                          >
+                          <div key={pu.id} className={styles.powerUpConfusion} title="Confusión">
                             ★
                           </div>
                         )
@@ -145,11 +134,7 @@ export function Maze({
 
                       // FREEZE → punto blanco
                       return (
-                        <div
-                          key={pu.id}
-                          className={styles.powerUpFreeze}
-                          title="Congelamiento"
-                        />
+                        <div key={pu.id} className={styles.powerUpFreeze} title="Congelamiento" />
                       )
                     })}
 
@@ -171,17 +156,14 @@ export function Maze({
                   {/* Jugador actual */}
                   {isPlayer && !isWall && (
                     <div
-                      className={cn(
-                        styles.playerToken,
-                        isGameWon && styles.playerTokenWinning,
-                      )}
+                      className={cn(styles.playerToken, isGameWon && styles.playerTokenWinning)}
                     />
                   )}
                 </>
               )}
             </div>
           )
-        }),
+        })
       )}
     </div>
   )

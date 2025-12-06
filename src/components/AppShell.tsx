@@ -1,26 +1,26 @@
-import { useState, type ReactNode } from "react"
+import AccountCircleIcon from "@mui/icons-material/AccountCircle"
+import GroupAddIcon from "@mui/icons-material/GroupAdd"
+import LogoutIcon from "@mui/icons-material/Logout"
+import MenuIcon from "@mui/icons-material/Menu"
+import DashboardIcon from "@mui/icons-material/SpaceDashboard"
 import {
   AppBar,
-  Toolbar,
-  Typography,
-  IconButton,
+  Avatar,
+  Box,
+  Button,
+  Divider,
   Drawer,
+  IconButton,
   List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Box,
-  Avatar,
-  Divider,
+  Toolbar,
   Tooltip,
-  Button,
+  Typography,
 } from "@mui/material"
-import MenuIcon from "@mui/icons-material/Menu"
-import DashboardIcon from "@mui/icons-material/SpaceDashboard"
-import AccountCircleIcon from "@mui/icons-material/AccountCircle"
-import LogoutIcon from "@mui/icons-material/Logout"
-import GroupAddIcon from "@mui/icons-material/GroupAdd"
-import { useNavigate, useLocation } from "react-router-dom"
+import { type ReactNode, useState } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
 import { useAuth } from "../context/useAuth"
 
 interface NavItem {
@@ -62,11 +62,17 @@ export default function AppShell({ children }: { children: ReactNode }) {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" fontWeight={700} sx={{ flexGrow: 1 }}>
-            Maze <Box component="span" sx={{ color: "primary.main" }}>Rush</Box>
+            Maze{" "}
+            <Box component="span" sx={{ color: "primary.main" }}>
+              Rush
+            </Box>
           </Typography>
           {user && (
             <Tooltip title={user.email} arrow>
-              <Avatar sx={{ bgcolor: user.avatarColor, cursor: "pointer" }} onClick={() => navigate("/app/profile")}> 
+              <Avatar
+                sx={{ bgcolor: user.avatarColor, cursor: "pointer" }}
+                onClick={() => navigate("/app/profile")}
+              >
                 {user.username[0]?.toUpperCase()}
               </Avatar>
             </Tooltip>
@@ -118,7 +124,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
                   borderRadius: 2,
                   mx: 1,
                   mb: 0.5,
-                  '&.Mui-selected': {
+                  "&.Mui-selected": {
                     background: "linear-gradient(90deg,#321658,#221033)",
                     border: "1px solid var(--brand-border-translucent)",
                   },

@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 import { render, screen, waitFor } from "@testing-library/react"
-import LoginPage from "./LoginPage" // Ajusta la ruta si es necesario
 import { BrowserRouter } from "react-router-dom"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import LoginPage from "./LoginPage" // Ajusta la ruta si es necesario
 
 // ----------------------------------------------------------------------
 // 1. MOCKS (Simulaciones)
@@ -69,7 +69,7 @@ const setupGoogleMock = () => {
       },
     },
   }
-  
+
   // Asignamos al objeto global window
   window.google = googleMock as any
   return googleMock
@@ -79,7 +79,7 @@ describe("LoginPage", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     document.body.innerHTML = "" // Limpiar el DOM
-    
+
     // Configuramos el mock de Google antes de renderizar
     setupGoogleMock()
   })
@@ -94,7 +94,7 @@ describe("LoginPage", () => {
     // Nota: Como tenemos el useEffect que crea el script, necesitamos simular el evento onload
     // o pre-cargar window.google. En este setup, window.google ya existe, así que el componente
     // debería detectar 'googleLoaded' true rápidamente o inmediatamente.
-    
+
     render(
       <BrowserRouter>
         <LoginPage />
@@ -158,9 +158,9 @@ describe("LoginPage", () => {
 
   it("muestra un error si el login falla", async () => {
     // 1. Configuramos el mock para devolver error
-    mockLoginWithGoogle.mockResolvedValue({ 
-      ok: false, 
-      error: "Credenciales inválidas" 
+    mockLoginWithGoogle.mockResolvedValue({
+      ok: false,
+      error: "Credenciales inválidas",
     })
 
     render(
@@ -184,5 +184,4 @@ describe("LoginPage", () => {
     // No debe navegar
     expect(mockNavigate).not.toHaveBeenCalled()
   })
-
 })

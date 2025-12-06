@@ -9,8 +9,7 @@
   position: relative;
   overflow: hidden;
   padding: 24px;
-  background: 
-    radial-gradient(ellipse at top, #001a1a 0%, #000508 100%),
+  background: radial-gradient(ellipse at top, #001a1a 0%, #000508 100%),
     linear-gradient(180deg, #000000 0%, #001214 50%, #000000 100%);
 }
 
@@ -19,28 +18,9 @@
   content: "";
   position: absolute;
   inset: 0;
-  background-image: 
-    /* Líneas verticales del laberinto */
-    repeating-linear-gradient(90deg, 
-      transparent, 
-      transparent 60px, 
-      rgba(0, 255, 255, 0.15) 60px, 
-      rgba(0, 255, 255, 0.15) 61px,
-      rgba(0, 255, 255, 0.4) 61px,
-      rgba(0, 255, 255, 0.4) 63px,
-      rgba(0, 255, 255, 0.15) 63px,
-      rgba(0, 255, 255, 0.15) 64px,
-      transparent 64px,
-      transparent 120px,
-      rgba(0, 200, 255, 0.12) 120px,
-      rgba(0, 200, 255, 0.12) 121px,
-      rgba(0, 200, 255, 0.3) 121px,
-      rgba(0, 200, 255, 0.3) 123px,
-      rgba(0, 200, 255, 0.12) 123px,
-      rgba(0, 200, 255, 0.12) 124px
-    ),
-    /* Líneas horizontales del laberinto */
-    repeating-linear-gradient(0deg,
+  /* Líneas verticales del laberinto */
+  background-image: repeating-linear-gradient(
+      90deg,
       transparent,
       transparent 60px,
       rgba(0, 255, 255, 0.15) 60px,
@@ -57,8 +37,26 @@
       rgba(0, 200, 255, 0.3) 123px,
       rgba(0, 200, 255, 0.12) 123px,
       rgba(0, 200, 255, 0.12) 124px
-    ),
-    /* Intersecciones del laberinto */
+    ), /* Líneas horizontales del laberinto */
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 60px,
+      rgba(0, 255, 255, 0.15) 60px,
+      rgba(0, 255, 255, 0.15) 61px,
+      rgba(0, 255, 255, 0.4) 61px,
+      rgba(0, 255, 255, 0.4) 63px,
+      rgba(0, 255, 255, 0.15) 63px,
+      rgba(0, 255, 255, 0.15) 64px,
+      transparent 64px,
+      transparent 120px,
+      rgba(0, 200, 255, 0.12) 120px,
+      rgba(0, 200, 255, 0.12) 121px,
+      rgba(0, 200, 255, 0.3) 121px,
+      rgba(0, 200, 255, 0.3) 123px,
+      rgba(0, 200, 255, 0.12) 123px,
+      rgba(0, 200, 255, 0.12) 124px
+    ), /* Intersecciones del laberinto */
     radial-gradient(circle at 25% 25%, rgba(0, 255, 255, 0.08), transparent 40%),
     radial-gradient(circle at 75% 75%, rgba(0, 200, 255, 0.06), transparent 40%);
   background-size: 480px 480px, 480px 480px, 100% 100%, 100% 100%;
@@ -66,9 +64,7 @@
   filter: blur(0.3px);
   opacity: 0.85;
   pointer-events: none;
-  animation: 
-    mazeDrift 40s linear infinite, 
-    neonPulse 4s ease-in-out infinite;
+  animation: mazeDrift 40s linear infinite, neonPulse 4s ease-in-out infinite;
   mix-blend-mode: screen;
 }
 
@@ -77,8 +73,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background-image: 
-    radial-gradient(2px 2px at 15% 25%, rgba(0, 255, 255, 0.6), transparent),
+  background-image: radial-gradient(2px 2px at 15% 25%, rgba(0, 255, 255, 0.6), transparent),
     radial-gradient(3px 3px at 45% 60%, rgba(0, 255, 255, 0.7), transparent),
     radial-gradient(2px 2px at 75% 35%, rgba(0, 200, 255, 0.5), transparent),
     radial-gradient(1px 1px at 85% 70%, rgba(0, 255, 255, 0.8), transparent),
@@ -87,9 +82,7 @@
     radial-gradient(1px 1px at 90% 45%, rgba(0, 200, 255, 0.7), transparent);
   background-size: 200% 200%;
   background-position: 0% 0%;
-  animation: 
-    floatParticles 15s ease-in-out infinite,
-    particlePulse 3s ease-in-out infinite;
+  animation: floatParticles 15s ease-in-out infinite, particlePulse 3s ease-in-out infinite;
   pointer-events: none;
   mix-blend-mode: screen;
 }
@@ -110,17 +103,11 @@
   align-items: center;
   gap: 40px;
   border-radius: 16px;
-  background: 
-    linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 10, 15, 0.95) 100%);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 10, 15, 0.95) 100%);
   border: 2px solid rgba(0, 255, 255, 0.3);
-  box-shadow: 
-    0 0 30px rgba(0, 255, 255, 0.3),
-    0 0 60px rgba(0, 200, 255, 0.15),
-    0 20px 60px rgba(0, 0, 0, 0.9),
-    inset 0 0 40px rgba(0, 255, 255, 0.03);
-  animation: 
-    panelIn 600ms cubic-bezier(0.16, 0.84, 0.44, 1),
-    cardNeonPulse 5s ease-in-out infinite;
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.3), 0 0 60px rgba(0, 200, 255, 0.15), 0 20px 60px
+    rgba(0, 0, 0, 0.9), inset 0 0 40px rgba(0, 255, 255, 0.03);
+  animation: panelIn 600ms cubic-bezier(0.16, 0.84, 0.44, 1), cardNeonPulse 5s ease-in-out infinite;
   backdrop-filter: blur(10px);
 }
 
@@ -132,9 +119,9 @@
   right: -2px;
   bottom: -2px;
   background: linear-gradient(
-    45deg, 
-    rgba(0, 255, 255, 0.6) 0%, 
-    rgba(0, 200, 255, 0.4) 50%, 
+    45deg,
+    rgba(0, 255, 255, 0.6) 0%,
+    rgba(0, 200, 255, 0.4) 50%,
     rgba(0, 255, 255, 0.6) 100%
   );
   border-radius: 16px;
@@ -149,12 +136,7 @@
   content: "";
   position: absolute;
   inset: -3px;
-  background: radial-gradient(
-    circle, 
-    rgba(0, 255, 255, 0.2), 
-    rgba(0, 200, 255, 0.1),
-    transparent
-  );
+  background: radial-gradient(circle, rgba(0, 255, 255, 0.2), rgba(0, 200, 255, 0.1), transparent);
   border-radius: 16px;
   z-index: -2;
   opacity: 0;
@@ -179,21 +161,13 @@
 }
 
 .titleGradient {
-  background: linear-gradient(
-    135deg, 
-    #00ffff 0%, 
-    #00d4ff 50%,
-    #00ffff 100%
-  );
+  background: linear-gradient(135deg, #00ffff 0%, #00d4ff 50%, #00ffff 100%);
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
   font-weight: 900;
-  filter: drop-shadow(0 0 12px rgba(0, 255, 255, 0.8))
-         drop-shadow(0 0 24px rgba(0, 200, 255, 0.5));
-  animation: 
-    titlePulse 3s ease-in-out infinite,
-    neonTextGlow 4s ease-in-out infinite;
+  filter: drop-shadow(0 0 12px rgba(0, 255, 255, 0.8)) drop-shadow(0 0 24px rgba(0, 200, 255, 0.5));
+  animation: titlePulse 3s ease-in-out infinite, neonTextGlow 4s ease-in-out infinite;
   background-size: 200% 200%;
 }
 
@@ -214,22 +188,13 @@
 }
 
 .ctaPrimary {
-  background: 
-    linear-gradient(135deg, 
-      rgba(0, 255, 255, 0.15) 0%, 
-      rgba(0, 200, 255, 0.15) 100%
-    ),
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.15) 0%, rgba(0, 200, 255, 0.15) 100%),
     linear-gradient(135deg, #000508 0%, #001214 100%);
   border: 3px solid #00ffff;
   color: #00ffff;
-  box-shadow: 
-    0 0 25px rgba(0, 255, 255, 0.7),
-    0 0 50px rgba(0, 255, 255, 0.4),
-    0 10px 35px rgba(0, 255, 255, 0.3),
-    inset 0 0 25px rgba(0, 255, 255, 0.08);
-  animation: 
-    neonButtonPulse 2.5s ease-in-out infinite,
-    buttonFloat 3s ease-in-out infinite;
+  box-shadow: 0 0 25px rgba(0, 255, 255, 0.7), 0 0 50px rgba(0, 255, 255, 0.4), 0 10px 35px
+    rgba(0, 255, 255, 0.3), inset 0 0 25px rgba(0, 255, 255, 0.08);
+  animation: neonButtonPulse 2.5s ease-in-out infinite, buttonFloat 3s ease-in-out infinite;
 }
 
 .ctaPrimary:before {
@@ -240,15 +205,15 @@
   width: 0;
   height: 0;
   border-radius: 50%;
-  background: 
-    radial-gradient(circle, 
-      rgba(0, 255, 255, 0.6) 0%, 
-      rgba(0, 200, 255, 0.3) 50%,
-      transparent 100%
-    );
+  background: radial-gradient(
+    circle,
+    rgba(0, 255, 255, 0.6) 0%,
+    rgba(0, 200, 255, 0.3) 50%,
+    transparent 100%
+  );
   transform: translate(-50%, -50%);
-  transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), 
-              height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.5s
+    cubic-bezier(0.34, 1.56, 0.64, 1);
   z-index: -1;
 }
 
@@ -256,12 +221,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(0, 255, 255, 0.5) 50%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg, transparent 0%, rgba(0, 255, 255, 0.5) 50%, transparent 100%);
   transform: translateX(-100%);
   animation: scanLine 3s linear infinite;
   z-index: -1;
@@ -276,51 +236,30 @@
   transform: translateY(-6px) scale(1.08);
   border-color: #00ffff;
   color: #ffffff;
-  background: 
-    linear-gradient(135deg, 
-      rgba(0, 255, 255, 0.25) 0%, 
-      rgba(0, 200, 255, 0.25) 100%
-    ),
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.25) 0%, rgba(0, 200, 255, 0.25) 100%),
     linear-gradient(135deg, #001214 0%, #002428 100%);
-  box-shadow: 
-    0 0 40px rgba(0, 255, 255, 1),
-    0 0 80px rgba(0, 255, 255, 0.7),
-    0 0 120px rgba(0, 200, 255, 0.5),
-    0 20px 50px rgba(0, 255, 255, 0.4),
-    inset 0 0 40px rgba(0, 255, 255, 0.2);
-  text-shadow: 
-    0 0 15px rgba(0, 255, 255, 1),
-    0 0 30px rgba(0, 255, 255, 0.9),
-    0 0 45px rgba(0, 200, 255, 0.7);
+  box-shadow: 0 0 40px rgba(0, 255, 255, 1), 0 0 80px rgba(0, 255, 255, 0.7), 0 0 120px
+    rgba(0, 200, 255, 0.5), 0 20px 50px rgba(0, 255, 255, 0.4), inset 0 0 40px
+    rgba(0, 255, 255, 0.2);
+  text-shadow: 0 0 15px rgba(0, 255, 255, 1), 0 0 30px rgba(0, 255, 255, 0.9), 0 0 45px
+    rgba(0, 200, 255, 0.7);
   animation: none;
 }
 
 .ctaPrimary:active {
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 
-    0 0 20px rgba(0, 255, 255, 0.8),
-    0 0 40px rgba(0, 255, 255, 0.5),
-    0 8px 25px rgba(0, 255, 255, 0.3),
-    inset 0 0 25px rgba(0, 255, 255, 0.25);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.8), 0 0 40px rgba(0, 255, 255, 0.5), 0 8px 25px
+    rgba(0, 255, 255, 0.3), inset 0 0 25px rgba(0, 255, 255, 0.25);
 }
 
 .ctaSecondary {
-  background: 
-    linear-gradient(135deg, 
-      rgba(0, 200, 255, 0.12) 0%, 
-      rgba(0, 150, 200, 0.12) 100%
-    ),
+  background: linear-gradient(135deg, rgba(0, 200, 255, 0.12) 0%, rgba(0, 150, 200, 0.12) 100%),
     linear-gradient(135deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 10, 15, 0.85) 100%);
   border: 3px solid rgba(0, 200, 255, 0.85);
   color: #00c8ff;
-  box-shadow: 
-    0 0 20px rgba(0, 200, 255, 0.6),
-    0 0 40px rgba(0, 200, 255, 0.35),
-    0 6px 20px rgba(0, 200, 255, 0.25),
-    inset 0 0 20px rgba(0, 200, 255, 0.08);
-  animation: 
-    neonButtonPulse 3s ease-in-out infinite,
-    buttonFloat 3.5s ease-in-out infinite;
+  box-shadow: 0 0 20px rgba(0, 200, 255, 0.6), 0 0 40px rgba(0, 200, 255, 0.35), 0 6px 20px
+    rgba(0, 200, 255, 0.25), inset 0 0 20px rgba(0, 200, 255, 0.08);
+  animation: neonButtonPulse 3s ease-in-out infinite, buttonFloat 3.5s ease-in-out infinite;
 }
 
 .ctaSecondary:before {
@@ -331,15 +270,15 @@
   width: 0;
   height: 0;
   border-radius: 50%;
-  background: 
-    radial-gradient(circle, 
-      rgba(0, 200, 255, 0.5) 0%, 
-      rgba(0, 150, 200, 0.3) 50%,
-      transparent 100%
-    );
+  background: radial-gradient(
+    circle,
+    rgba(0, 200, 255, 0.5) 0%,
+    rgba(0, 150, 200, 0.3) 50%,
+    transparent 100%
+  );
   transform: translate(-50%, -50%);
-  transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), 
-              height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.5s
+    cubic-bezier(0.34, 1.56, 0.64, 1);
   z-index: -1;
 }
 
@@ -352,32 +291,20 @@
   border-color: #00ffff;
   color: #ffffff;
   transform: translateY(-6px) scale(1.08);
-  background: 
-    linear-gradient(135deg, 
-      rgba(0, 255, 255, 0.2) 0%, 
-      rgba(0, 200, 255, 0.2) 100%
-    ),
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(0, 200, 255, 0.2) 100%),
     linear-gradient(135deg, rgba(0, 10, 15, 0.9) 0%, rgba(0, 20, 30, 0.9) 100%);
-  box-shadow: 
-    0 0 35px rgba(0, 255, 255, 0.9),
-    0 0 70px rgba(0, 255, 255, 0.7),
-    0 0 100px rgba(0, 200, 255, 0.5),
-    0 16px 40px rgba(0, 255, 255, 0.4),
-    inset 0 0 35px rgba(0, 255, 255, 0.2);
-  text-shadow: 
-    0 0 12px rgba(0, 255, 255, 1),
-    0 0 25px rgba(0, 255, 255, 0.9),
-    0 0 40px rgba(0, 200, 255, 0.7);
+  box-shadow: 0 0 35px rgba(0, 255, 255, 0.9), 0 0 70px rgba(0, 255, 255, 0.7), 0 0 100px
+    rgba(0, 200, 255, 0.5), 0 16px 40px rgba(0, 255, 255, 0.4), inset 0 0 35px
+    rgba(0, 255, 255, 0.2);
+  text-shadow: 0 0 12px rgba(0, 255, 255, 1), 0 0 25px rgba(0, 255, 255, 0.9), 0 0 40px
+    rgba(0, 200, 255, 0.7);
   animation: none;
 }
 
 .ctaSecondary:active {
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 
-    0 0 15px rgba(0, 200, 255, 0.7),
-    0 0 30px rgba(0, 200, 255, 0.5),
-    0 4px 15px rgba(0, 200, 255, 0.3),
-    inset 0 0 20px rgba(0, 200, 255, 0.2);
+  box-shadow: 0 0 15px rgba(0, 200, 255, 0.7), 0 0 30px rgba(0, 200, 255, 0.5), 0 4px 15px
+    rgba(0, 200, 255, 0.3), inset 0 0 20px rgba(0, 200, 255, 0.2);
 }
 
 @keyframes panelIn {
@@ -404,7 +331,8 @@
 }
 
 @keyframes neonPulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.85;
   }
   50% {
@@ -413,7 +341,8 @@
 }
 
 @keyframes floatParticles {
-  0%, 100% {
+  0%,
+  100% {
     background-position: 0% 0%;
   }
   25% {
@@ -428,7 +357,8 @@
 }
 
 @keyframes particlePulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -437,19 +367,14 @@
 }
 
 @keyframes cardNeonPulse {
-  0%, 100% {
-    box-shadow: 
-      0 0 30px rgba(0, 255, 255, 0.3),
-      0 0 60px rgba(0, 200, 255, 0.15),
-      0 20px 60px rgba(0, 0, 0, 0.9),
-      inset 0 0 40px rgba(0, 255, 255, 0.03);
+  0%,
+  100% {
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.3), 0 0 60px rgba(0, 200, 255, 0.15), 0 20px 60px
+      rgba(0, 0, 0, 0.9), inset 0 0 40px rgba(0, 255, 255, 0.03);
   }
   50% {
-    box-shadow: 
-      0 0 40px rgba(0, 255, 255, 0.5),
-      0 0 80px rgba(0, 200, 255, 0.25),
-      0 20px 60px rgba(0, 0, 0, 0.9),
-      inset 0 0 50px rgba(0, 255, 255, 0.05);
+    box-shadow: 0 0 40px rgba(0, 255, 255, 0.5), 0 0 80px rgba(0, 200, 255, 0.25), 0 20px 60px
+      rgba(0, 0, 0, 0.9), inset 0 0 50px rgba(0, 255, 255, 0.05);
   }
 }
 
@@ -463,7 +388,8 @@
 }
 
 @keyframes titlePulse {
-  0%, 100% {
+  0%,
+  100% {
     background-position: 0% 50%;
     transform: scale(1);
   }
@@ -474,32 +400,25 @@
 }
 
 @keyframes neonTextGlow {
-  0%, 100% {
-    filter: 
-      drop-shadow(0 0 12px rgba(0, 255, 255, 0.8))
+  0%,
+  100% {
+    filter: drop-shadow(0 0 12px rgba(0, 255, 255, 0.8))
       drop-shadow(0 0 24px rgba(0, 200, 255, 0.5));
   }
   50% {
-    filter: 
-      drop-shadow(0 0 18px rgba(0, 255, 255, 1))
-      drop-shadow(0 0 36px rgba(0, 200, 255, 0.7));
+    filter: drop-shadow(0 0 18px rgba(0, 255, 255, 1)) drop-shadow(0 0 36px rgba(0, 200, 255, 0.7));
   }
 }
 
 @keyframes neonButtonPulse {
-  0%, 100% {
-    box-shadow: 
-      0 0 20px rgba(0, 255, 255, 0.6),
-      0 0 40px rgba(0, 255, 255, 0.3),
-      0 8px 28px rgba(0, 255, 255, 0.2),
-      inset 0 0 20px rgba(0, 255, 255, 0.05);
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.6), 0 0 40px rgba(0, 255, 255, 0.3), 0 8px 28px
+      rgba(0, 255, 255, 0.2), inset 0 0 20px rgba(0, 255, 255, 0.05);
   }
   50% {
-    box-shadow: 
-      0 0 30px rgba(0, 255, 255, 0.8),
-      0 0 60px rgba(0, 255, 255, 0.5),
-      0 8px 28px rgba(0, 255, 255, 0.3),
-      inset 0 0 30px rgba(0, 255, 255, 0.1);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.8), 0 0 60px rgba(0, 255, 255, 0.5), 0 8px 28px
+      rgba(0, 255, 255, 0.3), inset 0 0 30px rgba(0, 255, 255, 0.1);
   }
 }
 
@@ -513,7 +432,8 @@
 }
 
 @keyframes buttonFloat {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px);
   }
   50% {
@@ -540,11 +460,10 @@
   .ctaSecondary {
     animation: none !important;
   }
-  
+
   .ctaPrimary:hover:before,
   .ctaSecondary:hover:before {
     width: 0;
     height: 0;
   }
 }
-

@@ -10,14 +10,7 @@
     "type": "git",
     "url": "https://github.com/arsw-la-ley-del-corazon/Maze-Rush-Frontend"
   },
-  "keywords": [
-    "maze",
-    "game",
-    "react",
-    "typescript",
-    "websocket",
-    "multiplayer"
-  ],
+  "keywords": ["maze", "game", "react", "typescript", "websocket", "multiplayer"],
   "engines": {
     "node": ">=20.0.0",
     "npm": ">=10.0.0"
@@ -91,15 +84,7 @@
     "vitest": "^4.0.15"
   },
   "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "production": [">0.2%", "not dead", "not op_mini all"],
+    "development": ["last 1 chrome version", "last 1 firefox version", "last 1 safari version"]
   }
 }

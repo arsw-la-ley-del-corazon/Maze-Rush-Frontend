@@ -1,10 +1,10 @@
-import { Box, Button, Typography, Stack, Divider } from "@mui/material"
-import { Link as RouterLink } from "react-router-dom"
-import EmojiEventsIcon from "@mui/icons-material/EmojiEvents"
 import BoltIcon from "@mui/icons-material/Bolt"
-import TrackChangesIcon from "@mui/icons-material/TrackChanges"
-import PlayArrowIcon from "@mui/icons-material/PlayArrow"
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents"
 import PersonAddIcon from "@mui/icons-material/PersonAdd"
+import PlayArrowIcon from "@mui/icons-material/PlayArrow"
+import TrackChangesIcon from "@mui/icons-material/TrackChanges"
+import { Box, Button, Divider, Stack, Typography } from "@mui/material"
+import { Link as RouterLink } from "react-router-dom"
 import styles from "./HomePage.module.css"
 
 export default function HomePage() {
@@ -31,12 +31,12 @@ export default function HomePage() {
             <Typography
               variant="subtitle1"
               align="center"
-              sx={{ 
-                color: '#00ffff', 
-                maxWidth: 560, 
-                fontWeight: 500, 
-                fontSize: '1.1rem',
-                textShadow: '0 0 8px rgba(0, 255, 255, 0.6)'
+              sx={{
+                color: "#00ffff",
+                maxWidth: 560,
+                fontWeight: 500,
+                fontSize: "1.1rem",
+                textShadow: "0 0 8px rgba(0, 255, 255, 0.6)",
               }}
             >
               Corre contra el tiempo. Resuelve el laberinto. Vence a tus rivales.
@@ -104,29 +104,38 @@ function MazeLogo() {
 function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <Box sx={{ textAlign: "center", minWidth: 80 }}>
-      <Box sx={{ 
-        mb: 1,
-        display: 'flex',
-        justifyContent: 'center',
-        '& svg': { 
-          fontSize: '2rem',
-          color: '#00ffff',
-          filter: 'drop-shadow(0 0 8px rgba(0, 255, 255, 0.7))'
-        }
-      }}>
+      <Box
+        sx={{
+          mb: 1,
+          display: "flex",
+          justifyContent: "center",
+          "& svg": {
+            fontSize: "2rem",
+            color: "#00ffff",
+            filter: "drop-shadow(0 0 8px rgba(0, 255, 255, 0.7))",
+          },
+        }}
+      >
         {icon}
       </Box>
-      <Typography variant="h5" fontWeight="bold" sx={{ 
-        color: '#00ffff',
-        textShadow: '0 0 8px rgba(0, 255, 255, 0.6)'
-      }}>
+      <Typography
+        variant="h5"
+        fontWeight="bold"
+        sx={{
+          color: "#00ffff",
+          textShadow: "0 0 8px rgba(0, 255, 255, 0.6)",
+        }}
+      >
         {value}
       </Typography>
-      <Typography variant="caption" sx={{ 
-        color: '#00c8ff', 
-        fontWeight: 600,
-        textShadow: '0 0 5px rgba(0, 200, 255, 0.4)'
-      }}>
+      <Typography
+        variant="caption"
+        sx={{
+          color: "#00c8ff",
+          fontWeight: 600,
+          textShadow: "0 0 5px rgba(0, 200, 255, 0.4)",
+        }}
+      >
         {label}
       </Typography>
     </Box>

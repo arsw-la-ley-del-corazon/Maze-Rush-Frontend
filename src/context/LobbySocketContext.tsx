@@ -1,9 +1,10 @@
-import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from "react"
 import { Client } from "@stomp/stompjs"
+import type React from "react"
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react"
 import SockJS from "sockjs-client"
-import { useAuth } from "./useAuth"
 import { SOCKET_CONFIG } from "../common/globas"
 import type { ChatMessage } from "../types/api"
+import { useAuth } from "./useAuth"
 
 // Tipo para mensajes STOMP
 interface StompMessage {
@@ -58,7 +59,9 @@ export const LobbySocketProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const readySubscriptionRef = useRef<{ unsubscribe: () => void } | null>(null)
   const gameSubscriptionRef = useRef<{ unsubscribe: () => void } | null>(null)
   const playersSubscriptionRef = useRef<{ unsubscribe: () => void } | null>(null)
-  const onDisconnectCallbackRef = useRef<((lobbyCode: string) => Promise<void>) | undefined>(undefined)
+  const onDisconnectCallbackRef = useRef<((lobbyCode: string) => Promise<void>) | undefined>(
+    undefined
+  )
   const reconnectTimeoutRef = useRef<number | null>(null)
   const reconnectAttemptsRef = useRef(0)
 
@@ -131,15 +134,15 @@ export const LobbySocketProvider: React.FC<{ children: React.ReactNode }> = ({ c
               (message: StompMessage) => {
                 try {
                   const chatMessage: ChatMessage = JSON.parse(message.body)
-                  
+
                   // Crear ID único para el mensaje basado en username, message y timestamp
                   const messageId = `${chatMessage.username}-${chatMessage.message}-${chatMessage.timestamp || Date.now()}`
-                  
+
                   // Prevenir duplicación
                   if (!processedMessageIdsRef.current.has(messageId)) {
                     processedMessageIdsRef.current.add(messageId)
                     setMessages((prev) => [...prev, chatMessage])
-                    
+
                     // Limpiar IDs antiguos (mantener solo los últimos 100)
                     if (processedMessageIdsRef.current.size > 100) {
                       const idsArray = Array.from(processedMessageIdsRef.current)
@@ -161,7 +164,7 @@ export const LobbySocketProvider: React.FC<{ children: React.ReactNode }> = ({ c
                 try {
                   const data = JSON.parse(message.body)
                   console.log("Evento de ready recibido:", data)
-                  
+
                   // El backend envía { username: string, isReady: boolean }
                   if (data.username) {
                     setReadyPlayers((prev) => {
@@ -172,7 +175,7 @@ export const LobbySocketProvider: React.FC<{ children: React.ReactNode }> = ({ c
                       } else {
                         newSet.delete(data.username)
                       }
-                      console.log(`${data.username} está ${data.isReady ? 'listo' : 'no listo'}`)
+                      console.log(`${data.username} está ${data.isReady ? "listo" : "no listo"}`)
                       return newSet
                     })
                   }
@@ -191,20 +194,20 @@ export const LobbySocketProvider: React.FC<{ children: React.ReactNode }> = ({ c
                 try {
                   const data = JSON.parse(message.body)
                   console.log("Game event recibido:", data)
-                  
+
                   if (data.action === "game_started") {
                     if (data.maze) {
                       // Guardar el laberinto en sessionStorage para usarlo en GamePage
                       sessionStorage.setItem(`maze_${data.lobbyCode}`, JSON.stringify(data.maze))
                       console.log("Laberinto compartido guardado para lobby:", data.lobbyCode)
                     }
-                    
+
                     // Notificar al componente del lobby que el juego ha comenzado
                     // El componente manejará la navegación usando React Router
                     console.log("Juego iniciado, notificando al componente...")
                     setGameStarted({
                       lobbyCode: data.lobbyCode,
-                      mazeData: data.maze
+                      mazeData: data.maze,
                     })
                   }
                 } catch (err) {
@@ -222,19 +225,20 @@ export const LobbySocketProvider: React.FC<{ children: React.ReactNode }> = ({ c
                 try {
                   const data = JSON.parse(message.body)
                   console.log("Evento de jugadores recibido:", data)
-                  
+
                   if (data.players && Array.isArray(data.players)) {
                     setPlayers(data.players)
-                    
+
                     // Agregar mensaje de sistema solo si hay acción específica
                     if (data.username && data.action && data.username !== "system") {
                       const systemMsg: SystemMessage = {
                         username: "Sistema",
-                        message: data.action === "joined" 
-                          ? `${data.username} se unió al lobby`
-                          : data.action === "left"
-                          ? `${data.username} salió del lobby`
-                          : `Lista de jugadores actualizada`,
+                        message:
+                          data.action === "joined"
+                            ? `${data.username} se unió al lobby`
+                            : data.action === "left"
+                              ? `${data.username} salió del lobby`
+                              : `Lista de jugadores actualizada`,
                         isSystem: true,
                         type: data.action === "joined" ? "player_joined" : "player_left",
                         timestamp: new Date().toISOString(),
@@ -251,7 +255,7 @@ export const LobbySocketProvider: React.FC<{ children: React.ReactNode }> = ({ c
         },
         onDisconnect: () => {
           setIsConnected(false)
-          
+
           // Agregar mensaje de sistema sobre desconexión
           if (currentLobbyCodeRef.current) {
             const systemMsg: SystemMessage = {
@@ -443,4 +447,3 @@ export function useLobbySocket() {
   }
   return context
 }
-

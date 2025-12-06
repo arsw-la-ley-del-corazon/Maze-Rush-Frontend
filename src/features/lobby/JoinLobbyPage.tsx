@@ -1,15 +1,8 @@
+import { Alert, Button, CircularProgress, Paper, Stack, TextField } from "@mui/material"
 import { useState } from "react"
-import {
-  Paper,
-  Stack,
-  TextField,
-  Button,
-  Alert,
-  CircularProgress,
-} from "@mui/material"
 import { useNavigate } from "react-router-dom"
-import { joinLobby } from "./services/lobbyService"
 import styles from "./JoinLobbyPage.module.css"
+import { joinLobby } from "./services/lobbyService"
 
 export default function JoinLobbyPage() {
   const navigate = useNavigate()
@@ -41,7 +34,7 @@ export default function JoinLobbyPage() {
     <div className={styles.container}>
       {/* Patrón de laberinto animado */}
       <div className={styles.mazePattern} />
-      
+
       {/* Partículas decorativas */}
       <div className={styles.particles}>
         <div className={styles.particle} />
@@ -53,9 +46,7 @@ export default function JoinLobbyPage() {
 
       <div className={styles.content}>
         <h1 className={styles.title}>Unirse al Juego</h1>
-        <p className={styles.subtitle}>
-          Ingresa el código que te compartió el anfitrión
-        </p>
+        <p className={styles.subtitle}>Ingresa el código que te compartió el anfitrión</p>
 
         <Paper className={styles.paper}>
           <form onSubmit={handleSubmit}>
@@ -66,8 +57,8 @@ export default function JoinLobbyPage() {
                 <div className={styles.instructionText}>
                   <div className={styles.instructionTitle}>¿Cómo funciona?</div>
                   <div className={styles.instructionSubtitle}>
-                    El anfitrión te compartirá un código único de 6 caracteres. 
-                    Ingrésalo aquí para unirte a la partida.
+                    El anfitrión te compartirá un código único de 6 caracteres. Ingrésalo aquí para
+                    unirte a la partida.
                   </div>
                 </div>
               </div>
@@ -83,48 +74,53 @@ export default function JoinLobbyPage() {
                 <TextField
                   value={code}
                   onChange={(e) => {
-                    setCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6))
+                    setCode(
+                      e.target.value
+                        .toUpperCase()
+                        .replace(/[^A-Z0-9]/g, "")
+                        .slice(0, 6)
+                    )
                     setError(null)
                   }}
                   placeholder="------"
                   fullWidth
                   required
                   variant="outlined"
-                  inputProps={{ 
+                  inputProps={{
                     maxLength: 6,
-                    "aria-label": "Código del Lobby"
+                    "aria-label": "Código del Lobby",
                   }}
                   sx={{
-                    '& .MuiOutlinedInput-root': {
-                      fontSize: '1.75rem',
+                    "& .MuiOutlinedInput-root": {
+                      fontSize: "1.75rem",
                       fontWeight: 700,
-                      letterSpacing: '0.5rem',
-                      textAlign: 'center',
+                      letterSpacing: "0.5rem",
+                      textAlign: "center",
                       fontFamily: "'Courier New', monospace",
-                      background: 'rgba(10, 14, 39, 0.5)',
-                      borderRadius: '16px',
-                      color: '#4cffb3',
-                      '& fieldset': {
-                        borderColor: 'rgba(76, 255, 179, 0.3)',
-                        borderWidth: '2px',
+                      background: "rgba(10, 14, 39, 0.5)",
+                      borderRadius: "16px",
+                      color: "#4cffb3",
+                      "& fieldset": {
+                        borderColor: "rgba(76, 255, 179, 0.3)",
+                        borderWidth: "2px",
                       },
-                      '&:hover fieldset': {
-                        borderColor: 'rgba(76, 255, 179, 0.5)',
+                      "&:hover fieldset": {
+                        borderColor: "rgba(76, 255, 179, 0.5)",
                       },
-                      '&.Mui-focused fieldset': {
-                        borderColor: 'rgba(76, 255, 179, 0.6)',
-                        boxShadow: '0 0 30px rgba(76, 255, 179, 0.2)',
+                      "&.Mui-focused fieldset": {
+                        borderColor: "rgba(76, 255, 179, 0.6)",
+                        boxShadow: "0 0 30px rgba(76, 255, 179, 0.2)",
                       },
-                      '& input': {
-                        textAlign: 'center',
-                        textTransform: 'uppercase',
-                        padding: '1rem',
+                      "& input": {
+                        textAlign: "center",
+                        textTransform: "uppercase",
+                        padding: "1rem",
                       },
-                      '& input::placeholder': {
-                        color: 'rgba(76, 255, 179, 0.3)',
+                      "& input::placeholder": {
+                        color: "rgba(76, 255, 179, 0.3)",
                         opacity: 1,
-                      }
-                    }
+                      },
+                    },
                   }}
                 />
                 <div className={styles.characterCounter}>
@@ -149,9 +145,9 @@ export default function JoinLobbyPage() {
                 >
                   Cancelar
                 </Button>
-                <Button 
-                  type="submit" 
-                  variant="contained" 
+                <Button
+                  type="submit"
+                  variant="contained"
                   disabled={loading || code.length !== 6}
                   className={styles.joinButton}
                 >
@@ -169,4 +165,3 @@ export default function JoinLobbyPage() {
     </div>
   )
 }
-

@@ -1,6 +1,6 @@
-// src/components/Loader.test.tsx
-import { describe, it, expect } from "vitest"
 import { render } from "@testing-library/react"
+// src/components/Loader.test.tsx
+import { describe, expect, it } from "vitest"
 import Loader from "./Loader"
 
 describe("Loader component", () => {
