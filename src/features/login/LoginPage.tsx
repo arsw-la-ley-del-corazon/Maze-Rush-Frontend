@@ -27,6 +27,8 @@ declare global {
             callback: (response: { credential: string }) => void
             auto_select?: boolean
             cancel_on_tap_outside?: boolean
+            itp_support?: boolean
+            ux_mode?: "popup" | "redirect"
           }) => void
           renderButton: (
             element: HTMLElement,
@@ -39,7 +41,15 @@ declare global {
               width?: string
             }
           ) => void
-          prompt: () => void
+          prompt: (callback?: (notification: {
+            isNotDisplayed: () => boolean
+            isSkippedMoment: () => boolean
+            isDismissedMoment: () => boolean
+            getNotDisplayedReason: () => string
+            getSkippedReason: () => string
+            getDismissedReason: () => string
+          }) => void) => void
+          cancel: () => void
         }
       }
     }
@@ -49,7 +59,9 @@ declare global {
 export default function LoginPage() {
   const [error, setError] = useState("")
   const [googleLoaded, setGoogleLoaded] = useState(false)
+  const [isInitialized, setIsInitialized] = useState(false)
   const googleButtonRef = useRef<HTMLDivElement>(null)
+  const initAttempts = useRef(0)
   const navigate = useNavigate()
   const { loginWithGoogle, loading } = useAuth()
 
@@ -95,7 +107,17 @@ export default function LoginPage() {
       return
     }
 
-    const googleClientId = GOOGLE_CONFIG.CLIENT_ID
+    const initializeGoogle = () => {
+      if (!window.google?.accounts?.id) {
+        // Reintentar si aún no está disponible
+        if (initAttempts.current < 10) {
+          initAttempts.current++
+          setTimeout(initializeGoogle, 300)
+        } else {
+          setError("No se pudo inicializar Google. Por favor, recarga la página.")
+        }
+        return
+      }
 
     if (!googleClientId) {
       console.error("[LoginPage] VITE_GOOGLE_CLIENT_ID no está configurado")
@@ -123,9 +145,11 @@ export default function LoginPage() {
         width: "400",
       })
     }
-  }, [googleLoaded])
 
-  const handleGoogleResponse = async (response: { credential: string }) => {
+    initializeGoogle()
+  }, [googleLoaded, isInitialized, handleGoogleResponse])
+
+  const handleGoogleSignIn = useCallback(() => {
     setError("")
 
     try {
@@ -141,7 +165,6 @@ export default function LoginPage() {
         "No se pudo conectar con el servidor. Verifica que el backend esté corriendo en http://localhost:8080",
       )
     }
-  }
 
   const handleGoogleSignIn = () => {
     setError("")
@@ -171,7 +194,20 @@ export default function LoginPage() {
         setError("No se pudo iniciar el flujo de Google")
       }
     }
-  }
+
+    // Si no hay botón renderizado, usar prompt() como fallback
+    window.google.accounts.id.prompt((notification) => {
+      if (notification.isNotDisplayed()) {
+        const reason = notification.getNotDisplayedReason()
+        console.log("Prompt no mostrado:", reason)
+        setError("No se pudo mostrar el diálogo de Google. Intenta recargar la página.")
+      } else if (notification.isSkippedMoment()) {
+        console.log("Prompt saltado:", notification.getSkippedReason())
+      } else if (notification.isDismissedMoment()) {
+        console.log("Prompt cerrado:", notification.getDismissedReason())
+      }
+    })
+  }, [isInitialized])
 
   return (
     <Box className={styles.root}>
@@ -359,16 +395,15 @@ export default function LoginPage() {
         )}
       </Paper>
 
-      {/* Div oculto con el botón real de Google */}
+      {/* Contenedor del botón real de Google (oculto, usado como fallback) */}
       <Box
         ref={googleButtonRef}
         sx={{
           position: "absolute",
+          left: "-9999px",
+          top: "-9999px",
           opacity: 0,
           pointerEvents: "none",
-          width: 0,
-          height: 0,
-          overflow: "hidden",
         }}
       />
     </Box>
