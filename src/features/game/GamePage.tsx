@@ -1,3 +1,4 @@
+// src/features/game/GamePage.tsx
 import { useEffect, useState, useCallback, useRef } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import {
@@ -24,6 +25,16 @@ import {
 } from "./services/mazeService"
 import styles from "./GamePage.module.css"
 
+// === Tipos locales para poderes (solo front) ===
+type PowerUpType = "CLEAR_FOG" | "FREEZE" | "CONFUSION"
+
+interface PowerUpInstance {
+  id: string
+  x: number
+  y: number
+  type: PowerUpType
+}
+
 export default function GamePage() {
   const { code } = useParams<{ code: string }>()
   const navigate = useNavigate()
@@ -33,6 +44,7 @@ export default function GamePage() {
   const [playerPosition, setPlayerPosition] = useState({ x: 0, y: 0 })
   const [endPosition, setEndPosition] = useState({ x: 19, y: 19 })
 
+  // ⏱ tiempo de partida
   const [timer, setTimer] = useState(0)
   const [isTimerRunning, setIsTimerRunning] = useState(false)
 
@@ -47,11 +59,28 @@ export default function GamePage() {
 
   const gameStartedRef = useRef(false)
   const lastMoveTimeRef = useRef(0)
-  const gameFinishedRef = useRef(false) // <- NUEVO: para no cerrar el juego 2 veces
+  const gameFinishedRef = useRef(false)
+  const timerRef = useRef(0)
+
+  // 🎮 estados de poderes (efectos en este jugador)
+  const [hasClearFog, setHasClearFog] = useState(false)
+  const [isFrozen, setIsFrozen] = useState(false)
+  const [isConfused, setIsConfused] = useState(false)
+
+  // ⚡ poderes colocados en el laberinto
+  const [powerUps, setPowerUps] = useState<PowerUpInstance[]>([])
 
   // ---------- helpers ----------
+
   const generatePlayerColor = (username: string) => {
-    const colors = ["#F7FF3C", "#22D3EE", "#A855F7", "#FB7185", "#98D8C8", "#F7DC6F"]
+    const colors = [
+      "#22D3EE", // cyan
+      "#A855F7", // violeta
+      "#FB7185", // rosado
+      "#F97316", // naranja
+      "#4ADE80", // verde
+      "#38BDF8", // azul claro
+    ]
     let hash = 0
     for (let i = 0; i < username.length; i++) {
       hash = username.charCodeAt(i) + ((hash << 5) - hash)
@@ -60,30 +89,139 @@ export default function GamePage() {
   }
 
   /**
-   * Cierra la partida en ESTA PANTALLA.
-   * Se asegura de ejecutarse solo una vez usando gameFinishedRef.
+   * Cerrar la partida en esta pantalla (se ejecuta una sola vez).
    */
   const endGame = useCallback(
-    (winnerName: string | null, finalTime: number) => {
-      if (gameFinishedRef.current) {
-        // Ya se había cerrado esta partida
-        return
-      }
+    (winnerName: string | null, finalTime?: number) => {
+      if (gameFinishedRef.current) return
       gameFinishedRef.current = true
-      console.log("[GamePage] endGame => winner:", winnerName, "time:", finalTime)
+
+      const timeToUse =
+        typeof finalTime === "number" && finalTime > 0
+          ? finalTime
+          : timerRef.current
 
       setIsTimerRunning(false)
       setGameOver(true)
       setWinner(winnerName)
-      setWinnerTime(finalTime)
+      setWinnerTime(timeToUse)
     },
     [],
   )
 
+  /**
+   * Genera posiciones aleatorias para los poderes dentro del laberinto:
+   * - 1 CLEAR_FOG
+   * - 1 FREEZE
+   * - 2 o 3 CONFUSION
+   */
+  const generateRandomPowerUpsForMaze = useCallback(
+    (
+      mazeCells: MazeCell[][],
+      startX: number,
+      startY: number,
+      goalX: number,
+      goalY: number,
+    ): PowerUpInstance[] => {
+      const height = mazeCells.length
+      const width = mazeCells[0].length
+
+      type Coord = { x: number; y: number }
+      const validCells: Coord[] = []
+
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const cell = mazeCells[y][x]
+          const isWall = cell.top && cell.right && cell.bottom && cell.left
+
+          // Solo caminos, no muros, no start, no meta
+          if (
+            !isWall &&
+            !(x === startX && y === startY) &&
+            !(x === goalX && y === goalY)
+          ) {
+            validCells.push({ x, y })
+          }
+        }
+      }
+
+      if (validCells.length === 0) return []
+
+      // Mezclar celdas
+      validCells.sort(() => Math.random() - 0.5)
+
+      const confusionCount = 2 + Math.floor(Math.random() * 2) // 2 o 3
+      const totalNeeded = 1 + 1 + confusionCount // CLEAR_FOG + FREEZE + CONFUSION
+
+      const total = Math.min(totalNeeded, validCells.length)
+      const result: PowerUpInstance[] = []
+
+      let idx = 0
+
+      if (idx < total) {
+        const { x, y } = validCells[idx++]
+        result.push({
+          id: `fog-${Date.now()}-${idx}`,
+          x,
+          y,
+          type: "CLEAR_FOG",
+        })
+      }
+
+      if (idx < total) {
+        const { x, y } = validCells[idx++]
+        result.push({
+          id: `freeze-${Date.now()}-${idx}`,
+          x,
+          y,
+          type: "FREEZE",
+        })
+      }
+
+      for (let c = 0; c < confusionCount && idx < total; c++) {
+        const { x, y } = validCells[idx++]
+        result.push({
+          id: `conf-${Date.now()}-${idx}-${c}`,
+          x,
+          y,
+          type: "CONFUSION",
+        })
+      }
+
+      return result
+    },
+    [],
+  )
+
+  /**
+   * Aplica el efecto del poder recogido.
+   */
+  const applyPowerUpEffect = useCallback((pu: PowerUpInstance) => {
+    if (pu.type === "CLEAR_FOG") {
+      setHasClearFog(true)
+      setTimeout(() => setHasClearFog(false), 10_000) // 10s
+      return
+    }
+
+    if (pu.type === "FREEZE") {
+      setIsFrozen(true)
+      setTimeout(() => setIsFrozen(false), 5_000) // 5s
+      return
+    }
+
+    if (pu.type === "CONFUSION") {
+      setIsConfused(true)
+      setTimeout(() => setIsConfused(false), 5_000) // 5s
+    }
+  }, [])
+
   // ---------- WebSocket / estado multiplayer ----------
+
   const { isConnected, sendMove, sendFinish, disconnect: disconnectGame } = useGameSocket({
     lobbyCode: code || "",
     onPlayerMove: (username, position) => {
+      if (username === user?.username) return
+
       setOtherPlayers((prev) => {
         const existing = prev.find((p) => p.username === username)
         if (existing) {
@@ -100,20 +238,18 @@ export default function GamePage() {
         ]
       })
     },
-    onPlayerFinish: (username, finishTime) => {
-      console.log("[GamePage] onPlayerFinish (socket):", username, finishTime)
-
-      // Marcar al jugador como terminado en la lista local
+    onPlayerFinish: (username, finishTimeFromServer) => {
       setOtherPlayers((prev) =>
         prev.map((p) =>
-          p.username === username ? { ...p, isFinished: true, finishTime } : p,
+          p.username === username ? { ...p, isFinished: true, finishTime: finishTimeFromServer } : p,
         ),
       )
 
-      // Cerrar partida para TODOS (incluido el ganador)
-      endGame(username, finishTime)
+      endGame(username, finishTimeFromServer)
     },
     onPlayerJoined: (username) => {
+      if (username === user?.username) return
+
       setOtherPlayers((prev) => {
         if (prev.find((p) => p.username === username)) return prev
         return [
@@ -131,9 +267,6 @@ export default function GamePage() {
       setOtherPlayers((prev) => prev.filter((p) => p.username !== username))
     },
     onGameSync: (players) => {
-      console.log("[GamePage] onGameSync:", players)
-
-      // Actualizar jugadores remotos
       setOtherPlayers(
         players
           .filter((p) => p.username !== user?.username)
@@ -143,33 +276,39 @@ export default function GamePage() {
           })),
       )
 
-      // Buscar si ya hay un jugador terminado
       const finishedPlayer = players.find(
         (p) =>
           p.isFinished ||
           (typeof p.finishTime === "number" && p.finishTime > 0),
       )
 
-      if (finishedPlayer && typeof finishedPlayer.finishTime === "number") {
-        // Cerrar partida usando la información del sync
+      if (finishedPlayer) {
         endGame(finishedPlayer.username, finishedPlayer.finishTime)
       }
     },
   })
 
   // ---------- carga de laberinto ----------
+
   const initializeMaze = useCallback(async () => {
     setIsLoading(true)
     setMazeError(null)
 
-    // Reset de estado de partida
+    // Reset estado de partida
     setGameOver(false)
     setWinner(null)
     setWinnerTime(null)
     setTimer(0)
+    timerRef.current = 0
     setIsTimerRunning(false)
     gameStartedRef.current = false
     gameFinishedRef.current = false
+
+    // Reset efectos y poderes
+    setHasClearFog(false)
+    setIsFrozen(false)
+    setIsConfused(false)
+    setPowerUps([])
 
     const sharedMazeKey = `maze_${code}`
     const sharedMazeData = sessionStorage.getItem(sharedMazeKey)
@@ -221,11 +360,23 @@ export default function GamePage() {
     setPlayerPosition({ x: startX, y: startY })
     setEndPosition({ x: goalX, y: goalY })
 
+    // Generar poderes aleatorios para esta partida
+    const generatedPowerUps = generateRandomPowerUpsForMaze(
+      mazeCells,
+      startX,
+      startY,
+      goalX,
+      goalY,
+    )
+    setPowerUps(generatedPowerUps)
+
     setTimer(0)
+    timerRef.current = 0
     setIsTimerRunning(true)
+
     setIsLoading(false)
     gameStartedRef.current = true
-  }, [code, mazeSize])
+  }, [code, mazeSize, generateRandomPowerUpsForMaze])
 
   useEffect(() => {
     if (!code) {
@@ -235,22 +386,28 @@ export default function GamePage() {
     initializeMaze()
   }, [code, navigate, initializeMaze])
 
-  // ---------- Timer ----------
+  // ---------- Timer sincronizado (simple) ----------
+
   useEffect(() => {
-    let interval: ReturnType<typeof setInterval> | undefined
+    let interval: number | undefined
 
     if (isTimerRunning && !gameOver) {
-      interval = setInterval(() => {
-        setTimer((prev) => prev + 1)
+      interval = window.setInterval(() => {
+        setTimer((prev) => {
+          const next = prev + 1
+          timerRef.current = next
+          return next
+        })
       }, 1000)
     }
 
     return () => {
-      if (interval) clearInterval(interval)
+      if (interval) window.clearInterval(interval)
     }
   }, [isTimerRunning, gameOver])
 
   // ---------- Condición de victoria LOCAL ----------
+
   useEffect(() => {
     if (
       !isLoading &&
@@ -261,58 +418,70 @@ export default function GamePage() {
     ) {
       console.log("[GamePage] ¡Has llegado a la meta! Enviando finish al backend...")
 
-      // 1) Avisar al backend
-      sendFinish(timer)
-
-      // 2) Cerrar partida localmente de inmediato
-      endGame(user?.username ?? null, timer)
+      const myTime = timerRef.current
+      sendFinish(myTime)
+      endGame(user?.username ?? null, myTime)
     }
-  }, [playerPosition, endPosition, isLoading, gameOver, timer, sendFinish, endGame, user?.username])
+  }, [playerPosition, endPosition, isLoading, gameOver, sendFinish, endGame, user?.username])
 
-  // ---------- Movimiento del jugador ----------
+  // ---------- Movimiento del jugador + recogida de poderes ----------
+
   const movePlayer = useCallback(
     (direction: "Up" | "Down" | "Left" | "Right") => {
       if (!maze || gameOver || isLoading) return
 
-      setPlayerPosition((prev) => {
-        const { x, y } = prev
-        let newPos = { ...prev }
+      const { x, y } = playerPosition
+      let newPos = { x, y }
 
-        if (direction === "Up" && y > 0 && !maze[y][x].top) {
-          const destCell = maze[y - 1][x]
-          const isDestWall = destCell.top && destCell.right && destCell.bottom && destCell.left
-          if (!isDestWall) newPos = { x, y: y - 1 }
-        } else if (direction === "Down" && y < maze.length - 1 && !maze[y][x].bottom) {
-          const destCell = maze[y + 1][x]
-          const isDestWall = destCell.top && destCell.right && destCell.bottom && destCell.left
-          if (!isDestWall) newPos = { x, y: y + 1 }
-        } else if (direction === "Left" && x > 0 && !maze[y][x].left) {
-          const destCell = maze[y][x - 1]
-          const isDestWall = destCell.top && destCell.right && destCell.bottom && destCell.left
-          if (!isDestWall) newPos = { x: x - 1, y }
-        } else if (direction === "Right" && x < maze[0].length - 1 && !maze[y][x].right) {
-          const destCell = maze[y][x + 1]
-          const isDestWall = destCell.top && destCell.right && destCell.bottom && destCell.left
-          if (!isDestWall) newPos = { x: x + 1, y }
-        }
+      if (direction === "Up" && y > 0 && !maze[y][x].top) {
+        const destCell = maze[y - 1][x]
+        const isDestWall = destCell.top && destCell.right && destCell.bottom && destCell.left
+        if (!isDestWall) newPos = { x, y: y - 1 }
+      } else if (direction === "Down" && y < maze.length - 1 && !maze[y][x].bottom) {
+        const destCell = maze[y + 1][x]
+        const isDestWall = destCell.top && destCell.right && destCell.bottom && destCell.left
+        if (!isDestWall) newPos = { x, y: y + 1 }
+      } else if (direction === "Left" && x > 0 && !maze[y][x].left) {
+        const destCell = maze[y][x - 1]
+        const isDestWall = destCell.top && destCell.right && destCell.bottom && destCell.left
+        if (!isDestWall) newPos = { x: x - 1, y }
+      } else if (direction === "Right" && x < maze[0].length - 1 && !maze[y][x].right) {
+        const destCell = maze[y][x + 1]
+        const isDestWall = destCell.top && destCell.right && destCell.bottom && destCell.left
+        if (!isDestWall) newPos = { x: x + 1, y }
+      }
 
-        if (newPos.x !== prev.x || newPos.y !== prev.y) {
-          const now = Date.now()
-          if (now - lastMoveTimeRef.current > 100) {
-            sendMove(newPos)
-            lastMoveTimeRef.current = now
-          }
-        }
+      if (newPos.x === x && newPos.y === y) {
+        return
+      }
 
-        return newPos
+      const now = Date.now()
+      if (now - lastMoveTimeRef.current > 100) {
+        sendMove(newPos)
+        lastMoveTimeRef.current = now
+      }
+
+      setPlayerPosition(newPos)
+
+      // 💥 revisar si hay un power-up en la nueva posición
+      setPowerUps((prev) => {
+        const found = prev.find((p) => p.x === newPos.x && p.y === newPos.y)
+        if (!found) return prev
+
+        applyPowerUpEffect(found)
+        return prev.filter((p) => p.id !== found.id)
       })
     },
-    [maze, gameOver, isLoading, sendMove],
+    [maze, gameOver, isLoading, playerPosition, sendMove, applyPowerUpEffect],
   )
 
-  // ---------- Controles de teclado ----------
+  // ---------- Controles de teclado + confusión / freeze ----------
+
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
+      if (gameOver || isLoading) return
+      if (isFrozen) return
+
       const keyMap = {
         ArrowUp: "Up",
         ArrowDown: "Down",
@@ -322,16 +491,29 @@ export default function GamePage() {
         s: "Down",
         a: "Left",
         d: "Right",
+        W: "Up",
+        S: "Down",
+        A: "Left",
+        D: "Right",
       } as const
 
-      const direction = keyMap[e.key as keyof typeof keyMap]
+      let direction = keyMap[e.key as keyof typeof keyMap]
 
-      if (direction) {
-        e.preventDefault()
-        movePlayer(direction)
+      if (!direction) return
+
+      e.preventDefault()
+
+      // Si estoy confundido, invertimos los controles
+      if (isConfused) {
+        if (direction === "Up") direction = "Down"
+        else if (direction === "Down") direction = "Up"
+        else if (direction === "Left") direction = "Right"
+        else if (direction === "Right") direction = "Left"
       }
+
+      movePlayer(direction)
     },
-    [movePlayer],
+    [gameOver, isLoading, isFrozen, isConfused, movePlayer],
   )
 
   useEffect(() => {
@@ -340,8 +522,8 @@ export default function GamePage() {
   }, [handleKeyDown])
 
   // ---------- Salir del juego ----------
+
   const handleLeaveGame = useCallback(() => {
-    console.log("[GamePage] Leaving game...")
     try {
       if (isConnected) {
         disconnectGame()
@@ -361,7 +543,8 @@ export default function GamePage() {
     }
   }, [isConnected, disconnectGame])
 
-  // ---------- util: formato de tiempo ----------
+  // ---------- formato de tiempo ----------
+
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
@@ -369,6 +552,7 @@ export default function GamePage() {
   }
 
   // ---------- render ----------
+
   if (isLoading) {
     return (
       <Box className={styles.container}>
@@ -452,6 +636,8 @@ export default function GamePage() {
             endPosition={endPosition}
             isGameWon={gameOver}
             otherPlayers={otherPlayers}
+            hasClearFog={hasClearFog}
+            powerUps={powerUps}
           />
         )}
       </Box>

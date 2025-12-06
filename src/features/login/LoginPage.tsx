@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import {
   Box,
   Button,
@@ -7,11 +7,10 @@ import {
   Divider,
   Alert,
 } from "@mui/material"
-import { Link as RouterLink } from "react-router-dom"
+import { Link as RouterLink, useNavigate } from "react-router-dom"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import GoogleIcon from "@mui/icons-material/Google"
 import Loader from "../../components/Loader"
-import { useNavigate } from "react-router-dom"
 import { useAuth } from "../../context/useAuth"
 import { GOOGLE_CONFIG } from "../../common/globas"
 import styles from "./LoginPage.module.css"
@@ -27,6 +26,8 @@ declare global {
             callback: (response: { credential: string }) => void
             auto_select?: boolean
             cancel_on_tap_outside?: boolean
+            itp_support?: boolean
+            ux_mode?: "popup" | "redirect"
           }) => void
           renderButton: (
             element: HTMLElement,
@@ -39,7 +40,15 @@ declare global {
               width?: string
             }
           ) => void
-          prompt: () => void
+          prompt: (callback?: (notification: {
+            isNotDisplayed: () => boolean
+            isSkippedMoment: () => boolean
+            isDismissedMoment: () => boolean
+            getNotDisplayedReason: () => string
+            getSkippedReason: () => string
+            getDismissedReason: () => string
+          }) => void) => void
+          cancel: () => void
         }
       }
     }
@@ -49,55 +58,14 @@ declare global {
 export default function LoginPage() {
   const [error, setError] = useState("")
   const [googleLoaded, setGoogleLoaded] = useState(false)
+  const [isInitialized, setIsInitialized] = useState(false)
   const googleButtonRef = useRef<HTMLDivElement>(null)
+  const initAttempts = useRef(0)
   const navigate = useNavigate()
   const { loginWithGoogle, loading } = useAuth()
 
-  useEffect(() => {
-    // Cargar el script de Google Identity Services
-    const script = document.createElement("script")
-    script.src = "https://accounts.google.com/gsi/client"
-    script.async = true
-    script.defer = true
-    script.onload = () => setGoogleLoaded(true)
-    document.head.appendChild(script)
-
-    return () => {
-      document.head.removeChild(script)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!googleLoaded || !window.google) return
-
-    const googleClientId = GOOGLE_CONFIG.CLIENT_ID
-
-    if (!googleClientId) {
-      setError("Configuración de Google OAuth no disponible. Por favor, agrega VITE_GOOGLE_CLIENT_ID en tu archivo .env")
-      return
-    }
-
-    // Inicializar Google Identity Services
-    window.google.accounts.id.initialize({
-      client_id: googleClientId,
-      callback: handleGoogleResponse,
-      auto_select: false,
-      cancel_on_tap_outside: true,
-    })
-
-    // Renderizar el botón de Google en un div oculto
-    if (googleButtonRef.current) {
-      window.google.accounts.id.renderButton(googleButtonRef.current, {
-        theme: "filled_blue",
-        size: "large",
-        text: "signin_with",
-        shape: "rectangular",
-        width: "400",
-      })
-    }
-  }, [googleLoaded])
-
-  const handleGoogleResponse = async (response: { credential: string }) => {
+  // Callback estable para manejar la respuesta de Google
+  const handleGoogleResponse = useCallback(async (response: { credential: string }) => {
     setError("")
     
     try {
@@ -109,22 +77,147 @@ export default function LoginPage() {
       }
     } catch (err) {
       console.error("Error durante autenticación:", err)
-      setError("No se pudo conectar con el servidor. Verifica que el backend esté corriendo en http://localhost:8080")
+      setError("No se pudo conectar con el servidor. Verifica tu conexión a internet.")
     }
-  }
+  }, [loginWithGoogle, navigate])
 
-  const handleGoogleSignIn = () => {
-    if (!googleButtonRef.current) {
-      setError("Google Identity Services no está cargado")
+  // Cargar el script de Google Identity Services
+  useEffect(() => {
+    // Verificar si el script ya está cargado
+    const existingScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]')
+    
+    if (existingScript) {
+      // El script ya existe, verificar si Google está disponible
+      if (window.google?.accounts?.id) {
+        setGoogleLoaded(true)
+      } else {
+        // Esperar a que se cargue
+        existingScript.addEventListener('load', () => setGoogleLoaded(true))
+      }
+      return
+    }
+
+    const script = document.createElement("script")
+    script.src = "https://accounts.google.com/gsi/client"
+    script.async = true
+    script.defer = true
+    
+    script.onload = () => {
+      // Pequeño delay para asegurar que el objeto google esté disponible
+      setTimeout(() => {
+        if (window.google?.accounts?.id) {
+          setGoogleLoaded(true)
+        }
+      }, 100)
+    }
+    
+    script.onerror = () => {
+      setError("No se pudo cargar Google Identity Services. Por favor, recarga la página.")
+    }
+    
+    document.head.appendChild(script)
+
+    return () => {
+      // No remover el script en cleanup para evitar problemas de recarga
+    }
+  }, [])
+
+  // Inicializar Google Identity Services cuando esté cargado
+  useEffect(() => {
+    if (!googleLoaded || isInitialized) return
+
+    const initializeGoogle = () => {
+      if (!window.google?.accounts?.id) {
+        // Reintentar si aún no está disponible
+        if (initAttempts.current < 10) {
+          initAttempts.current++
+          setTimeout(initializeGoogle, 300)
+        } else {
+          setError("No se pudo inicializar Google. Por favor, recarga la página.")
+        }
+        return
+      }
+
+      const googleClientId = GOOGLE_CONFIG.CLIENT_ID
+
+      if (!googleClientId) {
+        setError("Configuración de Google OAuth no disponible. Por favor, verifica la configuración.")
+        return
+      }
+
+      try {
+        // Inicializar Google Identity Services con configuración optimizada
+        window.google.accounts.id.initialize({
+          client_id: googleClientId,
+          callback: handleGoogleResponse,
+          auto_select: false,
+          cancel_on_tap_outside: true,
+          itp_support: true,
+          ux_mode: "popup",
+        })
+
+        // Renderizar el botón de Google
+        if (googleButtonRef.current) {
+          window.google.accounts.id.renderButton(googleButtonRef.current, {
+            theme: "filled_blue",
+            size: "large",
+            text: "signin_with",
+            shape: "rectangular",
+            width: "400",
+          })
+          
+          // Esperar un poco para asegurar que el botón esté renderizado
+          setTimeout(() => {
+            setIsInitialized(true)
+          }, 200)
+        } else {
+          setIsInitialized(true)
+        }
+      } catch (err) {
+        console.error("Error inicializando Google:", err)
+        setError("Error al inicializar Google. Por favor, recarga la página.")
+      }
+    }
+
+    initializeGoogle()
+  }, [googleLoaded, isInitialized, handleGoogleResponse])
+
+  const handleGoogleSignIn = useCallback(() => {
+    setError("")
+    
+    if (!window.google?.accounts?.id) {
+      setError("Google no está disponible. Por favor, recarga la página.")
+      return
+    }
+
+    if (!isInitialized) {
+      setError("Espera un momento, Google se está cargando...")
       return
     }
     
-    // Hacer click en el botón invisible de Google
-    const googleButton = googleButtonRef.current.querySelector('div[role="button"]') as HTMLElement
-    if (googleButton) {
-      googleButton.click()
+    // Intentar hacer click directo en el botón renderizado de Google
+    // Esto es más confiable que usar prompt() en algunos navegadores
+    if (googleButtonRef.current) {
+      const googleButton = googleButtonRef.current.querySelector('div[role="button"]') as HTMLElement
+      if (googleButton) {
+        googleButton.click()
+        return
+      }
     }
-  }
+
+    // Si no hay botón renderizado, usar prompt() como fallback
+    window.google.accounts.id.prompt((notification) => {
+      if (notification.isNotDisplayed()) {
+        const reason = notification.getNotDisplayedReason()
+        console.log("Prompt no mostrado:", reason)
+        setError("No se pudo mostrar el diálogo de Google. Intenta recargar la página.")
+      } else if (notification.isSkippedMoment()) {
+        console.log("Prompt saltado:", notification.getSkippedReason())
+      } else if (notification.isDismissedMoment()) {
+        console.log("Prompt cerrado:", notification.getDismissedReason())
+      }
+    })
+  }, [isInitialized])
 
   return (
     <Box className={styles.root}>
@@ -144,7 +237,7 @@ export default function LoginPage() {
           textTransform: "none",
           textShadow: "0 0 8px rgba(0, 255, 255, 0.6)",
           transition: "all 0.3s ease",
-          "&:hover": { 
+          "&:hover": {
             color: "#00ffff",
             textShadow: "0 0 12px rgba(0, 255, 255, 1)",
             transform: "translateX(-4px)",
@@ -165,29 +258,29 @@ export default function LoginPage() {
         >
           Bienvenido a Maze Rush
         </Typography>
-        <Typography 
-          variant="body2" 
-          align="center" 
+        <Typography
+          variant="body2"
+          align="center"
           mb={3}
-          sx={{ 
+          sx={{
             color: "rgba(0, 255, 255, 0.7)",
-            textShadow: "0 0 8px rgba(0, 255, 255, 0.3)"
+            textShadow: "0 0 8px rgba(0, 255, 255, 0.3)",
           }}
         >
           Inicia sesión con tu cuenta de Google para comenzar
         </Typography>
 
         {error && (
-          <Alert 
-            severity="error" 
-            sx={{ 
+          <Alert
+            severity="error"
+            sx={{
               mb: 3,
               backgroundColor: "rgba(255, 0, 0, 0.1)",
               border: "1px solid rgba(255, 0, 0, 0.3)",
               color: "#ff6666",
               "& .MuiAlert-icon": {
-                color: "#ff4444"
-              }
+                color: "#ff4444",
+              },
             }}
           >
             {error}
@@ -202,8 +295,14 @@ export default function LoginPage() {
 
         {!loading && (
           <>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5, alignItems: "center" }}>
-              {/* Botón personalizado de Google con diseño neón cian */}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 2.5,
+                alignItems: "center",
+              }}
+            >
               <Button
                 fullWidth
                 onClick={handleGoogleSignIn}
@@ -237,7 +336,6 @@ export default function LoginPage() {
                 {googleLoaded ? "Continuar con Google" : "Cargando Google..."}
               </Button>
 
-              {/* Indicador visual de estado */}
               {googleLoaded && (
                 <Typography
                   variant="caption"
@@ -250,20 +348,27 @@ export default function LoginPage() {
                     textShadow: "0 0 8px rgba(0, 255, 255, 0.6)",
                   }}
                 >
-                  <span style={{ fontSize: "10px", animation: "pulse 2s ease-in-out infinite" }}>●</span> 
+                  <span
+                    style={{
+                      fontSize: "10px",
+                      animation: "pulse 2s ease-in-out infinite",
+                    }}
+                  >
+                    ●
+                  </span>
                   Listo para iniciar sesión
                 </Typography>
               )}
             </Box>
 
             <Divider sx={{ my: 3, borderColor: "rgba(0, 255, 255, 0.2)" }}>
-              <Typography 
-                variant="caption" 
-                sx={{ 
-                  color: "rgba(0, 255, 255, 0.6)", 
+              <Typography
+                variant="caption"
+                sx={{
+                  color: "rgba(0, 255, 255, 0.6)",
                   letterSpacing: 2,
                   fontWeight: 600,
-                  textShadow: "0 0 8px rgba(0, 255, 255, 0.3)"
+                  textShadow: "0 0 8px rgba(0, 255, 255, 0.3)",
                 }}
               >
                 AUTENTICACIÓN SEGURA
@@ -271,25 +376,26 @@ export default function LoginPage() {
             </Divider>
 
             <Box sx={{ textAlign: "center" }}>
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  color: "rgba(255, 255, 255, 0.7)", 
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "rgba(255, 255, 255, 0.7)",
                   mb: 2,
-                  lineHeight: 1.6
+                  lineHeight: 1.6,
                 }}
               >
-                Al continuar, aceptas nuestros términos de servicio y política de privacidad.
+                Al continuar, aceptas nuestros términos de servicio y política
+                de privacidad.
               </Typography>
-              <Typography 
-                variant="caption" 
-                sx={{ 
+              <Typography
+                variant="caption"
+                sx={{
                   color: "rgba(0, 255, 255, 0.7)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   gap: 0.5,
-                  textShadow: "0 0 8px rgba(0, 255, 255, 0.3)"
+                  textShadow: "0 0 8px rgba(0, 255, 255, 0.3)",
                 }}
               >
                 🔒 Autenticación segura proporcionada por Google
@@ -299,16 +405,15 @@ export default function LoginPage() {
         )}
       </Paper>
 
-      {/* Div oculto con el botón real de Google */}
+      {/* Contenedor del botón real de Google (oculto, usado como fallback) */}
       <Box
         ref={googleButtonRef}
         sx={{
           position: "absolute",
+          left: "-9999px",
+          top: "-9999px",
           opacity: 0,
           pointerEvents: "none",
-          width: 0,
-          height: 0,
-          overflow: "hidden",
         }}
       />
     </Box>
