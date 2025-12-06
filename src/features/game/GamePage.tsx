@@ -47,7 +47,6 @@ export default function GamePage() {
   // ⏱ tiempo de partida
   const [timer, setTimer] = useState(0)
   const [isTimerRunning, setIsTimerRunning] = useState(false)
-  const [startTimestamp, setStartTimestamp] = useState<number | null>(null)
 
   const [isLoading, setIsLoading] = useState(true)
   const [mazeSize] = useState("MEDIUM")
@@ -302,7 +301,6 @@ export default function GamePage() {
     setTimer(0)
     timerRef.current = 0
     setIsTimerRunning(false)
-    setStartTimestamp(null)
     gameStartedRef.current = false
     gameFinishedRef.current = false
 
@@ -372,8 +370,6 @@ export default function GamePage() {
     )
     setPowerUps(generatedPowerUps)
 
-    const now = Date.now()
-    setStartTimestamp(now)
     setTimer(0)
     timerRef.current = 0
     setIsTimerRunning(true)
