@@ -1,0 +1,40 @@
+name: SonarCloud Analysis
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  sonarcloud:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Descargar tu código
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Importante para que Sonar detecte bien los cambios
+
+      # 2. Instalar Node.js
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      # 3. Instalar dependencias
+      - name: Install dependencies
+        run: npm ci
+
+      # 4. CORRER TESTS Y GENERAR COBERTURA (Crea la carpeta /coverage)
+      - name: Run Tests and Coverage
+        run: npm run coverage
+
+      # 5. Enviar a SonarCloud
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub lo pone automático
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}    # El que creamos en el Paso 2
