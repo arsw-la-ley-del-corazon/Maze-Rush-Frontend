@@ -1,5 +1,4 @@
-// src/features/auth/LoginPage.tsx
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import {
   Box,
   Button,
@@ -27,6 +26,8 @@ declare global {
             callback: (response: { credential: string }) => void
             auto_select?: boolean
             cancel_on_tap_outside?: boolean
+            itp_support?: boolean
+            ux_mode?: "popup" | "redirect"
           }) => void
           renderButton: (
             element: HTMLElement,
@@ -39,7 +40,15 @@ declare global {
               width?: string
             }
           ) => void
-          prompt: () => void
+          prompt: (callback?: (notification: {
+            isNotDisplayed: () => boolean
+            isSkippedMoment: () => boolean
+            isDismissedMoment: () => boolean
+            getNotDisplayedReason: () => string
+            getSkippedReason: () => string
+            getDismissedReason: () => string
+          }) => void) => void
+          cancel: () => void
         }
       }
     }
@@ -49,85 +58,16 @@ declare global {
 export default function LoginPage() {
   const [error, setError] = useState("")
   const [googleLoaded, setGoogleLoaded] = useState(false)
+  const [isInitialized, setIsInitialized] = useState(false)
   const googleButtonRef = useRef<HTMLDivElement>(null)
+  const initAttempts = useRef(0)
   const navigate = useNavigate()
   const { loginWithGoogle, loading } = useAuth()
 
-  // 1️⃣ Cargar script de Google una sola vez y NO eliminarlo
-  useEffect(() => {
-    // ¿Ya existe el script?
-    const existingScript = document.querySelector<HTMLScriptElement>(
-      'script[data-google-identity="true"]',
-    )
-
-    if (existingScript) {
-      // Si ya está y window.google existe, marcamos como cargado
-      if (window.google?.accounts?.id) {
-        setGoogleLoaded(true)
-      }
-      return
-    }
-
-    const script = document.createElement("script")
-    script.src = "https://accounts.google.com/gsi/client"
-    script.async = true
-    script.defer = true
-    script.dataset.googleIdentity = "true"
-    script.onload = () => {
-      console.log("[LoginPage] Google Identity script cargado")
-      setGoogleLoaded(true)
-    }
-    script.onerror = () => {
-      console.error("[LoginPage] Error cargando script de Google")
-      setError("No se pudo cargar Google Identity Services. Revisa tu conexión.")
-    }
-
-    document.head.appendChild(script)
-
-    // ⚠️ NO lo eliminamos en el cleanup para evitar problemas con StrictMode
-  }, [])
-
-  // 2️⃣ Inicializar el botón de Google cuando el script esté listo
-  useEffect(() => {
-    if (!googleLoaded) return
-    if (!window.google?.accounts?.id) {
-      console.warn("[LoginPage] googleLoaded=true pero window.google.accounts.id no está disponible aún")
-      return
-    }
-
-    const googleClientId = GOOGLE_CONFIG.CLIENT_ID
-
-    if (!googleClientId) {
-      console.error("[LoginPage] VITE_GOOGLE_CLIENT_ID no está configurado")
-      setError(
-        "Configuración de Google OAuth no disponible. Por favor, agrega VITE_GOOGLE_CLIENT_ID en tu archivo .env",
-      )
-      return
-    }
-
-    console.log("[LoginPage] Inicializando Google Identity con CLIENT_ID:", googleClientId)
-
-    window.google.accounts.id.initialize({
-      client_id: googleClientId,
-      callback: handleGoogleResponse,
-      auto_select: false,
-      cancel_on_tap_outside: true,
-    })
-
-    if (googleButtonRef.current) {
-      window.google.accounts.id.renderButton(googleButtonRef.current, {
-        theme: "filled_blue",
-        size: "large",
-        text: "signin_with",
-        shape: "rectangular",
-        width: "400",
-      })
-    }
-  }, [googleLoaded])
-
-  const handleGoogleResponse = async (response: { credential: string }) => {
+  // Callback estable para manejar la respuesta de Google
+  const handleGoogleResponse = useCallback(async (response: { credential: string }) => {
     setError("")
-
+    
     try {
       const result = await loginWithGoogle(response.credential)
       if (result.ok) {
@@ -137,41 +77,147 @@ export default function LoginPage() {
       }
     } catch (err) {
       console.error("Error durante autenticación:", err)
-      setError(
-        "No se pudo conectar con el servidor. Verifica que el backend esté corriendo en http://localhost:8080",
-      )
+      setError("No se pudo conectar con el servidor. Verifica tu conexión a internet.")
     }
-  }
+  }, [loginWithGoogle, navigate])
 
-  const handleGoogleSignIn = () => {
-    setError("")
-
-    if (!googleLoaded || !window.google?.accounts?.id) {
-      setError("Google Identity Services no está completamente cargado todavía")
+  // Cargar el script de Google Identity Services
+  useEffect(() => {
+    // Verificar si el script ya está cargado
+    const existingScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]')
+    
+    if (existingScript) {
+      // El script ya existe, verificar si Google está disponible
+      if (window.google?.accounts?.id) {
+        setGoogleLoaded(true)
+      } else {
+        // Esperar a que se cargue
+        existingScript.addEventListener('load', () => setGoogleLoaded(true))
+      }
       return
     }
 
-    if (!googleButtonRef.current) {
-      setError("No se encontró el contenedor del botón de Google")
-      return
+    const script = document.createElement("script")
+    script.src = "https://accounts.google.com/gsi/client"
+    script.async = true
+    script.defer = true
+    
+    script.onload = () => {
+      // Pequeño delay para asegurar que el objeto google esté disponible
+      setTimeout(() => {
+        if (window.google?.accounts?.id) {
+          setGoogleLoaded(true)
+        }
+      }, 100)
     }
+    
+    script.onerror = () => {
+      setError("No se pudo cargar Google Identity Services. Por favor, recarga la página.")
+    }
+    
+    document.head.appendChild(script)
 
-    const googleButton = googleButtonRef.current.querySelector(
-      'div[role="button"]',
-    ) as HTMLElement | null
+    return () => {
+      // No remover el script en cleanup para evitar problemas de recarga
+    }
+  }, [])
 
-    if (googleButton) {
-      googleButton.click()
-    } else {
-      // Fallback: abrir prompt de Google
+  // Inicializar Google Identity Services cuando esté cargado
+  useEffect(() => {
+    if (!googleLoaded || isInitialized) return
+
+    const initializeGoogle = () => {
+      if (!window.google?.accounts?.id) {
+        // Reintentar si aún no está disponible
+        if (initAttempts.current < 10) {
+          initAttempts.current++
+          setTimeout(initializeGoogle, 300)
+        } else {
+          setError("No se pudo inicializar Google. Por favor, recarga la página.")
+        }
+        return
+      }
+
+      const googleClientId = GOOGLE_CONFIG.CLIENT_ID
+
+      if (!googleClientId) {
+        setError("Configuración de Google OAuth no disponible. Por favor, verifica la configuración.")
+        return
+      }
+
       try {
-        window.google.accounts.id.prompt()
-      } catch (e) {
-        console.error("[LoginPage] Error lanzando prompt de Google:", e)
-        setError("No se pudo iniciar el flujo de Google")
+        // Inicializar Google Identity Services con configuración optimizada
+        window.google.accounts.id.initialize({
+          client_id: googleClientId,
+          callback: handleGoogleResponse,
+          auto_select: false,
+          cancel_on_tap_outside: true,
+          itp_support: true,
+          ux_mode: "popup",
+        })
+
+        // Renderizar el botón de Google
+        if (googleButtonRef.current) {
+          window.google.accounts.id.renderButton(googleButtonRef.current, {
+            theme: "filled_blue",
+            size: "large",
+            text: "signin_with",
+            shape: "rectangular",
+            width: "400",
+          })
+          
+          // Esperar un poco para asegurar que el botón esté renderizado
+          setTimeout(() => {
+            setIsInitialized(true)
+          }, 200)
+        } else {
+          setIsInitialized(true)
+        }
+      } catch (err) {
+        console.error("Error inicializando Google:", err)
+        setError("Error al inicializar Google. Por favor, recarga la página.")
       }
     }
-  }
+
+    initializeGoogle()
+  }, [googleLoaded, isInitialized, handleGoogleResponse])
+
+  const handleGoogleSignIn = useCallback(() => {
+    setError("")
+    
+    if (!window.google?.accounts?.id) {
+      setError("Google no está disponible. Por favor, recarga la página.")
+      return
+    }
+
+    if (!isInitialized) {
+      setError("Espera un momento, Google se está cargando...")
+      return
+    }
+    
+    // Intentar hacer click directo en el botón renderizado de Google
+    // Esto es más confiable que usar prompt() en algunos navegadores
+    if (googleButtonRef.current) {
+      const googleButton = googleButtonRef.current.querySelector('div[role="button"]') as HTMLElement
+      if (googleButton) {
+        googleButton.click()
+        return
+      }
+    }
+
+    // Si no hay botón renderizado, usar prompt() como fallback
+    window.google.accounts.id.prompt((notification) => {
+      if (notification.isNotDisplayed()) {
+        const reason = notification.getNotDisplayedReason()
+        console.log("Prompt no mostrado:", reason)
+        setError("No se pudo mostrar el diálogo de Google. Intenta recargar la página.")
+      } else if (notification.isSkippedMoment()) {
+        console.log("Prompt saltado:", notification.getSkippedReason())
+      } else if (notification.isDismissedMoment()) {
+        console.log("Prompt cerrado:", notification.getDismissedReason())
+      }
+    })
+  }, [isInitialized])
 
   return (
     <Box className={styles.root}>
@@ -359,16 +405,15 @@ export default function LoginPage() {
         )}
       </Paper>
 
-      {/* Div oculto con el botón real de Google */}
+      {/* Contenedor del botón real de Google (oculto, usado como fallback) */}
       <Box
         ref={googleButtonRef}
         sx={{
           position: "absolute",
+          left: "-9999px",
+          top: "-9999px",
           opacity: 0,
           pointerEvents: "none",
-          width: 0,
-          height: 0,
-          overflow: "hidden",
         }}
       />
     </Box>
