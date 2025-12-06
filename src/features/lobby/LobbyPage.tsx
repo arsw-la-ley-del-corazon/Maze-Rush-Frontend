@@ -1,11 +1,11 @@
-import { useEffect, useState, useRef } from "react"
-import { useParams, useNavigate } from "react-router-dom"
 import { CircularProgress } from "@mui/material"
+import { useEffect, useRef, useState } from "react"
+import { useNavigate, useParams } from "react-router-dom"
 import { useLobbySocket } from "../../context/LobbySocketContext"
-import { getLobbyByCode, leaveLobby } from "./services/lobbyService"
 import { useAuth } from "../../context/useAuth"
 import type { LobbyWithPlayersResponse } from "../../types/api"
 import styles from "./LobbyPage.module.css"
+import { getLobbyByCode, leaveLobby } from "./services/lobbyService"
 
 export default function LobbyPage() {
   const { code } = useParams<{ code: string }>()
@@ -149,17 +149,19 @@ export default function LobbyPage() {
   }
 
   // Priorizar jugadores del socket cuando está conectado, sino usar los del lobby
-  const currentPlayers = isConnected && socketPlayers.length > 0 ? socketPlayers : (lobby?.players || [])
-  
+  const currentPlayers =
+    isConnected && socketPlayers.length > 0 ? socketPlayers : lobby?.players || []
+
   // El host no necesita estar "listo", solo los demás jugadores
-  const nonHostPlayers = currentPlayers.filter(p => p !== lobby?.creatorUsername)
-  const allPlayersReady = nonHostPlayers.length > 0 && nonHostPlayers.every((p) => readyPlayers.has(p))
+  const nonHostPlayers = currentPlayers.filter((p) => p !== lobby?.creatorUsername)
+  const allPlayersReady =
+    nonHostPlayers.length > 0 && nonHostPlayers.every((p) => readyPlayers.has(p))
   const canStartGame = currentPlayers.length >= 2 && allPlayersReady
 
   if (loading) {
     return (
       <div className={styles.loadingContainer}>
-        <CircularProgress sx={{ color: '#4cffb3' }} />
+        <CircularProgress sx={{ color: "#4cffb3" }} />
       </div>
     )
   }
@@ -190,13 +192,13 @@ export default function LobbyPage() {
             </h1>
             <div className={styles.badges}>
               <span className={styles.badge}>🎯 Laberinto: {lobby.mazeSize}</span>
-              <span className={`${styles.badge} ${currentPlayers.length === lobby.maxPlayers ? styles.badgeFull : ''}`}>
-                {isConnected && <span className={styles.statusDot} />}
-                👥 {currentPlayers.length}/{lobby.maxPlayers} Jugadores
+              <span
+                className={`${styles.badge} ${currentPlayers.length === lobby.maxPlayers ? styles.badgeFull : ""}`}
+              >
+                {isConnected && <span className={styles.statusDot} />}👥 {currentPlayers.length}/
+                {lobby.maxPlayers} Jugadores
               </span>
-              <span className={styles.badge}>
-                {lobby.isPublic ? '🌍 Público' : '🔒 Privado'}
-              </span>
+              <span className={styles.badge}>{lobby.isPublic ? "🌍 Público" : "🔒 Privado"}</span>
             </div>
           </div>
           <button onClick={handleLeave} className={styles.leaveButton}>
@@ -211,7 +213,9 @@ export default function LobbyPage() {
         <div className={styles.playersPanel}>
           <div className={styles.panelHeader}>
             <h2 className={styles.panelTitle}>👥 Jugadores</h2>
-            <span className={styles.playerCount}>{currentPlayers.length}/{lobby.maxPlayers}</span>
+            <span className={styles.playerCount}>
+              {currentPlayers.length}/{lobby.maxPlayers}
+            </span>
           </div>
 
           <div className={styles.playersList}>
@@ -221,12 +225,10 @@ export default function LobbyPage() {
               currentPlayers.map((player) => (
                 <div
                   key={player}
-                  className={`${styles.playerCard} ${player === user?.username ? styles.playerCardMe : ''}`}
+                  className={`${styles.playerCard} ${player === user?.username ? styles.playerCardMe : ""}`}
                 >
                   <div className={styles.playerInfo}>
-                    <div className={styles.playerAvatar}>
-                      {player.charAt(0).toUpperCase()}
-                    </div>
+                    <div className={styles.playerAvatar}>{player.charAt(0).toUpperCase()}</div>
                     <div className={styles.playerDetails}>
                       <span className={styles.playerName}>{player}</span>
                       {player === lobby.creatorUsername && (
@@ -253,16 +255,16 @@ export default function LobbyPage() {
                 <button
                   onClick={handleStartGame}
                   disabled={!canStartGame || !isConnected}
-                  className={`${styles.primaryButton} ${styles.startButton} ${!canStartGame || !isConnected ? styles.buttonDisabled : ''}`}
+                  className={`${styles.primaryButton} ${styles.startButton} ${!canStartGame || !isConnected ? styles.buttonDisabled : ""}`}
                 >
                   <span>▶</span>
                   Iniciar Juego
                 </button>
                 {!canStartGame && isConnected && (
                   <p className={styles.helperText}>
-                    {currentPlayers.length < 2 
-                      ? 'Se necesitan al menos 2 jugadores'
-                      : 'Todos los jugadores deben estar listos'}
+                    {currentPlayers.length < 2
+                      ? "Se necesitan al menos 2 jugadores"
+                      : "Todos los jugadores deben estar listos"}
                   </p>
                 )}
               </>
@@ -270,10 +272,10 @@ export default function LobbyPage() {
               <button
                 onClick={toggleReady}
                 disabled={!isConnected}
-                className={`${isReady ? styles.secondaryButton : styles.primaryButton} ${!isConnected ? styles.buttonDisabled : ''}`}
+                className={`${isReady ? styles.secondaryButton : styles.primaryButton} ${!isConnected ? styles.buttonDisabled : ""}`}
               >
-                <span>{isReady ? '✓' : '○'}</span>
-                {isReady ? 'No Listo' : 'Listo'}
+                <span>{isReady ? "✓" : "○"}</span>
+                {isReady ? "No Listo" : "Listo"}
               </button>
             )}
           </div>
@@ -291,15 +293,11 @@ export default function LobbyPage() {
           </div>
 
           {/* Alertas */}
-          {socketError && (
-            <div className={styles.alert}>
-              ⚠️ {socketError}
-            </div>
-          )}
+          {socketError && <div className={styles.alert}>⚠️ {socketError}</div>}
 
           {!isConnected && (
             <div className={styles.alertReconnecting}>
-              <CircularProgress size={16} sx={{ color: '#4cffb3' }} />
+              <CircularProgress size={16} sx={{ color: "#4cffb3" }} />
               <span>Reconectando...</span>
             </div>
           )}
@@ -307,9 +305,7 @@ export default function LobbyPage() {
           {/* Mensajes */}
           <div className={styles.messagesContainer}>
             {messages.length === 0 ? (
-              <p className={styles.emptyChat}>
-                No hay mensajes aún. ¡Sé el primero en escribir!
-              </p>
+              <p className={styles.emptyChat}>No hay mensajes aún. ¡Sé el primero en escribir!</p>
             ) : (
               <div className={styles.messagesList}>
                 {messages.map((msg, idx) => {
@@ -319,13 +315,16 @@ export default function LobbyPage() {
                     <div
                       key={idx}
                       className={`${styles.message} ${
-                        isSystem ? styles.messageSystem :
-                        isMe ? styles.messageMe : styles.messageOther
+                        isSystem
+                          ? styles.messageSystem
+                          : isMe
+                            ? styles.messageMe
+                            : styles.messageOther
                       }`}
                     >
                       <div className={styles.messageHeader}>
                         <span className={styles.messageUsername}>
-                          {isSystem ? '🤖' : isMe ? '👤' : '👥'} {msg.username}
+                          {isSystem ? "🤖" : isMe ? "👤" : "👥"} {msg.username}
                         </span>
                         {msg.timestamp && (
                           <span className={styles.messageTime}>
@@ -355,7 +354,7 @@ export default function LobbyPage() {
             <button
               type="submit"
               disabled={!messageInput.trim() || !isConnected}
-              className={`${styles.sendButton} ${!messageInput.trim() || !isConnected ? styles.buttonDisabled : ''}`}
+              className={`${styles.sendButton} ${!messageInput.trim() || !isConnected ? styles.buttonDisabled : ""}`}
             >
               📤
             </button>
@@ -365,4 +364,3 @@ export default function LobbyPage() {
     </div>
   )
 }
-

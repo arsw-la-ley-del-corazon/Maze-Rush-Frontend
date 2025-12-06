@@ -1,26 +1,33 @@
 import axiosInstance from "../../../common/AxiosIntance"
 import { API_ENDPOINTS } from "../../../common/globas"
-import type { Result, LobbyResponse, LobbyWithPlayersResponse, LobbyRequest } from "../../../types/api"
+import type {
+  LobbyRequest,
+  LobbyResponse,
+  LobbyWithPlayersResponse,
+  Result,
+} from "../../../types/api"
 
-export async function createLobby(request: LobbyRequest): Promise<Result<LobbyWithPlayersResponse>> {
+export async function createLobby(
+  request: LobbyRequest
+): Promise<Result<LobbyWithPlayersResponse>> {
   try {
     console.log("🚀 Enviando petición POST a:", API_ENDPOINTS.LOBBY.CREATE)
     console.log("📤 Datos enviados:", JSON.stringify(request, null, 2))
-    
+
     const response = await axiosInstance.post<LobbyWithPlayersResponse>(
       API_ENDPOINTS.LOBBY.CREATE,
       request
     )
-    
+
     console.log("📥 Respuesta recibida del backend:", response.data)
     console.log("   - isPublic en respuesta:", response.data.isPublic)
-    
+
     // WORKAROUND: Si el backend no devuelve isPublic, usar el valor que enviamos
     if (response.data.isPublic === undefined) {
       console.warn("⚠️ Backend no devolvió isPublic, usando valor enviado:", request.isPublic)
       response.data.isPublic = request.isPublic
     }
-    
+
     return { ok: true, data: response.data }
   } catch (error: any) {
     console.error("❌ Error en createLobby:", error)
@@ -44,7 +51,9 @@ export async function getAllLobbies(): Promise<Result<LobbyResponse[]>> {
     console.log("📦 Respuesta recibida:", response.data)
     console.log("📊 Análisis de isPublic por sala:")
     response.data.forEach((lobby, index) => {
-      console.log(`   Sala ${index + 1} (${lobby.code}): isPublic = ${lobby.isPublic} (${typeof lobby.isPublic})`)
+      console.log(
+        `   Sala ${index + 1} (${lobby.code}): isPublic = ${lobby.isPublic} (${typeof lobby.isPublic})`
+      )
     })
     return { ok: true, data: response.data }
   } catch (error: any) {

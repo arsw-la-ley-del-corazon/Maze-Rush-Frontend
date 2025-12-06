@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from "react"
+import type React from "react"
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react"
 
 // Tipos básicos de estado de conexión
 export type SocketStatus = "idle" | "connecting" | "open" | "closed" | "error"
@@ -63,7 +64,10 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       syncTimeoutRef.current = window.setTimeout(() => {
         if (!bcRef.current) return
         try {
-          bcRef.current.postMessage({ type: "local_sync", count: localCountRef.current } satisfies LocalMessage)
+          bcRef.current.postMessage({
+            type: "local_sync",
+            count: localCountRef.current,
+          } satisfies LocalMessage)
         } catch {
           // Canal ya cerrado (HMR), ignorar
         }
@@ -76,12 +80,18 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const broadcastCount = () => {
     if (!bcRef.current) return
     try {
-      bcRef.current.postMessage({ type: "local_sync", count: localCountRef.current } satisfies LocalMessage)
+      bcRef.current.postMessage({
+        type: "local_sync",
+        count: localCountRef.current,
+      } satisfies LocalMessage)
     } catch {
       // Si el canal fue cerrado (p.e. HMR), intentar recrear y reenviar una vez
       try {
         bcRef.current = new BroadcastChannel(CHANNEL_NAME)
-        bcRef.current.postMessage({ type: "local_sync", count: localCountRef.current } satisfies LocalMessage)
+        bcRef.current.postMessage({
+          type: "local_sync",
+          count: localCountRef.current,
+        } satisfies LocalMessage)
       } catch {
         // desistir silenciosamente
       }
@@ -104,7 +114,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         reconnectAttempts.current = 0
         if (joinedRef.current) {
           // Reunirse de nuevo al reconectar
-            ws.send(JSON.stringify({ type: "join_quick_play" }))
+          ws.send(JSON.stringify({ type: "join_quick_play" }))
         }
       }
       ws.onclose = () => {
@@ -122,7 +132,11 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       ws.onmessage = (ev) => {
         try {
           const data = JSON.parse(ev.data)
-          if (data.type === "players_count" && data.mode === "quick_play" && typeof data.count === "number") {
+          if (
+            data.type === "players_count" &&
+            data.mode === "quick_play" &&
+            typeof data.count === "number"
+          ) {
             setQuickPlayPlayers(data.count)
           }
         } catch {
@@ -140,18 +154,25 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     return () => {
       wsRef.current?.close()
       if (bcRef.current) {
-        try { bcRef.current.close() } catch { /* ignore */ }
+        try {
+          bcRef.current.close()
+        } catch {
+          /* ignore */
+        }
         bcRef.current = null
       }
       if (syncTimeoutRef.current) window.clearTimeout(syncTimeoutRef.current)
     }
   }, [connect])
 
-  const send = useCallback((data: Record<string, unknown>) => {
-    if (wsRef.current && status === "open" && wsUrl) {
-      wsRef.current.send(JSON.stringify(data))
-    }
-  }, [status, wsUrl])
+  const send = useCallback(
+    (data: Record<string, unknown>) => {
+      if (wsRef.current && status === "open" && wsUrl) {
+        wsRef.current.send(JSON.stringify(data))
+      }
+    },
+    [status, wsUrl]
+  )
 
   const joinQuickPlay = useCallback(() => {
     if (joinedRef.current) return

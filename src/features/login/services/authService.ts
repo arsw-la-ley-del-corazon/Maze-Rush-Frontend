@@ -1,11 +1,11 @@
 import { v4 as uuid } from "uuid"
 import type {
+  ApiErrorShape,
   AuthResponse,
   LoginRequest,
-  RegisterRequest,
   RefreshTokenRequest,
+  RegisterRequest,
   Result,
-  ApiErrorShape,
   UserInfo,
 } from "../../../types/api"
 import { mockDB } from "./mockDb"
@@ -13,7 +13,6 @@ import { mockDB } from "./mockDb"
 // Simulación (sin llamadas de red) replicando contrato del backend
 const ACCESS_LIFETIME_SEC = 60 * 15 // 15 minutos
 const REFRESH_LIFETIME_SEC = 60 * 60 * 24 * 7 // 7 días
-
 
 function generateToken(prefix: string) {
   return `${prefix}.${uuid()}.${Math.random().toString(36).slice(2)}`
@@ -24,7 +23,7 @@ export async function login(req: LoginRequest): Promise<Result<AuthResponse>> {
     return error(400, "Faltan credenciales", "/api/v1/auth/login")
   }
   const user = mockDB.users.find(
-    (u: InternalUser) => u.email === req.email || u.username === req.username,
+    (u: InternalUser) => u.email === req.email || u.username === req.username
   )
   if (!user || user.password !== req.password) {
     return error(401, "Credenciales inválidas", "/api/v1/auth/login")
@@ -33,7 +32,9 @@ export async function login(req: LoginRequest): Promise<Result<AuthResponse>> {
 }
 
 export async function register(req: RegisterRequest): Promise<Result<AuthResponse>> {
-  if (mockDB.users.some((u: InternalUser) => u.email === req.email || u.username === req.username)) {
+  if (
+    mockDB.users.some((u: InternalUser) => u.email === req.email || u.username === req.username)
+  ) {
     return error(409, "El username o email ya están en uso", "/api/v1/auth/register")
   }
   const user = {
@@ -48,17 +49,19 @@ export async function register(req: RegisterRequest): Promise<Result<AuthRespons
   return success(authPayload(user))
 }
 
-export async function refresh(
-  req: RefreshTokenRequest,
-): Promise<Result<AuthResponse>> {
-  const session = mockDB.refreshTokens.find((r: { token: string; userId: string; expiresAt: number }) => r.token === req.refreshToken)
+export async function refresh(req: RefreshTokenRequest): Promise<Result<AuthResponse>> {
+  const session = mockDB.refreshTokens.find(
+    (r: { token: string; userId: string; expiresAt: number }) => r.token === req.refreshToken
+  )
   if (!session) return error(401, "Refresh token inválido", "/api/v1/auth/refresh")
   if (session.expiresAt < Date.now())
     return error(401, "Refresh token expirado", "/api/v1/auth/refresh")
   const user = mockDB.users.find((u: InternalUser) => u.id === session.userId)
   if (!user) return error(404, "Usuario no encontrado", "/api/v1/auth/refresh")
   // Rotación simple (invalida el anterior)
-  mockDB.refreshTokens = mockDB.refreshTokens.filter((r: { token: string; userId: string; expiresAt: number }) => r !== session)
+  mockDB.refreshTokens = mockDB.refreshTokens.filter(
+    (r: { token: string; userId: string; expiresAt: number }) => r !== session
+  )
   return success(authPayload(user))
 }
 
@@ -67,11 +70,15 @@ export async function logout(accessToken: string): Promise<Result<null>> {
   const parts = accessToken.split(".")
   if (parts.length < 3) return error(400, "Token inválido", "/api/v1/auth/logout")
   const userId = parts[1]
-  mockDB.refreshTokens = mockDB.refreshTokens.filter((r: { token: string; userId: string; expiresAt: number }) => r.userId !== userId)
+  mockDB.refreshTokens = mockDB.refreshTokens.filter(
+    (r: { token: string; userId: string; expiresAt: number }) => r.userId !== userId
+  )
   return { ok: true, data: null }
 }
 
-interface InternalUser extends UserInfo { password: string }
+interface InternalUser extends UserInfo {
+  password: string
+}
 
 function authPayload(user: InternalUser): AuthResponse {
   const accessToken = generateToken("acc") + "." + user.id

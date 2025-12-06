@@ -50,20 +50,20 @@ export async function generateMazeFromBackend(size: string): Promise<Result<Maze
   try {
     const response = await axiosInstance.post<MazeEntityRaw>(`/map/generate/${size.toUpperCase()}`)
     const rawData = response.data
-    
+
     // Parse the layout JSON string to array
-    let layout: number[][];
-    if (typeof rawData.layout === 'string') {
+    let layout: number[][]
+    if (typeof rawData.layout === "string") {
       layout = JSON.parse(rawData.layout)
     } else {
       layout = rawData.layout as unknown as number[][]
     }
-    
+
     const parsedData: MazeEntity = {
       ...rawData,
-      layout
+      layout,
     }
-    
+
     return { ok: true, data: parsedData }
   } catch (error: unknown) {
     const err = error as { response?: { status?: number; data?: { message?: string } } }
@@ -117,7 +117,7 @@ export function convertLayoutToCells(layout: number[][]): MazeCell[][] {
     const row: MazeCell[] = []
     for (let x = 0; x < width; x++) {
       const isWall = layout[y][x] === 1
-      
+
       // For wall cells, all borders are solid
       if (isWall) {
         row.push({ top: true, right: true, bottom: true, left: true })

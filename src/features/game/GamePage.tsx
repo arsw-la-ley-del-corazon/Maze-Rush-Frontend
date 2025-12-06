@@ -1,29 +1,21 @@
-// src/features/game/GamePage.tsx
-import { useEffect, useState, useCallback, useRef } from "react"
-import { useParams, useNavigate } from "react-router-dom"
-import {
-  Box,
-  Typography,
-  Button,
-  Paper,
-  Avatar,
-  CircularProgress,
-  Chip,
-} from "@mui/material"
-import TimerIcon from "@mui/icons-material/Timer"
 import ExitToAppIcon from "@mui/icons-material/ExitToApp"
+import TimerIcon from "@mui/icons-material/Timer"
+import { Avatar, Box, Button, Chip, CircularProgress, Paper, Typography } from "@mui/material"
+// src/features/game/GamePage.tsx
+import { useCallback, useEffect, useRef, useState } from "react"
+import { useNavigate, useParams } from "react-router-dom"
 
 import { Maze } from "../../components/Maze"
 import { WinDialog } from "../../components/WinDialog"
 import { useAuth } from "../../context/useAuth"
 import { useGameSocket } from "../../context/useGameSocket"
 import type { PlayerGameState } from "../../types/api"
-import {
-  generateMazeFromBackend,
-  convertLayoutToCells,
-  type MazeCell,
-} from "./services/mazeService"
 import styles from "./GamePage.module.css"
+import {
+  type MazeCell,
+  convertLayoutToCells,
+  generateMazeFromBackend,
+} from "./services/mazeService"
 
 // === Tipos locales para poderes (solo front) ===
 type PowerUpType = "CLEAR_FOG" | "FREEZE" | "CONFUSION"
@@ -91,23 +83,17 @@ export default function GamePage() {
   /**
    * Cerrar la partida en esta pantalla (se ejecuta una sola vez).
    */
-  const endGame = useCallback(
-    (winnerName: string | null, finalTime?: number) => {
-      if (gameFinishedRef.current) return
-      gameFinishedRef.current = true
+  const endGame = useCallback((winnerName: string | null, finalTime?: number) => {
+    if (gameFinishedRef.current) return
+    gameFinishedRef.current = true
 
-      const timeToUse =
-        typeof finalTime === "number" && finalTime > 0
-          ? finalTime
-          : timerRef.current
+    const timeToUse = typeof finalTime === "number" && finalTime > 0 ? finalTime : timerRef.current
 
-      setIsTimerRunning(false)
-      setGameOver(true)
-      setWinner(winnerName)
-      setWinnerTime(timeToUse)
-    },
-    [],
-  )
+    setIsTimerRunning(false)
+    setGameOver(true)
+    setWinner(winnerName)
+    setWinnerTime(timeToUse)
+  }, [])
 
   /**
    * Genera posiciones aleatorias para los poderes dentro del laberinto:
@@ -121,7 +107,7 @@ export default function GamePage() {
       startX: number,
       startY: number,
       goalX: number,
-      goalY: number,
+      goalY: number
     ): PowerUpInstance[] => {
       const height = mazeCells.length
       const width = mazeCells[0].length
@@ -135,11 +121,7 @@ export default function GamePage() {
           const isWall = cell.top && cell.right && cell.bottom && cell.left
 
           // Solo caminos, no muros, no start, no meta
-          if (
-            !isWall &&
-            !(x === startX && y === startY) &&
-            !(x === goalX && y === goalY)
-          ) {
+          if (!isWall && !(x === startX && y === startY) && !(x === goalX && y === goalY)) {
             validCells.push({ x, y })
           }
         }
@@ -190,7 +172,7 @@ export default function GamePage() {
 
       return result
     },
-    [],
+    []
   )
 
   /**
@@ -217,7 +199,12 @@ export default function GamePage() {
 
   // ---------- WebSocket / estado multiplayer ----------
 
-  const { isConnected, sendMove, sendFinish, disconnect: disconnectGame } = useGameSocket({
+  const {
+    isConnected,
+    sendMove,
+    sendFinish,
+    disconnect: disconnectGame,
+  } = useGameSocket({
     lobbyCode: code || "",
     onPlayerMove: (username, position) => {
       if (username === user?.username) return
@@ -241,8 +228,8 @@ export default function GamePage() {
     onPlayerFinish: (username, finishTimeFromServer) => {
       setOtherPlayers((prev) =>
         prev.map((p) =>
-          p.username === username ? { ...p, isFinished: true, finishTime: finishTimeFromServer } : p,
-        ),
+          p.username === username ? { ...p, isFinished: true, finishTime: finishTimeFromServer } : p
+        )
       )
 
       endGame(username, finishTimeFromServer)
@@ -273,13 +260,11 @@ export default function GamePage() {
           .map((p) => ({
             ...p,
             avatarColor: p.avatarColor || generatePlayerColor(p.username),
-          })),
+          }))
       )
 
       const finishedPlayer = players.find(
-        (p) =>
-          p.isFinished ||
-          (typeof p.finishTime === "number" && p.finishTime > 0),
+        (p) => p.isFinished || (typeof p.finishTime === "number" && p.finishTime > 0)
       )
 
       if (finishedPlayer) {
@@ -320,9 +305,7 @@ export default function GamePage() {
       try {
         const parsedMaze = JSON.parse(sharedMazeData)
         const layout =
-          typeof parsedMaze.layout === "string"
-            ? JSON.parse(parsedMaze.layout)
-            : parsedMaze.layout
+          typeof parsedMaze.layout === "string" ? JSON.parse(parsedMaze.layout) : parsedMaze.layout
 
         mazeData = {
           layout,
@@ -361,13 +344,7 @@ export default function GamePage() {
     setEndPosition({ x: goalX, y: goalY })
 
     // Generar poderes aleatorios para esta partida
-    const generatedPowerUps = generateRandomPowerUpsForMaze(
-      mazeCells,
-      startX,
-      startY,
-      goalX,
-      goalY,
-    )
+    const generatedPowerUps = generateRandomPowerUpsForMaze(mazeCells, startX, startY, goalX, goalY)
     setPowerUps(generatedPowerUps)
 
     setTimer(0)
@@ -472,7 +449,7 @@ export default function GamePage() {
         return prev.filter((p) => p.id !== found.id)
       })
     },
-    [maze, gameOver, isLoading, playerPosition, sendMove, applyPowerUpEffect],
+    [maze, gameOver, isLoading, playerPosition, sendMove, applyPowerUpEffect]
   )
 
   // ---------- Controles de teclado + confusión / freeze ----------
@@ -513,7 +490,7 @@ export default function GamePage() {
 
       movePlayer(direction)
     },
-    [gameOver, isLoading, isFrozen, isConfused, movePlayer],
+    [gameOver, isLoading, isFrozen, isConfused, movePlayer]
   )
 
   useEffect(() => {

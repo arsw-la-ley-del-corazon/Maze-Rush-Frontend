@@ -6,21 +6,35 @@
   justify-content: center;
   padding: 1.5rem;
   gap: 2.5rem;
-  background: 
-    linear-gradient(135deg, rgba(10, 5, 20, 1) 0%, rgba(30, 15, 50, 1) 50%, rgba(10, 5, 20, 1) 100%),
-    radial-gradient(circle at 20% 80%, rgba(147, 51, 234, 0.15) 0%, transparent 50%),
+  background: linear-gradient(
+      135deg,
+      rgba(10, 5, 20, 1) 0%,
+      rgba(30, 15, 50, 1) 50%,
+      rgba(10, 5, 20, 1) 100%
+    ), radial-gradient(circle at 20% 80%, rgba(147, 51, 234, 0.15) 0%, transparent 50%),
     radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.15) 0%, transparent 50%);
   position: relative;
   overflow: hidden;
 }
 
 .container::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
-  background: 
-    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(147, 51, 234, 0.03) 2px, rgba(147, 51, 234, 0.03) 4px),
-    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(147, 51, 234, 0.03) 2px, rgba(147, 51, 234, 0.03) 4px);
+  background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(147, 51, 234, 0.03) 2px,
+      rgba(147, 51, 234, 0.03) 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(147, 51, 234, 0.03) 2px,
+      rgba(147, 51, 234, 0.03) 4px
+    );
   pointer-events: none;
   animation: backgroundShift 20s linear infinite;
 }
@@ -42,23 +56,18 @@
   justify-content: space-between;
   align-items: center;
   border-radius: 20px;
-  background: 
-    linear-gradient(135deg, rgba(30, 15, 50, 0.95) 0%, rgba(50, 25, 80, 0.95) 100%);
+  background: linear-gradient(135deg, rgba(30, 15, 50, 0.95) 0%, rgba(50, 25, 80, 0.95) 100%);
   backdrop-filter: blur(20px);
   border: 2px solid;
-  border-image: linear-gradient(135deg, 
-    rgba(168, 85, 247, 0.5) 0%, 
-    rgba(236, 72, 153, 0.5) 100%) 1;
-  box-shadow: 
-    0 0 40px rgba(147, 51, 234, 0.4),
-    0 8px 32px rgba(0, 0, 0, 0.4),
-    inset 0 1px 2px rgba(255, 255, 255, 0.1);
+  border-image: linear-gradient(135deg, rgba(168, 85, 247, 0.5) 0%, rgba(236, 72, 153, 0.5) 100%) 1;
+  box-shadow: 0 0 40px rgba(147, 51, 234, 0.4), 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 2px
+    rgba(255, 255, 255, 0.1);
   position: relative;
   z-index: 10;
 }
 
 .header::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   border-radius: 20px;
@@ -111,26 +120,20 @@
     border-radius: 20px;
     backdrop-filter: blur(20px);
     border: 2px solid rgba(168, 85, 247, 0.4);
-    box-shadow: 
-      0 0 30px rgba(147, 51, 234, 0.3),
-      0 8px 24px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 30px rgba(147, 51, 234, 0.3), 0 8px 24px rgba(0, 0, 0, 0.4);
   }
 
   .controlGrid button {
     background: linear-gradient(135deg, rgba(147, 51, 234, 0.6) 0%, rgba(168, 85, 247, 0.6) 100%);
     border: 2px solid rgba(168, 85, 247, 0.8);
     border-radius: 12px;
-    box-shadow: 
-      0 0 20px rgba(147, 51, 234, 0.5),
-      0 4px 12px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 20px rgba(147, 51, 234, 0.5), 0 4px 12px rgba(0, 0, 0, 0.4);
     transition: all 200ms ease-in-out;
   }
 
   .controlGrid button:hover:not(:disabled) {
     background: linear-gradient(135deg, rgba(168, 85, 247, 0.8) 0%, rgba(192, 132, 252, 0.8) 100%);
-    box-shadow: 
-      0 0 30px rgba(147, 51, 234, 0.8),
-      0 6px 16px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 30px rgba(147, 51, 234, 0.8), 0 6px 16px rgba(0, 0, 0, 0.5);
     transform: scale(1.05);
   }
 
@@ -149,9 +152,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: 
-    linear-gradient(135deg, rgba(10, 5, 20, 1) 0%, rgba(30, 15, 50, 1) 50%, rgba(10, 5, 20, 1) 100%),
-    radial-gradient(circle at 50% 50%, rgba(147, 51, 234, 0.1) 0%, transparent 50%);
+  background: linear-gradient(
+      135deg,
+      rgba(10, 5, 20, 1) 0%,
+      rgba(30, 15, 50, 1) 50%,
+      rgba(10, 5, 20, 1) 100%
+    ), radial-gradient(circle at 50% 50%, rgba(147, 51, 234, 0.1) 0%, transparent 50%);
 }
 
 .errorContainer {
@@ -159,7 +165,5 @@
   backdrop-filter: blur(20px);
   border: 2px solid rgba(239, 68, 68, 0.5) !important;
   border-radius: 20px !important;
-  box-shadow: 
-    0 0 40px rgba(239, 68, 68, 0.3),
-    0 8px 32px rgba(0, 0, 0, 0.4) !important;
+  box-shadow: 0 0 40px rgba(239, 68, 68, 0.3), 0 8px 32px rgba(0, 0, 0, 0.4) !important;
 }

@@ -1,0 +1,53 @@
+# ========================================================================
+#  MAZE RUSH FRONTEND - Docker Ignore
+# ========================================================================
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+!README.md
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+coverage/
+*.test.*
+__tests__/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Temp files
+tmp/
+temp/
+
+# Package lock (will be regenerated)
+# package-lock.json
+
+# TypeScript build info
+*.tsbuildinfo

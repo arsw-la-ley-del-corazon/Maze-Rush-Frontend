@@ -1,38 +1,38 @@
-import { useState, useEffect } from "react"
+import RefreshIcon from "@mui/icons-material/Autorenew"
+import CancelIcon from "@mui/icons-material/Cancel"
+import CheckCircleIcon from "@mui/icons-material/CheckCircle"
+import EditIcon from "@mui/icons-material/Edit"
+import ErrorIcon from "@mui/icons-material/Error"
+import SaveIcon from "@mui/icons-material/Save"
 import {
+  Alert,
   Avatar,
   Box,
   Button,
   Chip,
+  CircularProgress,
   Divider,
   IconButton,
+  LinearProgress,
   Paper,
+  Skeleton,
+  Snackbar,
   Stack,
   TextField,
-  Typography,
   Tooltip,
-  Snackbar,
-  Alert,
-  LinearProgress,
-  CircularProgress,
-  Skeleton,
+  Typography,
 } from "@mui/material"
-import EditIcon from "@mui/icons-material/Edit"
-import SaveIcon from "@mui/icons-material/Save"
-import RefreshIcon from "@mui/icons-material/Autorenew"
-import CancelIcon from "@mui/icons-material/Cancel"
-import CheckCircleIcon from "@mui/icons-material/CheckCircle"
-import ErrorIcon from "@mui/icons-material/Error"
-import styles from "./ProfilePage.module.css"
+import { useEffect, useState } from "react"
 import { useAuth } from "../../context/useAuth"
+import styles from "./ProfilePage.module.css"
 import {
-  getCurrentUserProfile,
-  updateUserProfile,
-  getUserStats,
-  validateUsername,
-  validateEmail,
-  type UserStatsData,
   type UserProfileData,
+  type UserStatsData,
+  getCurrentUserProfile,
+  getUserStats,
+  updateUserProfile,
+  validateEmail,
+  validateUsername,
 } from "./services/profileService"
 
 const sizes: Array<{ label: string; desc: string; value: "Pequeño" | "Mediano" | "Grande" }> = [
@@ -62,7 +62,7 @@ export default function ProfilePage() {
   const [email, setEmail] = useState(user?.email || "")
   const [bio, setBio] = useState(user?.bio || "")
   const [preferred, setPreferred] = useState<"Pequeño" | "Mediano" | "Grande">(
-    user?.preferredMazeSize || "Mediano",
+    user?.preferredMazeSize || "Mediano"
   )
   const [avatarColor, setAvatarColor] = useState(user?.avatarColor || "#A46AFF")
 
@@ -196,7 +196,7 @@ export default function ProfilePage() {
 
     // Remover propiedades undefined
     const cleanUpdates = Object.fromEntries(
-      Object.entries(updates).filter(([_, v]) => v !== undefined),
+      Object.entries(updates).filter(([_, v]) => v !== undefined)
     )
 
     if (Object.keys(cleanUpdates).length === 0) {
@@ -242,12 +242,7 @@ export default function ProfilePage() {
       </Stack>
 
       {error && (
-        <Alert
-          severity="error"
-          sx={{ mb: 3 }}
-          onClose={() => setError(null)}
-          icon={<ErrorIcon />}
-        >
+        <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)} icon={<ErrorIcon />}>
           {error}
         </Alert>
       )}
@@ -493,7 +488,7 @@ export default function ProfilePage() {
               <Box>
                 <LinearProgress
                   variant="determinate"
-                  value={Math.min(100, ((tokenEta / 1000) / 900) * 100)}
+                  value={Math.min(100, (tokenEta / 1000 / 900) * 100)}
                   sx={{ height: 8, borderRadius: 2, mb: 1 }}
                 />
                 <Typography variant="caption" sx={{ opacity: 0.7 }}>
@@ -614,7 +609,10 @@ export default function ProfilePage() {
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <Stack direction="row" justifyContent="space-between" sx={{ py: 0.6 }}>
-      <Typography variant="caption" sx={{ opacity: 0.6, letterSpacing: 1, textTransform: "uppercase" }}>
+      <Typography
+        variant="caption"
+        sx={{ opacity: 0.6, letterSpacing: 1, textTransform: "uppercase" }}
+      >
         {label}
       </Typography>
       <Typography variant="body2" fontWeight={500}>
@@ -639,7 +637,10 @@ function MiniStat({ title, value, hint }: { title: string; value: string; hint?:
         },
       }}
     >
-      <Typography variant="caption" sx={{ opacity: 0.6, letterSpacing: 1, textTransform: "uppercase" }}>
+      <Typography
+        variant="caption"
+        sx={{ opacity: 0.6, letterSpacing: 1, textTransform: "uppercase" }}
+      >
         {title}
       </Typography>
       <Typography variant="h6" fontWeight={600} sx={{ mt: 0.5 }}>

@@ -1,22 +1,31 @@
 .layout {
   display: grid;
   gap: 32px;
-  grid-template-columns: minmax(0,1fr) 380px;
+  grid-template-columns: minmax(0, 1fr) 380px;
 }
 @media (max-width: 1100px) {
-  .layout { grid-template-columns: 1fr; }
+  .layout {
+    grid-template-columns: 1fr;
+  }
 }
 
 .panel {
   position: relative;
-  background: linear-gradient(145deg, rgba(49,31,79,0.55) 0%, rgba(61,34,98,0.50) 70%, rgba(79,42,128,0.45) 100%);
+  background: linear-gradient(
+    145deg,
+    rgba(49, 31, 79, 0.55) 0%,
+    rgba(61, 34, 98, 0.5) 70%,
+    rgba(79, 42, 128, 0.45) 100%
+  );
   border: 1px solid var(--brand-border-translucent);
   border-radius: 18px;
   padding: 28px 32px 36px;
   backdrop-filter: blur(14px) saturate(160%);
   transition: var(--transition-base);
 }
-.panel:hover { border-color: var(--brand-border-strong); }
+.panel:hover {
+  border-color: var(--brand-border-strong);
+}
 
 .sectionTitle {
   font-size: 0.72rem;
@@ -27,7 +36,10 @@
   margin-bottom: 12px;
 }
 
-.avatarEditable { cursor: pointer; position: relative; }
+.avatarEditable {
+  cursor: pointer;
+  position: relative;
+}
 .avatarEditable::after {
   content: "Editar";
   position: absolute;
@@ -39,17 +51,47 @@
   font-weight: 600;
   opacity: 0;
   border-radius: 50%;
-  background: rgba(0,0,0,0.55);
+  background: rgba(0, 0, 0, 0.55);
   color: #fff;
   transition: var(--transition-base);
 }
-.avatarEditable:hover::after { opacity: 1; }
+.avatarEditable:hover::after {
+  opacity: 1;
+}
 
-.gradientTitle { background: var(--gradient-text); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.gradientTitle {
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
 
-.preferenceGrid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill,minmax(140px,1fr)); }
-.prefCard { border:1px solid var(--brand-border-translucent); padding:12px 14px; border-radius:14px; cursor:pointer; background: rgba(38,23,62,0.35); transition: var(--transition-base); }
-.prefCard:hover { background: rgba(49,31,79,0.55); }
-.prefCardActive { background: linear-gradient(145deg,#26173e,#321658); border-color: var(--brand-border-strong); box-shadow: 0 6px 18px -6px rgba(164,106,255,0.4); }
+.preferenceGrid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+}
+.prefCard {
+  border: 1px solid var(--brand-border-translucent);
+  padding: 12px 14px;
+  border-radius: 14px;
+  cursor: pointer;
+  background: rgba(38, 23, 62, 0.35);
+  transition: var(--transition-base);
+}
+.prefCard:hover {
+  background: rgba(49, 31, 79, 0.55);
+}
+.prefCardActive {
+  background: linear-gradient(145deg, #26173e, #321658);
+  border-color: var(--brand-border-strong);
+  box-shadow: 0 6px 18px -6px rgba(164, 106, 255, 0.4);
+}
 
-.saveBar { position: fixed; bottom: 20px; right: 28px; display: flex; gap: 12px; }
+.saveBar {
+  position: fixed;
+  bottom: 20px;
+  right: 28px;
+  display: flex;
+  gap: 12px;
+}

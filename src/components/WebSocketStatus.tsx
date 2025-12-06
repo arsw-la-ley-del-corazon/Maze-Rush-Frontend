@@ -1,10 +1,10 @@
 // Componente opcional para mostrar el estado de conexión WebSocket
 // Se puede agregar al Dashboard si se desea feedback visual de la conexión
 
-import { Box, Chip } from "@mui/material"
 import WifiIcon from "@mui/icons-material/Wifi"
 import WifiOffIcon from "@mui/icons-material/WifiOff"
-import { useState, useEffect } from "react"
+import { Box, Chip } from "@mui/material"
+import { useEffect, useState } from "react"
 
 interface WebSocketStatusProps {
   isConnected: boolean
