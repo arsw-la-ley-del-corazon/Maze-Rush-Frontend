@@ -431,6 +431,7 @@ export default function DashboardPage() {
             size="small"
             disabled={loadingRooms}
             title="Actualizar manualmente"
+            aria-label="Actualizar salas"
           >
             <RefreshIcon className={loadingRooms ? styles.spinning : ""} />
           </IconButton>
